@@ -16,3 +16,31 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+div.dropdown-multicol {
+    width: 20em;
+    position: relative;
+}
+
+    div.dropdown-multicol > div.dropdown-col {
+        display: inline-block;
+        width: 39%;
+        float: left;
+        vertical-align: top;
+    }
+        div.dropdown-multicol > div.dropdown-col:nth-child(1) {
+            width: 61%;
+            border-right: 1px solid #eee;
+        }
+            div.dropdown-multicol > div.dropdown-col:nth-child(1) i {
+                float: right;
+                margin-right: -6px;
+            }
+
+        div.dropdown-multicol > div.dropdown-col.visible-item {
+                display: inline-block;
+            }
+        div.dropdown-multicol > div.dropdown-col.hidden-item {
+            display: none ;
+        }
+

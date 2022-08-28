@@ -11780,3 +11780,15 @@ textarea.form-control-lg {
 nav.navbar {
   background-color: #25c791;
 }
+
+.selected {
+  background-color: rgba(37, 199, 145, 0.3);
+}
+
+div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
+  --bs-dropdown-link-hover-bg: rgba(37, 199, 145, 0.3);
+}
+
+.dropdown-item.highlight {
+  color: #c74025 !important;
+}
