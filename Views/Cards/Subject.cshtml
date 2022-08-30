@@ -1,0 +1,115 @@
+﻿@model SubjectPageViewModel
+
+
+<div class="row">
+	<div class="col-12">
+		<nav aria-label="breadcrumb">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item" aria-current="page"><a asp-controller="Cards" asp-action="Category" asp-route-categoryName="@Model.CardSubject.CardCategory.Name">@Model.CardSubject.CardCategory.Name</a></li>
+				<li class="breadcrumb-item active" aria-current="page">@Model.CardSubject.Name</li>
+			</ol>
+		</nav>
+	</div>
+</div>
+<div class="row">
+	<div class="col-12">
+		<div class="container-fluid languages rounded text-dark p-3">
+			<div class="container py-3 px-5">
+				<p class="lead">Flashcard sets</p>
+				<p class="display-6"><strong>@Model.CardSubject.Name</strong></p>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div class="col-12">
+		<p class="mt-5 mb-3"><strong>Different subject?</strong></p>
+	</div>
+	<div class="col-12 subject-buttons">
+		@foreach (var subject in Model.OtherSubjects)
+		{
+			<button type="button" class="btn btn-light btn-lg">@subject.Name</button>
+		}
+	</div>
+
+</div>
+<div class="row">
+	<div class="col-12">
+		<p class="mt-5 mb-3"><strong>Flashcard sets</strong></p>
+	</div>
+	<div class="col-12">
+		<div class="row">
+			<div class="col-4 pb-4 d-flex align-items-stretch">
+				<div class="card">
+					<div class="card-body d-flex flex-column justify-content-between">
+						<div class="row">
+							<h5 class="card-title">Name</h5>
+							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
+							<p class="card-text">
+								DESCRIPTION Some quick example text to build on the card title and make up the
+								bulk of the card's content.
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-4 pb-4 d-flex align-items-stretch">
+				<div class="card">
+					<div class="card-body d-flex flex-column justify-content-between">
+						<div class="row">
+							<h5 class="card-title">Name</h5>
+							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
+							<p class="card-text">
+								DESCRIPTION Some quick example text to build on the card title and make up the
+								bulk of the card's content.
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-4 pb-4 d-flex align-items-stretch">
+				<div class="card">
+					<div class="card-body d-flex flex-column justify-content-between">
+						<div class="row">
+							<h5 class="card-title">Name</h5>
+							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
+							<p class="card-text">
+								DESCRIPTION Some quick example text to build on the card title and make up the
+								bulk of the card's content.
+								DESCRIPTION Some quick example text to build on the card title and make up the
+								bulk of the card's content.
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-4 pb-4 d-flex align-items-stretch">
+				<div class="card">
+					<div class="card-body d-flex flex-column justify-content-between">
+						<div class="row">
+							<h5 class="card-title">Name</h5>
+							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
+							<p class="card-text">
+								DESCRIPTION Some quick example text to build on the card title and make up the
+								bulk of the card's content.
+							</p>
+						</div>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>

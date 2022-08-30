@@ -1,0 +1,111 @@
+﻿@using FlashCards.Helpers
+@model CreateCardSetViewModel
+
+<form method="post" asp-controller="Cards" asp-action="CreateSetPOST">
+	<div class="mb-3">
+		<input type="text" class="form-control" placeholder="Enter a title">
+	</div>
+	<div class="row mb-3">
+		<div class="col-6 d-flex align-items-stretch">
+			<textarea class="form-control resize-off" placeholder="Add a description..."></textarea>
+		</div>
+		<div class="col-6 d-flex flex-column align-items-stretch">
+
+			@if (Model.SelectedCardCategoryId == -1)
+			{
+				<select id="card-category-select" class="form-select mb-3 " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")" aria-label="Category">
+				</select>
+			}
+			else
+			{
+				<select id="card-category-select" class="form-select mb-3 " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)" aria-label="Category">
+				</select>
+			}
+			@if (Model.CardSet.CardSubjectId == 0)
+			{
+				<select disabled id="card-subject-select" class="form-select" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				</select>
+			}
+			else
+			{
+				<select id="card-subject-select" class="form-select" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				</select>
+			}
+		</div>
+	</div>
+	<div class="row mb-3 d-flex align-items-center">
+		<div class="col-4">
+			<a class="btn btn-primary">Import from Excel</a>
+		</div>
+		<div class="form-check form-switch offset-4 col-4 d-flex justify-content-end">
+			<input class="form-check-input checkbox-margin-right" type="checkbox" value="" id="checkPublic">
+			<label class="form-check-label" for="checkPublic">
+				Allow others access to this set?
+			</label>
+		</div>
+	</div>
+	<div class="row mb-3">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-header p-3 d-flex justify-content-between align-items-center">
+					<p class="card-subtitle text-muted p-0 m-0">1</p>
+					<button class="btn btn-danger">Trash</button>
+				</div>
+				<div class="card-body">
+					<div class="row question-answer">
+						<div class="col-6 form-floating">
+							<input type="text" class="form-control shadow-none" placeholder="Not a cat" id="questionInput" value="Not a cat">
+							<label class="card-label-floating" for="questionInput">Question</label>
+						</div>
+						<div class="col-6 form-floating">
+							<input type="text" class="form-control shadow-none" placeholder="Dog" id="answerInput" value="Dog">
+							<label class="card-label-floating" for="answerInput">Answer</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<button type="submit" class="btn btn-primary">Submit</button>
+</form>
+@section Scripts {
+<script>
+	var cardCategorySelect = document.querySelector("#card-category-select");
+	var cardSubjectSelect = document.querySelector("#card-subject-select");
+	var categoryChanged = false;
+	var items = '';
+
+	if(cardCategorySelect.value != -1) {
+		categoryChanged = true;
+		fetch('@Url.Content("~/")' + "Cards/GetSubjectsForCardCategory/" + cardCategorySelect.value)
+		.then(response => response.json()).then(data => {
+			items = '';
+			data.forEach(subject => {
+				items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+			});
+			cardSubjectSelect.removeAttribute("disabled");
+			cardSubjectSelect.innerHTML = items;
+			cardSubjectSelect.value = @Model.CardSet.CardSubjectId;
+		});
+	}
+
+	cardCategorySelect.addEventListener('change', (e) =>{
+		if(!categoryChanged)
+		{
+			cardCategorySelect.removeChild(cardCategorySelect.querySelector('option[value="-1"]'));
+			categoryChanged = true;
+		}
+		fetch('@Url.Content("~/")' + "Cards/GetSubjectsForCardCategory/" + cardCategorySelect.value)
+		.then(response => response.json()).then(data => {
+			items = '';
+			data.forEach(subject => {
+				items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+			});
+			cardSubjectSelect.removeAttribute("disabled");
+			cardSubjectSelect.innerHTML = items;
+		});
+	})
+
+</script>
+
+}

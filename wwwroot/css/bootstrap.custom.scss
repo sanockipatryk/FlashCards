@@ -1,5 +1,5 @@
 ﻿$primary: #25c791;
-$highlight: #c74025;
+$highlight: #c72591;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
@@ -17,4 +17,28 @@ div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
 
 .dropdown-item.highlight {
     color: $highlight !important;
-} 
+}
+
+.subject-buttons button{
+    margin-right: 4px;
+    font-size: 12pt;
+    padding: 12px 20px;
+}
+
+.subject-buttons button.btn-light {
+    background-color: white;
+}
+
+.form-check-input.checkbox-margin-right {
+    margin-right: 0.5rem;
+}
+
+div.question-answer div input {
+    border: none;
+    border-radius: unset;
+    border-bottom: 3px solid $primary;
+}
+div.question-answer div input:focus {
+    border-color: $highlight;
+    
+}

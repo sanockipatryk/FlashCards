@@ -1,5 +1,6 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
+    background-color: #F6F7FB;
 }
 
 @media (min-width: 768px) {
@@ -14,7 +15,8 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
+    background-color: #F6F7FB;
 }
 
 div.dropdown-multicol {
@@ -44,3 +46,14 @@ div.dropdown-multicol {
             display: none ;
         }
 
+.languages {
+    background-color: #f29898;
+}
+
+.resize-off {
+    resize: none;
+}
+
+label.card-label-floating {
+    left: unset;
+}

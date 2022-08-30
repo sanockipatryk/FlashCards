@@ -11790,5 +11790,29 @@ div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
 }
 
 .dropdown-item.highlight {
-  color: #c74025 !important;
+  color: #c72591 !important;
+}
+
+.subject-buttons button {
+  margin-right: 4px;
+  font-size: 12pt;
+  padding: 12px 20px;
+}
+
+.subject-buttons button.btn-light {
+  background-color: white;
+}
+
+.form-check-input.checkbox-margin-right {
+  margin-right: 0.5rem;
+}
+
+div.question-answer div input {
+  border: none;
+  border-radius: unset;
+  border-bottom: 3px solid #25c791;
+}
+
+div.question-answer div input:focus {
+  border-color: #c72591;
 }
