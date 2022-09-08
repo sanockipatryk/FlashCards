@@ -15,5 +15,7 @@ namespace FlashCards.Data.Services
 		Task<IEnumerable<CardSet>> GetAllUserCardSetsAsync(string userId);
 		Task<IEnumerable<CardSet>> GetAllPublicCardSetsForSubjectAsync(int subjectId);
 
+		Task CreateCardSetAsync(CreateCardSetViewModel model, string userId);
+
 	}
 }

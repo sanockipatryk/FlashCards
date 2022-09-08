@@ -1,72 +1,103 @@
 ﻿@using FlashCards.Helpers
 @model CreateCardSetViewModel
 
-<form method="post" asp-controller="Cards" asp-action="CreateSetPOST">
+
+<div class="row">
+	<div class="col"><p class="display-6"><strong>Create a new card set</strong></p></div>
+</div>
+<form method="post">
 	<div class="mb-3">
-		<input type="text" class="form-control" placeholder="Enter a title">
+		<input type="text" class="form-control" asp-for="@Model.CardSet.Name" placeholder="Enter a title">
+		<span asp-validation-for="@Model.CardSet.Name" class="text-danger"></span>
 	</div>
 	<div class="row mb-3">
 		<div class="col-6 d-flex align-items-stretch">
-			<textarea class="form-control resize-off" placeholder="Add a description..."></textarea>
+			<textarea class="form-control resize-off" asp-for="@Model.CardSet.Description" placeholder="Add a description..."></textarea>
 		</div>
 		<div class="col-6 d-flex flex-column align-items-stretch">
+			<input type="hidden" asp-for="@Model.CardSet" />
 
 			@if (Model.SelectedCardCategoryId == -1)
 			{
-				<select id="card-category-select" class="form-select mb-3 " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")" aria-label="Category">
+				<select id="card-category-select" class="form-select " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")" aria-label="Category">
 				</select>
+				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
 			}
 			else
 			{
-				<select id="card-category-select" class="form-select mb-3 " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)" aria-label="Category">
+				<select id="card-category-select" class="form-select " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)" aria-label="Category">
 				</select>
+				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
 			}
 			@if (Model.CardSet.CardSubjectId == 0)
 			{
-				<select disabled id="card-subject-select" class="form-select" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				<select disabled id="card-subject-select" class="form-select mt-3" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
 				</select>
+				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
 			}
 			else
 			{
-				<select id="card-subject-select" class="form-select" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				<select id="card-subject-select" class="form-select mt-3" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
 				</select>
+				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
 			}
 		</div>
 	</div>
 	<div class="row mb-3 d-flex align-items-center">
-		<div class="col-4">
-			<a class="btn btn-primary">Import from Excel</a>
-		</div>
-		<div class="form-check form-switch offset-4 col-4 d-flex justify-content-end">
-			<input class="form-check-input checkbox-margin-right" type="checkbox" value="" id="checkPublic">
+		<div class="form-check form-switch offset-4 col-4 d-flex justify-content-center">
+			<input asp-for="CardSet.IsPublic" class="form-check-input checkbox-margin-right" type="checkbox" id="checkPublic">
 			<label class="form-check-label" for="checkPublic">
 				Allow others access to this set?
 			</label>
 		</div>
 	</div>
-	<div class="row mb-3">
-		<div class="col-12">
-			<div class="card">
-				<div class="card-header p-3 d-flex justify-content-between align-items-center">
-					<p class="card-subtitle text-muted p-0 m-0">1</p>
-					<button class="btn btn-danger">Trash</button>
-				</div>
-				<div class="card-body">
-					<div class="row question-answer">
-						<div class="col-6 form-floating">
-							<input type="text" class="form-control shadow-none" placeholder="Not a cat" id="questionInput" value="Not a cat">
-							<label class="card-label-floating" for="questionInput">Question</label>
-						</div>
-						<div class="col-6 form-floating">
-							<input type="text" class="form-control shadow-none" placeholder="Dog" id="answerInput" value="Dog">
-							<label class="card-label-floating" for="answerInput">Answer</label>
+	<div class="row card-row mb-3">
+		@{
+			int i = 0;
+		}
+		@foreach (var card in Model.CardSet.Cards)
+		{
+			<div class="col-12 mb-3 qa-card">
+				<div class="card">
+					<div class="card-header p-3 d-flex justify-content-between align-items-center">
+						<p class="card-subtitle text-muted p-0 m-0">@(i+1)</p>
+						<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel" asp-route-cardIndex="@i"><i class="bi bi-trash"></i></button>
+					</div>
+					<div class="card-body">
+						<div class="row question-answer">
+							<div class="col-6 form-floating">
+								<input type="text" asp-for="@card.Question" name="CardSet.Cards[@i].Question" class="form-control shadow-none" placeholder="q" id="questionInput-@i">
+								<label class="card-label-floating" for="questionInput-@i">Question</label>
+								<span asp-validation-for="@Model.CardSet.Cards[@i].Question" class="text-danger"></span>
+							</div>
+							<div class="col-6 form-floating">
+								<input type="text" asp-for="@card.Answer" name="CardSet.Cards[@i].Answer" class="form-control shadow-none" placeholder="a" id="answerInput-@i">
+								<label class="card-label-floating" for="answerInput-@i">Answer</label>
+								<span asp-validation-for="@Model.CardSet.Cards[@i].Answer" class="text-danger"></span>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
+			i++;
+		}
+		<div class="col-12 mb-3">
+			<div class="card">
+				<div id="addCardsContainer" class="card-body py-4 text-center d-flex justify-content-center align-items-center">
+					<label id="addManyInputLabel" class="card-label" for="addManyInput">How many cards to add?</label>
+					<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number" class="form-control shadow-none mx-2" min="1" max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
+					<button type="submit" id="btnAddCards" class="btn btn-light" asp-action="AddCardToModel">Add Card</button>
+					<p hidden id="cardLimitInfo" class="text-primary m-0">Limit of cards per set achieved.</p>
+				</div>
+			</div>
 		</div>
 	</div>
-	<button type="submit" class="btn btn-primary">Submit</button>
+	<div class="row">
+		<div class="col text-center">
+	<button type="submit" class="btn btn-primary" asp-action="CreateSetPOST">Submit</button>
+	<a type="submit" class="btn btn-danger" asp-controller="Home" asp-action="Index">Cancel</a>
+	</div>
+	</div>
 </form>
 @section Scripts {
 <script>
@@ -106,6 +137,36 @@
 		});
 	})
 
-</script>
+	var addManyInput = document.querySelector("#addManyInput");
+	var addManyInputMax = addManyInput.getAttribute('max');
+	var addManyInputMin = addManyInput.getAttribute('min');
+	var btnAddCards = document.querySelector("#btnAddCards");
+	var cardLimitInfo = document.querySelector("#cardLimitInfo");
 
+	addManyInput.addEventListener('input', (e) => {
+		if (e.currentTarget.value > parseInt(addManyInputMax)) {
+			addManyInput.value = addManyInputMax;
+		}
+		 if (e.currentTarget.value < parseInt(addManyInputMin)) {
+			addManyInput.value = addManyInputMin;
+		}
+		if(addManyInput.value == 1)
+		{
+			btnAddCards.textContent = "Add Card";
+		}
+		if(addManyInput.value > 1)
+		{
+			btnAddCards.textContent = "Add Cards";
+		}
+	})
+
+	var addManyInputLabel = document.querySelector("#addManyInputLabel");
+	if(@Model.CardSet.Cards.Count() == 50) {
+		document.querySelector("#addCardsContainer").removeChild(addManyInput);
+		document.querySelector("#addCardsContainer").removeChild(addManyInputLabel);
+
+		document.querySelector("#addCardsContainer").removeChild(btnAddCards);
+		cardLimitInfo.removeAttribute('hidden');
+	}
+</script>
 }

@@ -26,11 +26,10 @@ namespace FlashCards.Data.Services
         {
             var cardCategory = await _context.CardCategories.Include(c => c.CardSubjects)
             .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
+            var cardSubjectIds = cardCategory.CardSubjects.Select(cs => cs.Id).ToList();
             if (cardCategory != null)
             {
-                var cardSets = await _context.CardSets.Include(cs => cs.CardSubject)
-                    .Where(cs => cs.CardSubject.CardCategoryId == cardCategory.Id && (cs.IsPublic || cs.UserId == "test"))
-                    .ToListAsync();
+                var cardSets = await _context.CardSets.Where(c => cardSubjectIds.Contains(c.CardSubjectId) && c.IsPublic).ToListAsync();
 
                 return new CategoryPageViewModel
                 {
@@ -84,6 +83,20 @@ namespace FlashCards.Data.Services
         public async Task<IEnumerable<CardSet>> GetAllUserCardSetsAsync(string userId)
         {
             return await _context.CardSets.Where(c => c.UserId == userId).ToListAsync();
+        }
+
+        public async Task CreateCardSetAsync(CreateCardSetViewModel model, string userId)
+        {
+            model.CardSet.DateCreated = DateTime.UtcNow;
+            model.CardSet.DateUpdated = DateTime.UtcNow;
+            foreach(var card in model.CardSet.Cards)
+            {
+                card.DateCreated = DateTime.UtcNow;
+                card.DateUpdated = DateTime.UtcNow;
+            }
+            model.CardSet.UserId = userId;
+            await _context.CardSets.AddAsync(model.CardSet);
+            await _context.SaveChangesAsync();
         }
     }
 }

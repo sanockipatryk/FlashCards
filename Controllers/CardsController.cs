@@ -1,8 +1,10 @@
 ﻿using FlashCards.Data.Services;
 using FlashCards.Models;
 using FlashCards.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace FlashCards.Controllers
 {
@@ -14,10 +16,7 @@ namespace FlashCards.Controllers
 		{
 			_service = service;
 		}
-		//public async Task<IActionResult> Index()
-		//{
-		//	return View();
-		//}
+		
 		[HttpGet("{categoryName}")]
 		public async Task<IActionResult> Category(string categoryName)
 		{
@@ -42,18 +41,31 @@ namespace FlashCards.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
+		[Authorize]
 		[HttpGet("CreateSet")]
 		public async Task<IActionResult> CreateSet()
         {
 			var createCardSetViewModel = new CreateCardSetViewModel
 			{
 				CardCategories = await _service.GetAllCardCategoriesAsync(),
-				CardSet = new CardSet(),
-				SelectedCardCategoryId = -1
+				CardSet = new CardSet()
+                {
+					Cards = new List<Card>()
+					{
+						new Card(),
+						new Card(),
+						new Card()
+					}
+				},
+				SelectedCardCategoryId = -1,
+				AddManyCards = 1
+				
 			};
 			return View(createCardSetViewModel);
         }
 
+		[Authorize]
+		[ValidateAntiForgeryToken]
 		[HttpPost]
 		public async Task<IActionResult> CreateSetPOST(CreateCardSetViewModel model)
 		{
@@ -62,6 +74,31 @@ namespace FlashCards.Controllers
 				model.CardCategories = await _service.GetAllCardCategoriesAsync();
 				return View(nameof(CreateSet), model);
             }
+			string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			await _service.CreateCardSetAsync(model, userId);
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpPost("AddCardToModel")]
+		public async Task<IActionResult> AddCardToModel(CreateCardSetViewModel model)
+        {
+            model.CardCategories = await _service.GetAllCardCategoriesAsync();
+			for(int i = 0; i<model.AddManyCards; i++)
+            {
+				model.CardSet.Cards.Add(new Card());
+            }
+			model.AddManyCards = 1;
+			ModelState.Clear(); //For clearing validation errors
+			return View(nameof(CreateSet), model);
+		}
+
+		[HttpPost("DeleteCardFromModel/{cardIndex}")]
+		public async Task<IActionResult> DeleteCardFromModel(CreateCardSetViewModel model, int cardIndex)
+        {
+			model.CardCategories = await _service.GetAllCardCategoriesAsync();
+			model.CardSet.Cards.RemoveAt(cardIndex);
+			model.AddManyCards = 1;
+			ModelState.Clear(); //For clearing validation errors
 			return View(nameof(CreateSet), model);
 		}
 

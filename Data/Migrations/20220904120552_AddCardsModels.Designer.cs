@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlashCards.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220825145724_AddCardsModels")]
+    [Migration("20220904120552_AddCardsModels")]
     partial class AddCardsModels
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,11 +84,13 @@ namespace FlashCards.Data.Migrations
                     b.Property<int>("CardSubjectId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateUpdated")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsPublic")
@@ -98,11 +100,7 @@ namespace FlashCards.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -376,9 +374,7 @@ namespace FlashCards.Data.Migrations
 
                     b.HasOne("FlashCards.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserId");
 
                     b.Navigation("CardSubject");
 
