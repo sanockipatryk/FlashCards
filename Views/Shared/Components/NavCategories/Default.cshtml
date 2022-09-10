@@ -16,9 +16,9 @@
 			<div id="subjects-@category.Id" class="dropdown-col @(category.Id == Model.First().Id?"visible-item":"hidden-item")">
 				@foreach (var subject in category.CardSubjects.Take(4))
 				{
-					<a class="dropdown-item text-dark" asp-controller="Cards" asp-action="Subject" asp-route-categoryName="@category.Name" asp-route-subjectName="@subject.Name">@subject.Name</a>
+					<a class="dropdown-item text-dark" asp-controller="Cards" asp-action="Subject" asp-route-categoryName="@category.Name" asp-route-subjectName="@subject.Name" asp-route-page="1">@subject.Name</a>
 				}
-				<a class="dropdown-item text-dark highlight" asp-controller="Cards" asp-action="Category" asp-route-categoryName="@category.Name">See all</a>
+				<a class="dropdown-item text-dark highlight" asp-controller="Cards" asp-action="Category" asp-route-categoryName="@category.Name" asp-route-page="1">See all</a>
 			</div>
 
 		}

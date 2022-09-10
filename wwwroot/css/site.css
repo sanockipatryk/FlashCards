@@ -57,3 +57,7 @@ div.dropdown-multicol {
 label.card-label-floating {
     left: unset;
 }
+
+.disabled-link {
+    pointer-events: none;
+}

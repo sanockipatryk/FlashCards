@@ -17,10 +17,10 @@ namespace FlashCards.Controllers
 			_service = service;
 		}
 		
-		[HttpGet("{categoryName}")]
-		public async Task<IActionResult> Category(string categoryName)
+		[HttpGet("{categoryName}/page/{page:int?}")]
+		public async Task<IActionResult> Category(string categoryName, int page = 1, int cardsPerPage = 12)
 		{
-			CategoryPageViewModel categoryPageViewModel = await _service.GetCardCategoryWithItsCardSets(categoryName);
+			CategoryPageViewModel categoryPageViewModel = await _service.GetCardCategoryWithItsCardSets(categoryName, page, cardsPerPage);
 
 			if(categoryPageViewModel.CardCategory != null)
             {
@@ -29,10 +29,10 @@ namespace FlashCards.Controllers
 			return RedirectToAction("Index", "Home");
 		}
 
-		[HttpGet("{categoryName}/{subjectName}")]
-		public async Task<IActionResult> Subject(string categoryName, string subjectName)
+		[HttpGet("{categoryName}/{subjectName}/page/{page:int?}")]
+		public async Task<IActionResult> Subject(string categoryName, string subjectName, int page = 1, int cardsPerPage = 12)
 		{
-			SubjectPageViewModel subjectPageViewModel = await _service.GetCardSubjectWithItsCardSets(categoryName, subjectName);
+			SubjectPageViewModel subjectPageViewModel = await _service.GetCardSubjectWithItsCardSets(categoryName, subjectName, page, cardsPerPage);
 
 			if (subjectPageViewModel.CardSubject != null)
 			{

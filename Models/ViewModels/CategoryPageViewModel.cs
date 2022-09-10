@@ -4,5 +4,6 @@
     {
         public CardCategory CardCategory { get; set; }
         public List<CardSet> CardSets { get; set; }
+        public PaginationViewModel Pagination { get; set; }
     }
 }

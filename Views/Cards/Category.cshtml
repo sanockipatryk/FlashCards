@@ -2,6 +2,8 @@
 
 
 <div class="row">
+	<input type="hidden" asp-for="Pagination.CurrentPage" />
+	<input type="hidden" asp-for="CardCategory.Name" />
 	<div class="col-12">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
@@ -34,81 +36,30 @@
 </div>
 <div class="row">
 	<div class="col-12">
-		<p class="mt-5 mb-3"><strong>Flashcard sets</strong></p>
+		<p class="mt-5 mb-3"><strong>Flashcard sets @Model.Pagination.NumberOfPages</strong></p>
 	</div>
 	<div class="col-12">
 		<div class="row">
-			<div class="col-4 pb-4 d-flex align-items-stretch">
-				<div class="card">
-					<div class="card-body d-flex flex-column justify-content-between">
-						<div class="row">
-							<h5 class="card-title">Name</h5>
-							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
-							<p class="card-text">
-								DESCRIPTION Some quick example text to build on the card title and make up the
-								bulk of the card's content.
-							</p>
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-4 pb-4 d-flex align-items-stretch">
-				<div class="card">
-					<div class="card-body d-flex flex-column justify-content-between">
-						<div class="row">
-							<h5 class="card-title">Name</h5>
-							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
-							<p class="card-text">
-								DESCRIPTION Some quick example text to build on the card title and make up the
-								bulk of the card's content.
-							</p>
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+			@foreach (var cardSet in @Model.CardSets)
+			{
+				<div class="col-4 pb-4 d-flex align-items-stretch">
+					<div class="card">
+						<div class="card-body d-flex flex-column justify-content-between">
+							<div class="row">
+								<h5 class="card-title">@cardSet.Name</h5>
+								@*<h6 class="card-subtitle mb-2 text-muted">@cardSet.Cards.Count()</h6>*@
+								<p class="card-text">
+									@cardSet.Description
+								</p>
+							</div>
+							<div class="row">
+								<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-4 pb-4 d-flex align-items-stretch">
-				<div class="card">
-					<div class="card-body d-flex flex-column justify-content-between">
-						<div class="row">
-							<h5 class="card-title">Name</h5>
-							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
-							<p class="card-text">
-								DESCRIPTION Some quick example text to build on the card title and make up the
-								bulk of the card's content.
-								DESCRIPTION Some quick example text to build on the card title and make up the
-								bulk of the card's content.
-							</p>
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="col-4 pb-4 d-flex align-items-stretch">
-				<div class="card">
-					<div class="card-body d-flex flex-column justify-content-between">
-						<div class="row">
-							<h5 class="card-title">Name</h5>
-							<h6 class="card-subtitle mb-2 text-muted">26 cards</h6>
-							<p class="card-text">
-								DESCRIPTION Some quick example text to build on the card title and make up the
-								bulk of the card's content.
-							</p>
-						</div>
-						<div class="row">
-							<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
-						</div>
-					</div>
-				</div>
-			</div>
+			}
 		</div>
 	</div>
-
+	<partial name="_CardSetListPagination" model="@Model.Pagination"/>
 </div>

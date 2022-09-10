@@ -81,12 +81,12 @@ namespace FlashCards.Data
                     {
                         foreach(var subject in category.CardSubjects)
                         {
-                            for(int j = 0; j < 15; j++)
+                            for(int j = 0; j < 30; j++)
                             {
                                 var cardSet = new CardSet()
                                 {
-                                    Name = $"Card set {j + i * 15}",
-                                    Description = $"Description for Card set {j + i * 15}",
+                                    Name = $"Card set {j + i * 30}",
+                                    Description = $"Description for Card set {j + i * 30}",
                                     DateCreated = DateTime.UtcNow,
                                     DateUpdated = DateTime.UtcNow,
                                     CardSubjectId = subject.Id,
@@ -101,8 +101,8 @@ namespace FlashCards.Data
                                 {
                                     cardSet.Cards.Add(new Card()
                                     {
-                                        Question = $"Question {j + i * 15}/{k}",
-                                        Answer = $"Answer {j + i * 15}/{k}",
+                                        Question = $"Question {j + i * 30}/{k}",
+                                        Answer = $"Answer {j + i * 30}/{k}",
                                         DateCreated = DateTime.UtcNow,
                                         DateUpdated = DateTime.UtcNow,
                                         CardSetId = cardSet.Id
