@@ -1,12 +1,12 @@
 ﻿@model CategoryPageViewModel
 
-
 <div class="row">
-	<input type="hidden" asp-for="Pagination.CurrentPage" />
-	<input type="hidden" asp-for="CardCategory.Name" />
 	<div class="col-12">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
+				<li class="breadcrumb-item" aria-current="page">
+					<a asp-action="Sets" asp-route-page="1">All sets</a>
+				</li>
 				<li class="breadcrumb-item active" aria-current="page">@Model.CardCategory.Name</li>
 			</ol>
 		</nav>
@@ -14,7 +14,7 @@
 </div>
 <div class="row">
 	<div class="col-12">
-		<div class="container-fluid languages rounded text-dark p-3">
+		<div class="container-fluid cat-sub-title rounded text-dark p-3">
 			<div class="container py-3 px-5">
 				<p class="lead">Flashcard sets</p>
 				<p class="display-6"><strong>@Model.CardCategory.Name</strong></p>
@@ -24,42 +24,35 @@
 </div>
 <div class="row">
 	<div class="col-12">
-		<p class="mt-5 mb-3"><strong>Specific subject?</strong></p>
+		<p class="mt-3 mb-3"><strong>Different category?</strong></p>
 	</div>
-	<div class="col-12 subject-buttons">
-		@foreach (var subject in Model.CardCategory.CardSubjects)
+	<div class="col-12 subject-category-buttons">
+		@foreach (var category in Model.OtherCategories)
 		{
-			<button type="button" class="btn btn-light btn-lg">@subject.Name</button>
+			<a class="btn btn-light different-cat-sub"
+		   asp-route-categoryName="@category.Name" asp-route-page="1">
+				@category.Name
+			</a>
 		}
 	</div>
-
 </div>
 <div class="row">
 	<div class="col-12">
-		<p class="mt-5 mb-3"><strong>Flashcard sets @Model.Pagination.NumberOfPages</strong></p>
+		<p class="mt-3 mb-3"><strong>Specific subject?</strong></p>
 	</div>
-	<div class="col-12">
-		<div class="row">
-			@foreach (var cardSet in @Model.CardSets)
-			{
-				<div class="col-4 pb-4 d-flex align-items-stretch">
-					<div class="card">
-						<div class="card-body d-flex flex-column justify-content-between">
-							<div class="row">
-								<h5 class="card-title">@cardSet.Name</h5>
-								@*<h6 class="card-subtitle mb-2 text-muted">@cardSet.Cards.Count()</h6>*@
-								<p class="card-text">
-									@cardSet.Description
-								</p>
-							</div>
-							<div class="row">
-								<div class="col-12 d-flex justify-content-between align-items-center"><p class="m-0">created by: Bob</p><a href="#" class="btn btn-light">Preview</a></div>
-							</div>
-						</div>
-					</div>
-				</div>
-			}
-		</div>
+	<div class="col-12 subject-category-buttons">
+		@foreach (var subject in Model.CardCategory.CardSubjects)
+		{
+			<a class="btn btn-light different-cat-sub"
+		   asp-action="Subject" asp-route-categoryName="@Model.CardCategory.Name"
+		   asp-route-subjectName="@subject.Name" asp-route-page="1">
+				@subject.Name
+			</a>
+		}
 	</div>
-	<partial name="_CardSetListPagination" model="@Model.Pagination"/>
 </div>
+<div class="row">
+	<partial name="_CardSetList" model="@Model.CardSets" />
+	<partial name="_CardSetListPagination" model="@Model.Pagination" />
+</div>
+<partial name="_ModalPreviewCardSet" />

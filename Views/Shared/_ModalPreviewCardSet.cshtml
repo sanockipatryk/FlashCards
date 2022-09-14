@@ -1,0 +1,59 @@
+﻿<div class="modal modal-lg fade" id="previewModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-light bg-success">
+				<h5 class="modal-title"></h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div id="card-preview-scrollable" class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-primary">Study</button>
+			</div>
+		</div>
+	</div>
+</div>
+<script language="javascript">
+	document.addEventListener('DOMContentLoaded', function (event) {
+	var PostBackURL = '@Url.Content("~/")' + "Cards/GetCardSetPreview/";
+	var id = undefined;
+	var modalBody = document.querySelector("#previewModal .modal-body");
+	var modalTitle = document.querySelector("#previewModal .modal-title");
+	var previewButtons = document.querySelectorAll(".previewButton");
+	previewButtons.forEach(button => button.addEventListener('click', async () => {
+		modalBody.innerHTML = '';
+		modalTitle.textContent = button.getAttribute("data-title");
+		id = button.getAttribute('data-id');
+		await fetch(PostBackURL + id + "/" + 0, {
+			method: "GET",
+			headers: {
+				'Content-Type': 'application/json; charset=utf-8'
+			}
+		})
+		.then((response) => response.text())
+		.then((data) => {
+			modalBody.innerHTML += data;
+				})
+		}));
+		var cardPreviewDiv = document.querySelector("#card-preview-scrollable");
+		var qaPreviewElements;
+		cardPreviewDiv.addEventListener('scroll', async (event) => {
+			qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
+			var element = event.target;
+			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+				await fetch(PostBackURL + id + '/' + qaPreviewElementsCount, {
+					method: "GET",
+					headers: {
+						'Content-Type': 'application/json; charset=utf-8'
+					}
+				})
+					.then((response) => response.text())
+					.then((data) => {
+						modalBody.innerHTML += data;
+						firstCardsLoaded = true;
+					})
+			}
+		})
+	})
+</script>

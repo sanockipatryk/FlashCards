@@ -8,7 +8,7 @@ using System.Security.Claims;
 
 namespace FlashCards.Controllers
 {
-	[Route("Cards")]
+	[Route("Sets")]
 	public class CardsController : Controller
 	{
 		private readonly ICardsService _service;
@@ -16,7 +16,37 @@ namespace FlashCards.Controllers
 		{
 			_service = service;
 		}
-		
+
+		[HttpGet("MySets/page/{page:int?}")]
+		public async Task<IActionResult> MySets(string categoryName, int page = 1, int cardsPerPage = 12)
+		{
+			SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage);
+
+			if (setsPageViewModel.CardSets != null)
+			{
+				return View(nameof(Sets), setsPageViewModel);
+			}
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet("page/{page:int?}")]
+		public async Task<IActionResult> Sets(string categoryName, int page = 1, int cardsPerPage = 12)
+		{
+			SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage);
+
+			if (setsPageViewModel.CardSets != null)
+			{
+				return View(nameof(Sets), setsPageViewModel);
+			}
+			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet("{categoryName}")]
+		public IActionResult Category(string categoryName, string subjectName)
+		{
+			return RedirectToAction(nameof(Category), new { categoryName = categoryName, page = 1 });
+		}
+
 		[HttpGet("{categoryName}/page/{page:int?}")]
 		public async Task<IActionResult> Category(string categoryName, int page = 1, int cardsPerPage = 12)
 		{
@@ -27,6 +57,12 @@ namespace FlashCards.Controllers
 				return View(nameof(Category), categoryPageViewModel);
 			}
 			return RedirectToAction("Index", "Home");
+		}
+
+		[HttpGet("{categoryName}/{subjectName}")]
+		public IActionResult Subject(string categoryName, string subjectName)
+		{
+			return RedirectToAction(nameof(Subject), new {categoryName = categoryName, subjectName = subjectName, page = 1});
 		}
 
 		[HttpGet("{categoryName}/{subjectName}/page/{page:int?}")]
@@ -109,5 +145,18 @@ namespace FlashCards.Controllers
 
 			return Json(new SelectList(cardSubjects, "Id", "Name"));
 		}
+
+		[HttpGet("GetCardSetPreview/{cardSetId}/{count}")]
+		public async Task<IActionResult> GetCardSetPreview(int cardSetId, int count)
+		{
+			var cardSetPreview = await _service.GetCardSetPreview(cardSetId, count);
+			if(cardSetPreview != null)
+			{
+				return PartialView("_PreviewCardSetInnerModal", cardSetPreview);
+			}
+			return NotFound();
+		}
+
+
 	}
 }

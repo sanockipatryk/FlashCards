@@ -7,6 +7,7 @@ namespace FlashCards.Data.Services
 	{
 		Task<IEnumerable<CardCategory>> GetAllCardCategoriesAsync();
 		Task<IEnumerable<CardCategory>> GetAllCardCategoriesWithSubjectsAsync();
+		Task<SetsPageViewModel> GetAllCardSetsAsync(int currentPage, int cardsPerPage);
 		Task<CategoryPageViewModel> GetCardCategoryWithItsCardSets(string categoryName, int currentPage, int cardsPerPage);
 		Task<IEnumerable<CardSubject>> GetAllCardSubjectsAsync();
 		Task<SubjectPageViewModel> GetCardSubjectWithItsCardSets(string categoryName, string subjectName, int currentPage, int cardsPerPage);
@@ -14,6 +15,7 @@ namespace FlashCards.Data.Services
 		Task<IEnumerable<CardSet>> GetAllPublicCardSetsAsync();
 		Task<IEnumerable<CardSet>> GetAllUserCardSetsAsync(string userId);
 		Task<IEnumerable<CardSet>> GetAllPublicCardSetsForSubjectAsync(int subjectId);
+		Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreview(int cardSetId, int count);
 
 		Task CreateCardSetAsync(CreateCardSetViewModel model, string userId);
 

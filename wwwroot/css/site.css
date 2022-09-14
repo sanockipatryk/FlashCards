@@ -1,17 +1,53 @@
+/* Works on Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: blue orange;
+}
+
+    /* Works on Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+        width: 12px;
+        height: 10px;
+        background-color: #F5F5F5;
+    }
+
+    *::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+        background-color: #F5F5F5;
+    }
+        *::-webkit-scrollbar-track:horizontal {
+            border-radius: 10px;
+        }
+.subject-category-buttons::-webkit-scrollbar-track {
+    margin-right: 14px;
+}
+
+.subject-category-buttons::-webkit-scrollbar-track {
+    margin-left: 14px;
+}
+
+    *::-webkit-scrollbar-thumb {
+        background-color: #bebfbe;
+    }
+        ::-webkit-scrollbar-thumb:horizontal {
+            border-radius: 10px;
+        }
+
+
 html {
     font-size: 14px;
     background-color: #F6F7FB;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
@@ -30,23 +66,26 @@ div.dropdown-multicol {
         float: left;
         vertical-align: top;
     }
+
         div.dropdown-multicol > div.dropdown-col:nth-child(1) {
             width: 61%;
             border-right: 1px solid #eee;
         }
+
             div.dropdown-multicol > div.dropdown-col:nth-child(1) i {
                 float: right;
                 margin-right: -6px;
             }
 
         div.dropdown-multicol > div.dropdown-col.visible-item {
-                display: inline-block;
-            }
-        div.dropdown-multicol > div.dropdown-col.hidden-item {
-            display: none ;
+            display: inline-block;
         }
 
-.languages {
+        div.dropdown-multicol > div.dropdown-col.hidden-item {
+            display: none;
+        }
+
+.cat-sub-title {
     background-color: #f29898;
 }
 
@@ -60,4 +99,27 @@ label.card-label-floating {
 
 .disabled-link {
     pointer-events: none;
+}
+
+.tags div {
+    border-radius: 25px;
+    padding: 0 10px;
+    font-size: 10pt;
+    display: inline-block;
+}
+    .tags div.tag-category {
+        background-color: #a5deff;
+    }
+    .tags div.tag-subject {
+        background-color: #fbe6a1;
+    }
+
+.set-qa-preview {
+    border-bottom: 1px solid lightgrey;
+}
+.set-qa-preview .q-preview {
+    font-weight: 500;
+}
+.set-qa-preview .a-preview {
+    font-size: 10pt;
 }

@@ -1,10 +1,9 @@
 ﻿namespace FlashCards.Models.ViewModels
 {
-    public class CategoryPageViewModel
+    public class SetsPageViewModel
     {
-        public CardCategory CardCategory { get; set; }
-        public List<CardCategory> OtherCategories { get; set; }
         public List<CardSet> CardSets { get; set; }
+        public List<CardCategory> CardCategories { get; set; }
         public PaginationViewModel Pagination { get; set; }
     }
 }

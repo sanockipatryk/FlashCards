@@ -11793,7 +11793,13 @@ div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
   color: #c72591 !important;
 }
 
-.subject-buttons button {
+.subject-category-buttons {
+  overflow-x: auto;
+  padding-bottom: 10px;
+  white-space: nowrap;
+}
+
+.subject-category-buttons button {
   margin-right: 4px;
   font-size: 12pt;
   padding: 12px 20px;
@@ -11815,4 +11821,8 @@ div.question-answer div input {
 
 div.question-answer div input:focus {
   border-color: #c72591;
+}
+
+.btn.btn-light.different-cat-sub {
+  background-color: white;
 }

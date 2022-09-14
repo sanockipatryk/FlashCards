@@ -2,13 +2,16 @@
 
 <li class="nav-item dropdown">
 	<a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-		Dropdown
+		Browse sets
 	</a>
 	<div class="dropdown-menu dropdown-multicol">
 		<div class="dropdown-col">
 			@foreach (var category in Model)
 			{
-				<a class="dropdown-item text-dark category-item @(category.Id == Model.First().Id?"selected":"")" data-categoryId=@category.Id href="#">@category.Name<i class="bi bi-caret-right-fill"></i></a>
+				<a class="dropdown-item text-dark category-item @(category.Id == Model.First().Id?"selected":"")"
+				data-categoryId="@category.Id"  asp-controller="Cards" asp-action="Category" 
+				asp-route-categoryName="@category.Name" asp-route-page="1">@category.Name<i class="bi bi-caret-right-fill"></i>
+				</a>
 			}
 		</div>
 		@foreach (var category in Model)
@@ -20,7 +23,6 @@
 				}
 				<a class="dropdown-item text-dark highlight" asp-controller="Cards" asp-action="Category" asp-route-categoryName="@category.Name" asp-route-page="1">See all</a>
 			</div>
-
 		}
 	</div>
 </li>

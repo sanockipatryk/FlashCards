@@ -1,0 +1,13 @@
+﻿@model List<QuestionWithAnswerViewModel>
+	@foreach (var item in Model)
+	{
+		<div class="set-qa-preview py-3 ">
+			<div class="q-preview px-5">@item.Question</div>
+			<div class="a-preview px-5">@item.Answer</div>
+		</div>
+	}
+@section Scripts {
+<script>
+	
+</script>
+}
