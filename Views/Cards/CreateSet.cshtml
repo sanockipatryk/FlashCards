@@ -108,7 +108,7 @@
 
 	if(cardCategorySelect.value != -1) {
 		categoryChanged = true;
-		fetch('@Url.Content("~/")' + "Cards/GetSubjectsForCardCategory/" + cardCategorySelect.value)
+		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
 		.then(response => response.json()).then(data => {
 			items = '';
 			data.forEach(subject => {
@@ -126,7 +126,7 @@
 			cardCategorySelect.removeChild(cardCategorySelect.querySelector('option[value="-1"]'));
 			categoryChanged = true;
 		}
-		fetch('@Url.Content("~/")' + "Cards/GetSubjectsForCardCategory/" + cardCategorySelect.value)
+		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
 		.then(response => response.json()).then(data => {
 			items = '';
 			data.forEach(subject => {

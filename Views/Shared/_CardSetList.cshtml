@@ -8,7 +8,7 @@
 		@foreach (var cardSet in @Model)
 		{
 			<div class="col-4 pb-4 d-flex align-items-stretch">
-				<div class="card">
+				<div class="card flex-grow-1">
 					<div class="card-body d-flex flex-column justify-content-between">
 						<div class="row">
 							@if((string)ViewContext.RouteData.Values["action"] == "Category" || (string)ViewContext.RouteData.Values["action"] == "Sets") {

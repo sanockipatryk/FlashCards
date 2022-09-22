@@ -17,28 +17,67 @@ namespace FlashCards.Controllers
 			_service = service;
 		}
 
-		[HttpGet("MySets/page/{page:int?}")]
-		public async Task<IActionResult> MySets(string categoryName, int page = 1, int cardsPerPage = 12)
-		{
-			SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage);
+		//[Authorize]
+		//[HttpGet("{userNickName}")]
+		//public async Task<IActionResult> UserSets(string userNickName)
+		//{
+		//	return RedirectToAction(nameof(UserSets), new {userNickName = userNickName, page = 1 });
+		//}
 
-			if (setsPageViewModel.CardSets != null)
-			{
-				return View(nameof(Sets), setsPageViewModel);
-			}
-			return RedirectToAction("Index", "Home");
-		}
+		//[Authorize]
+		//[HttpGet("{requestedUserNickName}/page/{page:int?}")]
+		//public async Task<IActionResult> UserSets(string requestedUserNickName, int page = 1, int cardsPerPage = 12)
+		//{
+		//	string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+		//	SetsPageViewModel setsPageViewModel = await _service.GetAllUserCardSetsAsync(requestedUserNickName, userId, page, cardsPerPage);
+
+		//	if (setsPageViewModel.CardSets != null)
+		//	{
+		//		return View(nameof(Sets), setsPageViewModel);
+		//	}
+		//	return RedirectToAction("Index", "Home");
+		//}
+
+		//[Authorize]
+		//[HttpGet("MySets/{categoryName}/page/{page:int?}")]
+		//public async Task<IActionResult> MySetsCategory(string categoryName, int page = 1, int cardsPerPage = 12)
+		//{
+		//	string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		//	SetsPageViewModel setsPageViewModel = await _service.GetAllOwnerCardSetsAsync(userId, page, cardsPerPage);
+
+		//	if (setsPageViewModel.CardSets != null)
+		//	{
+		//		return View(nameof(Sets), setsPageViewModel);
+		//	}
+		//	return RedirectToAction("Index", "Home");
+		//}
+
+		//[Authorize]
+		//[HttpGet("MySets/{categoryName}/{subjectName}/page/{page:int?}")]
+		//public async Task<IActionResult> MySetsSubject(string categoryName, string subjectName, int page = 1, int cardsPerPage = 12)
+		//{
+		//	string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		//	SetsPageViewModel setsPageViewModel = await _service.GetAllOwnerCardSetsAsync(userId, page, cardsPerPage);
+
+		//	if (setsPageViewModel.CardSets != null)
+		//	{
+		//		return View(nameof(Sets), setsPageViewModel);
+		//	}
+		//	return RedirectToAction("Index", "Home");
+		//}
+
+		
+
 
 		[HttpGet("page/{page:int?}")]
-		public async Task<IActionResult> Sets(string categoryName, int page = 1, int cardsPerPage = 12)
+		public async Task<IActionResult> Sets(string categoryName, int page = 1, int cardsPerPage = 12, string? name = null, string? numberOfCards = null, string? author = null, string? sort = null)
 		{
-			SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage);
+			SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage, name, numberOfCards, author, sort);
 
-			if (setsPageViewModel.CardSets != null)
-			{
 				return View(nameof(Sets), setsPageViewModel);
-			}
-			return RedirectToAction("Index", "Home");
+
+			//return RedirectToAction("Index", "Home");
 		}
 
 		[HttpGet("{categoryName}")]
@@ -48,9 +87,9 @@ namespace FlashCards.Controllers
 		}
 
 		[HttpGet("{categoryName}/page/{page:int?}")]
-		public async Task<IActionResult> Category(string categoryName, int page = 1, int cardsPerPage = 12)
+		public async Task<IActionResult> Category(string categoryName, int page = 1, int cardsPerPage = 12, string? name = null, string? numberOfCards = null, string? author = null, string? sort = null)
 		{
-			CategoryPageViewModel categoryPageViewModel = await _service.GetCardCategoryWithItsCardSets(categoryName, page, cardsPerPage);
+			CategoryPageViewModel categoryPageViewModel = await _service.GetPublicCardCategoryWithItsCardSetsAsync(categoryName, page, cardsPerPage, name, numberOfCards, author, sort);
 
 			if(categoryPageViewModel.CardCategory != null)
             {
@@ -66,9 +105,9 @@ namespace FlashCards.Controllers
 		}
 
 		[HttpGet("{categoryName}/{subjectName}/page/{page:int?}")]
-		public async Task<IActionResult> Subject(string categoryName, string subjectName, int page = 1, int cardsPerPage = 12)
+		public async Task<IActionResult> Subject(string categoryName, string subjectName, int page = 1, int cardsPerPage = 12, string? name = null, string? numberOfCards = null, string? author = null, string? sort = null)
 		{
-			SubjectPageViewModel subjectPageViewModel = await _service.GetCardSubjectWithItsCardSets(categoryName, subjectName, page, cardsPerPage);
+			SubjectPageViewModel subjectPageViewModel = await _service.GetCardSubjectWithItsCardSetsAsync(categoryName, subjectName, page, cardsPerPage, name, numberOfCards, author, sort);
 
 			if (subjectPageViewModel.CardSubject != null)
 			{
@@ -149,7 +188,7 @@ namespace FlashCards.Controllers
 		[HttpGet("GetCardSetPreview/{cardSetId}/{count}")]
 		public async Task<IActionResult> GetCardSetPreview(int cardSetId, int count)
 		{
-			var cardSetPreview = await _service.GetCardSetPreview(cardSetId, count);
+			var cardSetPreview = await _service.GetCardSetPreviewAsync(cardSetId, count);
 			if(cardSetPreview != null)
 			{
 				return PartialView("_PreviewCardSetInnerModal", cardSetPreview);

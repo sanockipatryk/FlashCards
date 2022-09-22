@@ -7,17 +7,20 @@ namespace FlashCards.Data.Services
 	{
 		Task<IEnumerable<CardCategory>> GetAllCardCategoriesAsync();
 		Task<IEnumerable<CardCategory>> GetAllCardCategoriesWithSubjectsAsync();
-		Task<SetsPageViewModel> GetAllCardSetsAsync(int currentPage, int cardsPerPage);
-		Task<CategoryPageViewModel> GetCardCategoryWithItsCardSets(string categoryName, int currentPage, int cardsPerPage);
+		Task<SetsPageViewModel> GetAllCardSetsAsync(int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort);
+		Task<CategoryPageViewModel> GetPublicCardCategoryWithItsCardSetsAsync(string categoryName, int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort);
 		Task<IEnumerable<CardSubject>> GetAllCardSubjectsAsync();
-		Task<SubjectPageViewModel> GetCardSubjectWithItsCardSets(string categoryName, string subjectName, int currentPage, int cardsPerPage);
+		Task<SubjectPageViewModel> GetCardSubjectWithItsCardSetsAsync(string categoryName, string subjectName, int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort);
 		Task<IEnumerable<CardSubject>> GetCardSubjectsForCategoryAsync(int categoryId);
 		Task<IEnumerable<CardSet>> GetAllPublicCardSetsAsync();
-		Task<IEnumerable<CardSet>> GetAllUserCardSetsAsync(string userId);
+		Task<SetsPageViewModel> GetAllOwnerCardSetsAsync(string userId, int currentPage, int cardsPerPage);
+		Task<IEnumerable<CardSet>> GetAllUserCardSetsAsync(string requestedUserNickName, int currentPage, int cardsPerPage);
 		Task<IEnumerable<CardSet>> GetAllPublicCardSetsForSubjectAsync(int subjectId);
-		Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreview(int cardSetId, int count);
+		Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreviewAsync(int cardSetId, int count);
 
 		Task CreateCardSetAsync(CreateCardSetViewModel model, string userId);
+
+		Task<bool> IsUserTheOwner(string userId, string requestedUserNickName);
 
 	}
 }

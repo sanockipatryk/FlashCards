@@ -5,12 +5,22 @@
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item" aria-current="page">
-					<a asp-action="Sets" asp-route-page="1">All sets</a>
+					<a asp-action="Sets" asp-route-page="1"
+					   asp-route-name="@Model.Filters.Name"
+					   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+					   asp-route-author="@Model.Filters.Author"
+					   asp-route-sort="@Model.Filters.SortBy">
+						All sets
+					</a>
 				</li>
 				<li class="breadcrumb-item" aria-current="page">
 					<a asp-action="Category"
 					   asp-route-categoryName="@Model.CardSubject.CardCategory.Name"
-					   asp-route-page="1">
+					   asp-route-page="1"
+					   asp-route-name="@Model.Filters.Name"
+					   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+					   asp-route-author="@Model.Filters.Author"
+					   asp-route-sort="@Model.Filters.SortBy">
 						@Model.CardSubject.CardCategory.Name
 					</a>
 				</li>
@@ -39,12 +49,17 @@
 			<a class="btn btn-light different-cat-sub"
 		   asp-action="Subject"
 		   asp-route-subjectName="@subject.Name"
-		   asp-route-page="1">
+		   asp-route-page="1"
+		   asp-route-name="@Model.Filters.Name"
+		   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+		   asp-route-author="@Model.Filters.Author"
+		   asp-route-sort="@Model.Filters.SortBy">
 				@subject.Name
 			</a>
 		}
 	</div>
 </div>
+<partial name="_SetsFilters" model="@Model.Filters" />
 <div class="row">
 	<partial name="_CardSetList" model="@Model.CardSubject.CardSets" />
 	<partial name="_CardSetListPagination" model="@Model.Pagination" />

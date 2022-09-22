@@ -1,4 +1,7 @@
-﻿namespace FlashCards.Helpers
+﻿using FlashCards.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace FlashCards.Helpers
 {
     public static class PaginationHelpers
     {
@@ -20,6 +23,17 @@
         public static int GetTotalPages(int itemsCount, int itemsPerPage)
         {
             return (int)Math.Ceiling((double)itemsCount / (double)itemsPerPage);
+        }
+
+        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> set, int currentPage, int cardsPerPage, int cardSetsCount) where T : class
+        {
+            if (cardSetsCount > 0)
+            {
+                return set
+                    .Skip((currentPage - 1) * cardsPerPage)
+                    .Take(cardsPerPage);
+            }
+            return set;
         }
     }
 }

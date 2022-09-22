@@ -5,7 +5,13 @@
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item" aria-current="page">
-					<a asp-action="Sets" asp-route-page="1">All sets</a>
+					<a asp-action="Sets" asp-route-page="1"
+					   asp-route-name="@Model.Filters.Name"
+					   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+					   asp-route-author="@Model.Filters.Author"
+					   asp-route-sort="@Model.Filters.SortBy">
+						All sets
+					</a>
 				</li>
 				<li class="breadcrumb-item active" aria-current="page">@Model.CardCategory.Name</li>
 			</ol>
@@ -30,7 +36,12 @@
 		@foreach (var category in Model.OtherCategories)
 		{
 			<a class="btn btn-light different-cat-sub"
-		   asp-route-categoryName="@category.Name" asp-route-page="1">
+		   asp-route-categoryName="@category.Name"
+		   asp-route-page="1"
+		   asp-route-name="@Model.Filters.Name"
+		   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+		   asp-route-author="@Model.Filters.Author"
+		   asp-route-sort="@Model.Filters.SortBy">
 				@category.Name
 			</a>
 		}
@@ -44,13 +55,20 @@
 		@foreach (var subject in Model.CardCategory.CardSubjects)
 		{
 			<a class="btn btn-light different-cat-sub"
-		   asp-action="Subject" asp-route-categoryName="@Model.CardCategory.Name"
-		   asp-route-subjectName="@subject.Name" asp-route-page="1">
+		   asp-action="Subject"
+		   asp-route-categoryName="@Model.CardCategory.Name"
+		   asp-route-subjectName="@subject.Name"
+		   asp-route-page="1"
+		   asp-route-name="@Model.Filters.Name"
+		   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
+		   asp-route-author="@Model.Filters.Author"
+		   asp-route-sort="@Model.Filters.SortBy">
 				@subject.Name
 			</a>
 		}
 	</div>
 </div>
+<partial name="_SetsFilters" model="@Model.Filters" />
 <div class="row">
 	<partial name="_CardSetList" model="@Model.CardSets" />
 	<partial name="_CardSetListPagination" model="@Model.Pagination" />

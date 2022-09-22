@@ -7,7 +7,11 @@ namespace FlashCards.Models
     {
         public int Id { get; set; }
         [Required]
+        [MinLength(5, ErrorMessage = "Name cannot be shorter than 5 characters.")]
+        [MaxLength(100, ErrorMessage = "Name cannot be longer than 100 characters.")]
         public string Name { get; set; }
+        [MinLength(5, ErrorMessage = "Description cannot be shorter than 5 characters.")]
+        [MaxLength(300, ErrorMessage = "Description cannot be longer than 300 characters.")]
         public string? Description { get; set; }
 
         public DateTime DateCreated { get; set; }

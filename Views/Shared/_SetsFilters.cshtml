@@ -1,0 +1,75 @@
+﻿@model CardSetFiltersViewModel
+
+<div class="row">
+	<div class="col-12">
+		<p class="my-3"><strong>Filters</strong></p>
+	</div>
+	<form id="filtersForm" class="col-12 d-flex justify-content-around">
+		<div class="col-2 d-inline-block">
+			<input name="name" asp-for="Name" class="form-control col-3" type="text" placeholder="Name" />
+		</div>
+		<div class="col-2 d-inline-block">
+			<select name="numberOfCards" asp-for="NumberOfCards" class="form-select" aria-label="Filter card count">
+				<option value="" selected>All</option>
+				<option value="lessThanTwenty">@("1 - 20")</option>
+				<option value="twentyToForty">@("20 - 39")</option>
+				<option value="moreThanForty">@("40 - 50")</option>
+			</select>
+		</div>
+		<div class="col-2 d-inline-block">
+			<input name="author" asp-for="Author" class="form-control col-3" type="text" placeholder="Nickname" />
+		</div>
+		<div class="col-2 d-inline-block">
+			<select name="sort" asp-for="SortBy" class="form-select" aria-label="Sort sets">
+				<option selected value="newest">Most recent</option>
+				<option value="oldest">Least recent</option>
+				<option value="az">Name A-Z</option>
+				<option value="za">Name Z-A</option>
+			</select>
+		</div>
+		<div class="col-2 d-inline-block text-center">
+			<button id="clearFiltersButton" class="btn btn-secondary">Clear</button>
+			<button id="filterButton" type="submit" class="btn btn-primary" asp-action="@((string)ViewContext.RouteData.Values["action"])" 
+			>Apply</button>
+		</div>
+	</form>
+</div>
+
+<script>
+	var filtersForm = document.querySelector("#filtersForm");
+	var filterButton = document.querySelector("#filterButton");
+
+	filtersForm.addEventListener('submit', (e) => {
+		filtersForm.querySelectorAll("input").forEach(i => {
+			if(i.value.length === 0)
+			{
+				i.setAttribute('disabled', true);
+			}
+		});
+		filtersForm.querySelectorAll("select").forEach(i => {
+			if(i.value.length === 0)
+			{
+				i.setAttribute('disabled', true);
+			}
+		});
+	});
+
+	filtersForm.addEventListener('keydown', (e) => {
+		if(event.keyCode === 13) {
+			e.preventDefault();
+			filterButton.click();
+		}
+	})
+
+	var clearFiltersButton = document.querySelector("#clearFiltersButton");
+	clearFiltersButton.addEventListener('click', () => {
+		filtersForm.querySelectorAll("input").forEach(i => {
+				i.value = '';
+		});
+		filtersForm.querySelectorAll("select").forEach(i => {
+				i.value = '';
+		});
+		filtersForm.submit();
+	})
+	
+</script>

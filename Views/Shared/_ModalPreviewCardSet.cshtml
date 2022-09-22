@@ -16,15 +16,17 @@
 </div>
 <script language="javascript">
 	document.addEventListener('DOMContentLoaded', function (event) {
-	var PostBackURL = '@Url.Content("~/")' + "Cards/GetCardSetPreview/";
+	var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardSetPreview/";
+	var firstLoadComplete;
 	var id = undefined;
 	var modalBody = document.querySelector("#previewModal .modal-body");
 	var modalTitle = document.querySelector("#previewModal .modal-title");
 	var previewButtons = document.querySelectorAll(".previewButton");
 	previewButtons.forEach(button => button.addEventListener('click', async () => {
-		modalBody.innerHTML = '';
 		modalTitle.textContent = button.getAttribute("data-title");
 		id = button.getAttribute('data-id');
+		modalBody.innerHTML = "<p class='text-center'>Loading...</p>";
+		firstLoadComplete = false;
 		await fetch(PostBackURL + id + "/" + 0, {
 			method: "GET",
 			headers: {
@@ -33,15 +35,16 @@
 		})
 		.then((response) => response.text())
 		.then((data) => {
-			modalBody.innerHTML += data;
-				})
+			modalBody.innerHTML = data;
+			firstLoadComplete = true;
+			})
 		}));
 		var cardPreviewDiv = document.querySelector("#card-preview-scrollable");
 		var qaPreviewElements;
 		cardPreviewDiv.addEventListener('scroll', async (event) => {
 			qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
 			var element = event.target;
-			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+			if ((element.scrollHeight - element.scrollTop === element.clientHeight) && firstLoadComplete) {
 				await fetch(PostBackURL + id + '/' + qaPreviewElementsCount, {
 					method: "GET",
 					headers: {
