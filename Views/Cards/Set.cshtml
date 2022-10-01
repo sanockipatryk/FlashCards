@@ -1,0 +1,432 @@
+﻿@model CardSetViewModel
+
+<div class="row">
+	<div class="row p-0 offset-xs-0 col-xs-12 offset-md-2 col-md-8">
+		<div class="col-12">
+			<p class="display-6 text-white"><strong>@Model.Name</strong></p>
+		</div>
+		<div class="col-12 set-study-card d-block">
+			<div class="set-study-card-inner">
+				<div class="card-front d-flex flex-column justify-content-between py-4 px-2">
+					<div class="row">
+						<div class="col-2 text-center">
+							<p class='card-text text-white'>
+								Question
+							</p>
+						</div>
+						<div class="offset-3 col-2 text-center">
+							<p class='card-text text-white'>
+								<span class="current-card-number">1</span>
+								<span>/ @Model.CardCount</span>
+							</p>
+						</div>
+					</div>
+					<div class="row text-center py-2 px-5 text-white">
+						<p id="setQuestion" class="set-study-qa card-text">
+						</p>
+					</div>
+					<div class="row">
+						<div class="col-12 d-flex justify-content-around align-items-center">
+							<button type="button" class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive"><i
+									class="bi bi-chevron-left"></i></button>
+							<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow"><i
+									class="bi bi-chevron-right"></i></button>
+						</div>
+					</div>
+				</div>
+				<div class="card-back d-flex flex-column justify-content-between py-4 px-2">
+					<div class="row">
+						<div class="col-2 text-center">
+							<p class='card-text text-white'>
+								Answer
+							</p>
+						</div>
+						<div class="offset-3 col-2 text-center">
+							<p class='card-text text-white'>
+								<span class="current-card-number">1</span>
+								<span>/ @Model.CardCount</span>
+							</p>
+						</div>
+					</div>
+					<div class="row text-center py-2 px-5 text-white">
+						<p id="setAnswer" class="set-study-qa card-text">
+						</p>
+					</div>
+					<div class="row">
+						<div class="col-12 d-flex justify-content-around align-items-center">
+							<button type="button" class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive"><i
+									class="bi bi-chevron-left"></i></button>
+							<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow"><i
+									class="bi bi-chevron-right"></i></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 after-study-screen d-none flex-column justify-content-between">
+			<div class="row pt-3 m-0">
+				<div class="col-8 p-0">
+					<p class="display-6 text-light">
+						<strong>You went through every card in the set.</strong>
+					</p>
+				</div>
+				<div class="col-4 p-0 bg-emote text-center text-info"><i class="bi bi-emoji-laughing-fill"></i>
+				</div>
+
+			</div>
+			<div class="row flex-grow-1 p-0 m-0">
+				<div class="col-6">
+					<p class="text-light text-sub">Your results</p>
+				</div>
+				<div class="col-6 d-flex flex-column justify-content-between p-0">
+					<p class="text-light text-sub">Next steps</p>
+					<div class="row continue-btn p-3 mx-0 mb-2">
+						<div class="col-3 bg-img bg-learn"></div>
+						<div class="col-8 d-flex flex-column justify-content-between">
+							<div>
+								<p class="btn-title">Learn the set</p>
+							</div>
+							<div>
+								<p class="btn-sub text-light">Quiz yourself in order to learn these terms.</p>
+							</div>
+						</div>
+						<div class="col-1 d-flex align-items-center">
+							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
+						</div>
+					</div>
+					<div id="repeatCards" class="row continue-btn p-3 mx-0">
+						<div class="col-3 bg-img bg-repeat"></div>
+						<div class="col-8">
+							<div>
+								<p class="btn-title">Restart flashcards</p>
+							</div>
+							<div>
+								<p class="btn-sub text-light">Start this sequence from the beginning.</p>
+							</div>
+						</div>
+						<div class="col-1 d-flex align-items-center">
+							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row py-3 m-0">
+				<div class="after-study-links col-12 d-flex justify-content-between align-items-center p-0">
+					<p id="backToLastQuestion" class="text-light"><i class="bi bi-arrow-left"></i> Back to the last
+						question</p>
+					<p class="text-light">Continue and test your knowledge<i class="bi bi-arrow-right"></i></p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row p-0 offset-xs-0 col-xs-12 offset-md-2 col-md-8 mt-3">
+		<p class='text-light cards-controls'>
+			<span class='btn-play'><i class="bi bi-play-fill"></i></span>
+			<span class='btn-shuffle'><i class="bi bi-shuffle"></i></span>
+		</p>
+	</div>
+</div>
+<div class="row">
+	<div class="offset-xs-0 col-xs-12 offset-md-2 col-md-8">
+		<div class="col-12">
+			<div class="row p-0 d-flex justify-content-between">
+				<div class="col-3 d-flex justify-content-start">
+					<div class="row p-0">
+						<div class="col-4">
+							<p class="display-6 text-info  m-0 p-0">
+								<a class="text-info user-link" asp-action="Sets"
+									asp-route-author="@Model.User.Nickname">
+									<i class="bi bi-person-circle"></i>
+								</a>
+							</p>
+						</div>
+						<div class="col-8">
+							<p class="text-muted text- m-0 p-0">Created by:</p>
+							<p class=" m-0 p-0">
+								<a class="text-info user-link" asp-action="Sets"
+									asp-route-author="@Model.User.Nickname">
+									@Model.User.Nickname</a>
+							</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-1 d-flex justify-content-end align-items-center cards-controls">
+					<span class="text-info m-0 p-0 btn-copy">
+						<a class="text-info user-link" asp-route-author="@Model.User.Nickname">
+							<i class="bi bi-clipboard-plus-fill"></i>
+						</a>
+					</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="row">
+	<div id="setTerms" class="offset-xs-0 col-xs-12 offset-md-2 col-md-8 mt-4">
+		<div>
+			<p class="text-light">
+				Terms in this set (@Model.CardCount)
+			</p>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+<script>
+	var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardsForCardSet/";
+	var setQuestion = document.querySelector("#setQuestion");
+	var setAnswer = document.querySelector("#setAnswer");
+	var currentCardNumberText = document.querySelectorAll('.current-card-number');
+	var cardElement = document.querySelector(".set-study-card");
+	var cardInnerElement = cardElement.querySelector('.set-study-card-inner');
+	var afterStudyScreen = document.querySelector(".after-study-screen");
+	var btnsPrevCard = document.querySelectorAll(".btn-prev-card, #backToLastQuestion");
+	var btnsNextCard = document.querySelectorAll(".btn-next-card");
+	var btnRepeatCards = document.querySelector("#repeatCards");
+	var btnAutoPlay = document.querySelector(".btn-play");
+	var btnShuffle = document.querySelector(".btn-shuffle");
+	var setTerms = document.querySelector('#setTerms');
+	var currentCardNumber = 0;
+	var cardsOriginal;
+	var cards;
+	var cardsScreenHidden = false;
+	var autoPlayToggled = false;
+	var shuffleToggled = false;
+	var autoPlayTimeout;
+
+	fetch(PostBackURL + @Model.Id, {
+		method: "GET",
+		headers: {
+			'Content-Type': 'application/json; charset=utf-8'
+		}
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			cardsOriginal = data;
+			cards = [...cardsOriginal];
+			setCurrentCardData(currentCardNumber);
+			loadTerms();
+		})
+
+	cardInnerElement.addEventListener('click', (e) => {
+		flipCard();
+		if (autoPlayToggled && e.isTrusted)
+			foo(true);
+	})
+
+	btnsPrevCard.forEach((item) => {
+		item.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (currentCardNumber > 0) {
+				currentCardNumber--;
+				if (autoPlayToggled && e.isTrusted)
+					foo(true);
+				hideAfterScreenShowCards();
+				slideFromLeft();
+				setCurrentCardData(currentCardNumber);
+				if (currentCardNumber === 0)
+					disablePrevCardButton();
+				else
+					eneablePrevCardButton();
+			}
+		});
+	});
+
+	btnsNextCard.forEach((item) => {
+		item.addEventListener('click', (e) => {
+			e.stopPropagation();
+			if (currentCardNumber < @Model.CardCount)
+				currentCardNumber++;
+			if (autoPlayToggled && e.isTrusted)
+				foo(true);
+			hideCardsShowAfterScreen();
+			if (currentCardNumber < @(Model.CardCount)) {
+				slideFromRight();
+				setCurrentCardData(currentCardNumber);
+				eneablePrevCardButton();
+			}
+		});
+	});
+
+	var setCurrentCardData = (i) => {
+		setQuestion.textContent = cards[i].question;
+		setAnswer.textContent = cards[i].answer;
+		currentCardNumberText.forEach(item => item.textContent = currentCardNumber + 1)
+	}
+
+	var flipCard = () => {
+		if (cardInnerElement.classList.contains('flip')) {
+			unflipCard();
+		}
+		else
+			cardInnerElement.classList.add('flip');
+	}
+
+	var unflipCard = () => {
+		cardInnerElement.classList.remove('flip');
+		if (!cardInnerElement.classList.contains('out'))
+			cardInnerElement.classList.add('out');
+	}
+
+	var slideFromLeft = () => {
+		cardInnerElement.classList.remove('out');
+		cardInnerElement.classList.remove('flip');
+		removeLeftRightClasses();
+		void cardElement.offsetWidth;
+		cardInnerElement.classList.add('from-left');
+	}
+
+	var slideFromRight = () => {
+		cardInnerElement.classList.remove('out');
+		cardInnerElement.classList.remove('flip');
+		removeLeftRightClasses();
+		void cardElement.offsetWidth;
+		cardInnerElement.classList.add('from-right');
+	}
+
+	var removeLeftRightClasses = () => {
+		if (cardInnerElement.classList.contains('from-left')) {
+			cardInnerElement.classList.remove('from-left');
+		}
+		if (cardInnerElement.classList.contains('from-right')) {
+			cardInnerElement.classList.remove('from-right');
+		}
+	}
+
+	var disablePrevCardButton = () => {
+		if (currentCardNumber === 0)
+			btnsPrevCard.forEach(b => b.classList.add('inactive'));
+	}
+
+	var eneablePrevCardButton = () => {
+		if (currentCardNumber === 1 && btnsPrevCard[0].classList.contains('inactive')) {
+			btnsPrevCard.forEach(b => b.classList.remove('inactive'));
+		}
+	}
+
+	var hideCardsShowAfterScreen = () => {
+		if (currentCardNumber > @(Model.CardCount - 1) && !cardsScreenHidden) {
+			cardElement.classList.replace('d-block', 'd-none');
+			afterStudyScreen.classList.replace('d-none', 'd-flex');
+			cardsScreenHidden = true;
+		}
+	}
+	var hideAfterScreenShowCards = () => {
+		if ((currentCardNumber === @Model.CardCount - 1 && cardsScreenHidden) || (cardsScreenHidden && currentCardNumber === 0)) {
+			afterStudyScreen.classList.replace('d-flex', 'd-none');
+			cardElement.classList.replace('d-none', 'd-block');
+			cardsScreenHidden = false;
+		}
+	}
+
+	btnRepeatCards.addEventListener('click', () => {
+		goBackToFirstCard();
+	})
+
+	var goBackToFirstCard = () => {
+		currentCardNumber = 0;
+		setCurrentCardData(currentCardNumber);
+		hideAfterScreenShowCards();
+		disablePrevCardButton();
+	}
+
+	btnAutoPlay.addEventListener('click', () => {
+		toggleAutoPlay();
+	})
+
+	var toggleAutoPlay = () => {
+		if (autoPlayToggled) {
+			clearTimeout(autoPlayTimeout);
+			autoPlayToggled = false;
+			btnAutoPlay.classList.remove('toggled');
+			btnAutoPlay.querySelector('i').classList = "bi bi-play";
+		}
+		else {
+			autoPlayToggled = true;
+			btnAutoPlay.classList.add('toggled');
+			btnAutoPlay.querySelector('i').classList = "bi bi-pause";
+			autoPlayTimeout = setTimeout(foo, 5000);
+		}
+	}
+
+	btnShuffle.addEventListener('click', () => {
+		toggleShuffle();
+	})
+
+	var toggleShuffle = () => {
+		console.log(cards);
+		if (shuffleToggled) {
+			shuffleToggled = false;
+			btnShuffle.classList.remove('toggled');
+			if (cardInnerElement.classList.contains('flip')) {
+				unflipCard();
+			}
+			cards = [...cardsOriginal];
+			currentCardNumber = 0;
+			setCurrentCardData(currentCardNumber);
+		}
+		else {
+			shuffleToggled = true;
+			btnShuffle.classList.add('toggled');
+			cards = shuffleArray(cards);
+			currentCardNumber = 0;
+			setCurrentCardData(currentCardNumber);
+		}
+	}
+
+	function foo(resetAutoplay = false) {
+		if (resetAutoplay) {
+			clearTimeout(autoPlayTimeout);
+			autoPlayTimeout = setTimeout(foo, 5000);
+		}
+		// clearing timeout and starting it again when user flips card/clicks prev/next card when autoplay is ON
+		// cleared when function called foo(true)
+		else {
+			if (autoPlayToggled && currentCardNumber < @Model.CardCount) {
+				autoPlayTimeout = setTimeout(foo, 5000);
+				if (!cardInnerElement.classList.contains('flip')) // if card was not yet flipped - flip it
+					flipCard();
+				else // else click NEXT CARD button
+					btnsNextCard[0].click();
+			}
+			// toggle autoplay OFF when finished all cards
+			else if (autoPlayToggled && currentCardNumber === @Model.CardCount) {
+				toggleAutoPlay();
+			}
+		}
+	}
+
+	function shuffleArray(array) {
+		let currentIndex = array.length, randomIndex;
+		// While there remain elements to shuffle.
+		while (currentIndex != 0) {
+			// Pick a remaining element.
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+			// And swap it with the current element.
+			[array[currentIndex], array[randomIndex]] = [
+				array[randomIndex], array[currentIndex]];
+		}
+		return array;
+	}
+
+	var loadTerms = () => {
+		cardsOriginal.forEach(card => {
+			let newTerm = document.createElement('div');
+			newTerm.className = "row mx-0 mb-2 p-3 text-light term-in-set";
+			let termQuestion = document.createElement('div');
+			termQuestion.className = "col-4 col-question p-0";
+			let p1 = document.createElement('p');
+			p1.textContent = card.question;
+			termQuestion.append(p1);
+			let termAnswer = document.createElement('div');
+			termAnswer.className = "col-8 col-answer";
+			let p2 = document.createElement('p');
+			p2.textContent = card.answer;
+			termAnswer.append(p2);
+			newTerm.append(termQuestion, termAnswer);
+			setTerms.append(newTerm);
+		})
+	}
+</script>
+}

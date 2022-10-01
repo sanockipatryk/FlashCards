@@ -9,7 +9,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<button type="button" class="btn btn-primary">Study</button>
+				<a id="studyButton" class="btn btn-primary">Study</a>
 			</div>
 		</div>
 	</div>
@@ -22,9 +22,11 @@
 	var modalBody = document.querySelector("#previewModal .modal-body");
 	var modalTitle = document.querySelector("#previewModal .modal-title");
 	var previewButtons = document.querySelectorAll(".previewButton");
+	var studyButton = document.querySelector("#studyButton");
 	previewButtons.forEach(button => button.addEventListener('click', async () => {
 		modalTitle.textContent = button.getAttribute("data-title");
 		id = button.getAttribute('data-id');
+		studyButton.setAttribute('href', '/Sets/' + id);
 		modalBody.innerHTML = "<p class='text-center'>Loading...</p>";
 		firstLoadComplete = false;
 		await fetch(PostBackURL + id + "/" + 0, {

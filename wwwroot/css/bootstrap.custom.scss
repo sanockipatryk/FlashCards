@@ -1,53 +1,536 @@
-﻿$primary: #25c791;
-$highlight: #c72591;
+﻿$primary: #448058;
+$highlight: #5fb27b;
+$info: #f1db77;
+$bg-color: #163e24;
 
 @import "../lib/bootstrap/scss/bootstrap";
 
+html,
+body {
+  background-color: $bg-color !important;
+}
+
 nav.navbar {
-    background-color: $primary;
+  background-color: $bg-color;
+  border-bottom: 1px solid grey !important;
+}
+
+.container {
+  max-width: 1280px;
+}
+
+.bg-main {
+  background-color: $bg-color;
+}
+
+input.form-control,
+textarea.form-control,
+select.form-select {
+  background-color: $primary;
+  color: white;
+  border-color: $primary;
+  border-width: 2px;
+}
+
+#card-subject-select[disabled] {
+  background-color: $primary;
+  opacity: 0.5;
+}
+
+input.form-control:focus,
+textarea.form-control:focus,
+select.form-select:focus {
+  background-color: $primary;
+  border-color: $info;
+  color: white;
+}
+
+select.form-select option:hover {
+  box-shadow: 0 0 10px 100px $highlight inset;
+}
+
+input.form-control::placeholder,
+textarea.form-control::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 1; /* Firefox */
+}
+
+input.form-control:-ms-input-placeholder,
+textarea.form-control:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: white;
+}
+
+input.form-control::-ms-input-placeholder,
+textarea.form-control::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: white;
+}
+
+input.form-control::-webkit-search-cancel-button {
+  filter: brightness(0) saturate(100%) invert(99%) sepia(13%) saturate(111%)
+    hue-rotate(155deg) brightness(114%) contrast(100%);
+}
+
+input.form-control:disabled,
+select.form-select:disabled {
+  background-color: $primary;
+}
+
+.qa-input.form-control,
+.qa-input.form-control:focus {
+  background-color: $bg-color;
+}
+
+input.form-control:-webkit-autofill,
+input.form-control:-webkit-autofill:hover,
+input.form-control:-webkit-autofill:focus,
+input.form-control:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px $primary inset !important;
+  -webkit-text-fill-color: white !important;
+  caret-color: white;
+  transition: background-color 5000s;
+}
+
+.qa-input.form-control:-webkit-autofill
+  .qa-input.form-control:-webkit-autofill:hover,
+.qa-input.form-control:-webkit-autofill:focus,
+.qa-input.form-control:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px $bg-color inset !important;
+}
+
+.qa-card .card {
+  background-color: $primary;
 }
 
 .selected {
-    background-color: rgba(37, 199, 145, 0.3);
+  background-color: $highlight;
 }
 
 div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
-    --bs-dropdown-link-hover-bg: rgba(37, 199, 145, 0.3);
+  background-color: $highlight;
 }
 
-.dropdown-item.highlight {
-    color: $highlight !important;
+.set-card {
+  background-color: transparent;
+}
+
+.set-card .card-body {
+  box-sizing: border-box;
+  background-color: $primary;
+  border-radius: 14px;
+  border-bottom: 8px solid transparent;
+}
+
+.set-card .card-body:hover {
+  cursor: pointer;
+  border-bottom: 8px solid $info;
 }
 
 .subject-category-buttons {
-    overflow-x: auto;
-    padding-bottom: 10px;
-    white-space: nowrap;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  white-space: nowrap;
 }
 
 .subject-category-buttons button {
-    margin-right: 4px;
-    font-size: 12pt;
-    padding: 12px 20px;
+  font-size: 12pt;
+  padding: 12px 20px;
 }
 
 .subject-buttons button.btn-light {
-    background-color: white;
+  background-color: white;
 }
 
 .form-check-input.checkbox-margin-right {
-    margin-right: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 div.question-answer div input {
-    border: none;
-    border-radius: unset;
-    border-bottom: 3px solid $primary;
+  border: none;
+  border-radius: unset;
+  border-bottom: 3px solid $highlight;
 }
+
 div.question-answer div input:focus {
-    border-color: $highlight;
-    
+  border-color: $info;
 }
-.btn.btn-light.different-cat-sub {
-    background-color: white;
+
+.different-cat-sub {
+  margin-right: 4px;
+}
+/* Works on Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: blue orange;
+}
+/* Works on Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+  width: 12px;
+  height: 10px;
+  background-color: #f5f5f5;
+}
+
+*::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
+  background-color: #f5f5f5;
+}
+
+*::-webkit-scrollbar-track:horizontal {
+  border-radius: 10px;
+}
+
+.subject-category-buttons::-webkit-scrollbar-track {
+  margin-right: 14px;
+}
+
+.subject-category-buttons::-webkit-scrollbar-track {
+  margin-left: 14px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #bebfbe;
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  border-radius: 10px;
+}
+
+html {
+  font-size: 14px;
+  background-color: #f6f7fb;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  background-color: #f6f7fb;
+}
+
+div.dropdown-multicol {
+  width: 20em;
+  position: relative;
+  background-color: $primary;
+}
+
+div.dropdown-multicol > div.dropdown-col {
+  display: inline-block;
+  width: 39%;
+  float: left;
+  vertical-align: top;
+}
+
+div.dropdown-multicol > div.dropdown-col:nth-child(1) {
+  width: 61%;
+  border-right: 1px solid #eee;
+}
+
+div.dropdown-multicol > div.dropdown-col:nth-child(1) i {
+  float: right;
+  margin-right: -6px;
+}
+
+div.dropdown-multicol > div.dropdown-col.visible-item {
+  display: inline-block;
+}
+
+div.dropdown-multicol > div.dropdown-col.hidden-item {
+  display: none;
+}
+
+.page-link {
+  border-color: $bg-color;
+}
+.page-link:hover {
+  border-color: $info;
+}
+
+.cat-sub-title {
+  background-color: #92b396;
+}
+
+.resize-off {
+  resize: none;
+}
+
+label.card-label-floating {
+  left: unset;
+}
+
+.disabled-link {
+  pointer-events: none;
+}
+
+.tags div {
+  border-radius: 25px;
+  padding: 0 10px;
+  font-size: 10pt;
+  display: inline-block;
+}
+
+.tags div.tag-category {
+  background-color: #bfd7ff;
+}
+
+.tags div.tag-subject {
+  background-color: #9bb1ff;
+}
+
+.set-qa-preview {
+  border-bottom: 1px solid lightgrey;
+}
+
+.set-qa-preview .q-preview {
+  font-weight: 500;
+}
+
+.set-qa-preview .a-preview {
+  font-size: 10pt;
+}
+
+.set-study-card {
+  perspective: 800px;
+}
+
+.set-study-card-inner.from-right {
+  animation: slideInFromRight 0.25s both 1;
+}
+
+.set-study-card-inner.from-left {
+  animation: slideInFromLeft 0.25s both 1;
+}
+
+.set-study-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 460px;
+  cursor: pointer;
+  perspective: 800px;
+  transform-style: preserve-3d;
+}
+
+.set-study-card-inner.out {
+  animation: flipOut 0.25s both 1;
+}
+
+.set-study-card-inner.flip {
+  animation: flipIn 0.25s both 1;
+}
+
+.card-front,
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: $primary;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 5px;
+}
+
+.card-front {
+  color: black;
+}
+
+.card-back {
+  transform: rotateX(180deg);
+  color: black;
+}
+
+.set-study-qa {
+  font-size: 22pt;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.set-study-arrow {
+  flex-basis: 48%;
+}
+
+.set-study-arrow.inactive {
+  cursor: default;
+  background-color: $info;
+  opacity: 0.6;
+}
+
+.set-study-arrow.inactive:hover {
+  background-color: $info;
+}
+
+.set-study-arrow.inactive:focus,
+.set-study-arrow.inactive:active {
+  outline: none;
+  box-shadow: none;
+}
+
+.bg-img {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.bg-hurray {
+  background-image: url(../img/undraw_well_done_re_3hpo.svg);
+}
+
+.bg-learn {
+  background-image: url(../img/undraw_bibliophile_re_xarc.svg);
+}
+
+.bg-repeat {
+  background-image: url(../img/undraw_tabs_re_a2bd.svg);
+}
+
+.bg-emote {
+  font-size: 60pt;
+}
+
+.after-study-screen {
+  min-height: 460px;
+  background-color: transparent;
+}
+
+.after-study-screen .continue-btn {
+  border: 2px solid transparent;
+  border-radius: 15px;
+  background-color: $primary;
+  flex-basis: 36%;
+  cursor: pointer;
+}
+.after-study-screen .continue-btn:hover {
+  border: 2px solid $info;
+}
+
+.after-study-screen .continue-btn .btn-title {
+  padding: 0;
+  margin: 0;
+  font-weight: 700;
+  font-size: 13pt;
+  color: $info;
+}
+
+.after-study-screen .continue-btn .btn-sub {
+  padding: 0;
+  margin: 0;
+  font-size: 12pt;
+}
+
+.after-study-screen .after-study-links p {
+  cursor: pointer;
+}
+
+.text-sub {
+  font-size: 14pt;
+  font-weight: bold;
+  color: $highlight !important;
+}
+
+.cards-controls {
+  font-size: 20pt;
+}
+
+.cards-controls span {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  border: 2px solid transparent;
+  border-radius: 100%;
+}
+
+.cards-controls span:hover {
+  cursor: pointer;
+  background-color: $highlight;
+}
+
+.cards-controls span.toggled {
+  border-color: $info;
+}
+
+.cards-controls span.btn-shuffle {
+  font-size: 16pt;
+  margin-left: 12px;
+}
+
+.cards-controls span.btn-copy {
+  font-size: 14pt;
+  border-color: $info;
+}
+
+.cards-controls span i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+a.user-link {
+  text-decoration: none;
+}
+
+.term-in-set {
+  padding: 20px;
+  background-color: $primary;
+  border-radius: 5px;
+}
+
+.term-in-set .col-answer {
+  border-left: 2px solid $bg-color;
+  padding-left: 20px;
+}
+
+.term-in-set .col-answer p {
+  margin: 0;
+}
+
+@keyframes flipIn {
+  from {
+    transform: rotateX(0);
+  }
+
+  to {
+    transform: rotateX(180deg);
+  }
+}
+
+@keyframes flipOut {
+  from {
+    transform: rotateX(180deg);
+  }
+
+  to {
+    transform: rotateX(360deg);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(80px) rotateY(-6deg);
+  }
+
+  to {
+    transform: translateX(0) rotateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-80px) rotateY(6deg);
+  }
+
+  to {
+    transform: translateX(0) rotateY(0);
+  }
 }

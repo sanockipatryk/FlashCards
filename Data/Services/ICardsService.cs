@@ -19,6 +19,8 @@ namespace FlashCards.Data.Services
 		Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreviewAsync(int cardSetId, int count);
 
 		Task CreateCardSetAsync(CreateCardSetViewModel model, string userId);
+		Task<CardSetViewModel> GetCardSetAsync(int id);
+		Task<IEnumerable<Card>> GetCardsForCardSetAsync(int id);
 
 		Task<bool> IsUserTheOwner(string userId, string requestedUserNickName);
 

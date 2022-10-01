@@ -1,34 +1,40 @@
 ﻿@model IEnumerable<CardCategory>
 
 <li class="nav-item dropdown">
-	<a class="nav-link text-dark dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+	<a class="nav-link text-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+		aria-expanded="false">
 		Browse sets
 	</a>
 	<div class="dropdown-menu dropdown-multicol">
 		<div class="dropdown-col">
 			@foreach (var category in Model)
 			{
-				<a class="dropdown-item text-dark category-item @(category.Id == Model.First().Id?"selected":"")"
-				data-categoryId="@category.Id"  asp-controller="Cards" asp-action="Category" 
-				asp-route-categoryName="@category.Name" asp-route-page="1">@category.Name<i class="bi bi-caret-right-fill"></i>
+				<a class="dropdown-item text-light category-item @(category.Id == Model.First().Id?"selected":"")"
+				data-categoryId="@category.Id" asp-controller="Cards" asp-action="Category"
+				asp-route-categoryName="@category.Name" asp-route-page="1">@category.Name<i
+					class="bi bi-caret-right-fill"></i>
 				</a>
 			}
 		</div>
 		@foreach (var category in Model)
 		{
-			<div id="subjects-@category.Id" class="dropdown-col @(category.Id == Model.First().Id?"visible-item":"hidden-item")">
+			<div id="subjects-@category.Id"
+			class="dropdown-col @(category.Id == Model.First().Id?"visible-item":"hidden-item")">
 				@foreach (var subject in category.CardSubjects.Take(4))
 				{
-					<a class="dropdown-item text-dark" asp-controller="Cards" asp-action="Subject" asp-route-categoryName="@category.Name" asp-route-subjectName="@subject.Name" asp-route-page="1">@subject.Name</a>
+					<a class="dropdown-item text-light" asp-controller="Cards" asp-action="Subject"
+				asp-route-categoryName="@category.Name" asp-route-subjectName="@subject.Name"
+				asp-route-page="1">@subject.Name</a>
 				}
-				<a class="dropdown-item text-dark highlight" asp-controller="Cards" asp-action="Category" asp-route-categoryName="@category.Name" asp-route-page="1">See all</a>
+				<a class="dropdown-item text-info" asp-controller="Cards" asp-action="Category"
+				asp-route-categoryName="@category.Name" asp-route-page="1"><strong>See all</strong></a>
 			</div>
 		}
 	</div>
 </li>
 
 <script>
-		document.addEventListener('DOMContentLoaded', function (event) {
+	document.addEventListener('DOMContentLoaded', function (event) {
 		let categoryItems = document.querySelectorAll('.category-item');
 		categoryItems.forEach(item => {
 			item.addEventListener('mouseover', event => {

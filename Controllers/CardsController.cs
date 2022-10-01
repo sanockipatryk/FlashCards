@@ -67,8 +67,23 @@ namespace FlashCards.Controllers
 		//	return RedirectToAction("Index", "Home");
 		//}
 
-		
+		[HttpGet("{id:int}")]
+		public async Task<IActionResult> Set(int id)
+		{
+			var cardSet = await _service.GetCardSetAsync(id);
+			if(cardSet.Name != null)
+			{
+				return View(cardSet);
 
+			}
+			return RedirectToAction(nameof(Sets), new { page = 1 });
+		}
+
+		[HttpGet]
+		public IActionResult Sets()
+		{
+			return RedirectToAction(nameof(Sets), new {page = 1 });
+		}
 
 		[HttpGet("page/{page:int?}")]
 		public async Task<IActionResult> Sets(string categoryName, int page = 1, int cardsPerPage = 12, string? name = null, string? numberOfCards = null, string? author = null, string? sort = null)
@@ -196,6 +211,18 @@ namespace FlashCards.Controllers
 			return NotFound();
 		}
 
+
+		[HttpGet("GetCardsForCardSet/{id}")]
+		public async Task<IActionResult> GetCardsForCardSet(int id)
+		{
+			var cards = await _service.GetCardsForCardSetAsync(id);
+			if (cards.Count() > 0)
+			{
+				return Json(cards);
+
+			}
+			return Json(null);
+		}
 
 	}
 }

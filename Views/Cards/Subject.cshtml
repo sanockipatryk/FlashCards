@@ -5,16 +5,18 @@
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item" aria-current="page">
-					<a asp-action="Sets" asp-route-page="1"
+					<a class="text-info"
+					   asp-action="Sets" asp-route-page="1"
 					   asp-route-name="@Model.Filters.Name"
 					   asp-route-numberOfCards="@Model.Filters.NumberOfCards"
 					   asp-route-author="@Model.Filters.Author"
 					   asp-route-sort="@Model.Filters.SortBy">
-						All sets
+						Sets
 					</a>
 				</li>
 				<li class="breadcrumb-item" aria-current="page">
-					<a asp-action="Category"
+					<a class="text-info"
+					   asp-action="Category"
 					   asp-route-categoryName="@Model.CardSubject.CardCategory.Name"
 					   asp-route-page="1"
 					   asp-route-name="@Model.Filters.Name"
@@ -24,7 +26,7 @@
 						@Model.CardSubject.CardCategory.Name
 					</a>
 				</li>
-				<li class="breadcrumb-item active" aria-current="page">@Model.CardSubject.Name</li>
+				<li class="breadcrumb-item active text-light" aria-current="page">@Model.CardSubject.Name</li>
 			</ol>
 		</nav>
 	</div>
@@ -41,12 +43,12 @@
 </div>
 <div class="row">
 	<div class="col-12">
-		<p class="mt-3 mb-3"><strong>Different subject?</strong></p>
+		<p class="mt-3 mb-3 text-light"><strong>Different subject?</strong></p>
 	</div>
 	<div class="col-12 subject-category-buttons">
 		@foreach (var subject in Model.OtherSubjects)
 		{
-			<a class="btn btn-light different-cat-sub"
+			<a class="btn btn-primary text-light different-cat-sub"
 		   asp-action="Subject"
 		   asp-route-subjectName="@subject.Name"
 		   asp-route-page="1"

@@ -334,6 +334,69 @@ namespace FlashCards.Data.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<CardSetViewModel> GetCardSetAsync(int id)
+		{
+            var cardSet = await _context.CardSets
+                .Select(c => new CardSet
+			        {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    DateUpdated = c.DateUpdated,
+                    User = new ApplicationUser
+					{
+                        Id = c.User.Id,
+                        Nickname = c.User.Nickname,
+					},
+                    CardSubject = new CardSubject
+					{
+                        Id = c.CardSubject.Id,
+                        Name = c.CardSubject.Name,
+                        CardCategory = new CardCategory
+						{
+                            Id = c.CardSubject.CardCategory.Id,
+                            Name = c.CardSubject.CardCategory.Name,
+						}
+					},
+			        })
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            var cardCount = _context.Cards.Count(c => c.CardSetId == cardSet.Id);
+
+            if(cardSet != null)
+			{
+                return new CardSetViewModel
+                {
+                    Id = cardSet.Id,
+                    Name = cardSet.Name,
+                    Description = cardSet.Description,
+                    DateUpdated = cardSet.DateUpdated,
+                    User = cardSet.User,
+                    CardSubject = cardSet.CardSubject,
+                    CardCount = cardCount
+                };
+			}
+            return new CardSetViewModel();
+		}
+        public async Task<IEnumerable<Card>> GetCardsForCardSetAsync(int id)
+        {
+            var cardSet = await _context.CardSets.FirstOrDefaultAsync(c => c.Id == id);
+            if(cardSet != null)
+			{
+                var cards = await _context.Cards.Where(c => c.CardSetId == cardSet.Id)
+                    .Select(c => new Card
+                    {
+                        Id = c.Id,
+                        Question = c.Question,
+                        Answer = c.Answer,
+                        DateUpdated = c.DateUpdated,
+                    }).ToListAsync();
+
+                return cards;
+            }
+            return null;
+        }
+
         public async Task<bool> IsUserTheOwner(string userId, string requestedUserNickName)
         {
             if (userId != null && requestedUserNickName != null)
