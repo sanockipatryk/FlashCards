@@ -14,38 +14,39 @@ namespace FlashCards.Data
             {
                 if (context.CardCategories.Any())
                 { }
-                else { 
-                string[] cardCategories = new string[]
+                else
                 {
+                    string[] cardCategories = new string[]
+                    {
                     "Languages", "Maths", "Science", "Human Sciences", "Arts", "Other"
-                };
-                string[] cardSubjects = new string[]
-                {
+                    };
+                    string[] cardSubjects = new string[]
+                    {
                     "English", "French", "German", "Spanish",
-                    "Algebra", "Arithmetic", "Geometry", "Calculus", 
+                    "Algebra", "Arithmetic", "Geometry", "Calculus",
                     "Biology", "Chemistry", "Physics", "Medicine",
                     "Psychology", "Business", "Economics", "Law",
                     "History", "Music", "Philosophy", "Literature",
                     "Hobby", "Sports", "Skills", "Other"
-                };
-                int row = 0;
-                foreach (var cardCategory in cardCategories)
-                {
-                    var newCategory = context.CardCategories.Add(new CardCategory() { Name = cardCategory });
-                    context.SaveChanges();
-                    
-                    for(int i = 0; i<4; i++)
-					{
-                        context.CardSubjects.Add(new CardSubject()
-                        {
-                            Name = cardSubjects[row * 4 + i],
-                            CardCategoryId = newCategory.Entity.Id
-                        });
-					}
-                    row++;
-                }
+                    };
+                    int row = 0;
+                    foreach (var cardCategory in cardCategories)
+                    {
+                        var newCategory = context.CardCategories.Add(new CardCategory() { Name = cardCategory });
+                        context.SaveChanges();
 
-                context.SaveChanges();
+                        for (int i = 0; i < 4; i++)
+                        {
+                            context.CardSubjects.Add(new CardSubject()
+                            {
+                                Name = cardSubjects[row * 4 + i],
+                                CardCategoryId = newCategory.Entity.Id
+                            });
+                        }
+                        row++;
+                    }
+
+                    context.SaveChanges();
                 }
                 using (var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>())
                 {
@@ -72,16 +73,16 @@ namespace FlashCards.Data
                     }
                 }
 
-                if(!context.Cards.Any())
+                if (!context.Cards.Any())
                 {
                     int i = 0;
                     var cardCategories = context.CardCategories.Include(c => c.CardSubjects).ToList();
                     var user = context.Users.FirstOrDefault(u => u.Email == "test@test.com");
-                    foreach(var category in cardCategories)
+                    foreach (var category in cardCategories)
                     {
-                        foreach(var subject in category.CardSubjects)
+                        foreach (var subject in category.CardSubjects)
                         {
-                            for(int j = 0; j < 30; j++)
+                            for (int j = 0; j < 30; j++)
                             {
                                 var cardSet = new CardSet()
                                 {
@@ -103,8 +104,6 @@ namespace FlashCards.Data
                                     {
                                         Question = $"Question {j + i * 30}/{k}",
                                         Answer = $"Answer {j + i * 30}/{k}",
-                                        DateCreated = DateTime.UtcNow,
-                                        DateUpdated = DateTime.UtcNow,
                                         CardSetId = cardSet.Id
                                     });
                                 }
@@ -116,7 +115,7 @@ namespace FlashCards.Data
                     }
                 }
             }
-            
+
         }
     }
 }

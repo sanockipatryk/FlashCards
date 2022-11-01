@@ -8,5 +8,6 @@ namespace FlashCards.Models
         [MaxLength(100)]
         public string Name { get; set; }
         public List<CardSubject> CardSubjects { get; set; }
+        public string Icon { get; set; }
     }
 }

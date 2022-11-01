@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using FlashCards.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace FlashCards.Models.ViewModels
 {
@@ -9,5 +10,6 @@ namespace FlashCards.Models.ViewModels
         public int SelectedCardCategoryId { get; set; }
         public IEnumerable<CardCategory>? CardCategories { get; set; }
         public int AddManyCards { get; set; }
+        public CreateSetActionType ActionType { get; set; }
     }
 }

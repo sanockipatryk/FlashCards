@@ -1,19 +1,17 @@
 ﻿@model IEnumerable<CardCategory>
 
-<li class="nav-item dropdown">
+<li class="nav-item dropdown d-none d-md-block">
 	<a class="nav-link text-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-		aria-expanded="false">
+		data-bs-auto-close="outside" aria-expanded="false">
 		Browse sets
 	</a>
 	<div class="dropdown-menu dropdown-multicol">
 		<div class="dropdown-col">
 			@foreach (var category in Model)
 			{
-				<a class="dropdown-item text-light category-item @(category.Id == Model.First().Id?"selected":"")"
-				data-categoryId="@category.Id" asp-controller="Cards" asp-action="Category"
-				asp-route-categoryName="@category.Name" asp-route-page="1">@category.Name<i
-					class="bi bi-caret-right-fill"></i>
-				</a>
+				<span class="dropdown-item category-item @(category.Id == Model.First().Id?"selected":"")"
+				data-categoryId="@category.Id">@category.Icon @category.Name<i class="bi bi-caret-right-fill"></i>
+				</span>
 			}
 		</div>
 		@foreach (var category in Model)
@@ -22,9 +20,8 @@
 			class="dropdown-col @(category.Id == Model.First().Id?"visible-item":"hidden-item")">
 				@foreach (var subject in category.CardSubjects.Take(4))
 				{
-					<a class="dropdown-item text-light" asp-controller="Cards" asp-action="Subject"
-				asp-route-categoryName="@category.Name" asp-route-subjectName="@subject.Name"
-				asp-route-page="1">@subject.Name</a>
+					<a class="dropdown-item" asp-controller="Cards" asp-action="Subject" asp-route-categoryName="@category.Name"
+				asp-route-subjectName="@subject.Name" asp-route-page="1">@subject.Name</a>
 				}
 				<a class="dropdown-item text-info" asp-controller="Cards" asp-action="Category"
 				asp-route-categoryName="@category.Name" asp-route-page="1"><strong>See all</strong></a>
@@ -32,7 +29,35 @@
 		}
 	</div>
 </li>
+<div class="divide-areas mt-2 pt-2 d-block d-md-none">
+	<p class="text-light nav-text lead mb-2 pb-2 d-block d-md-none"><strong>Subject areas</strong></p>
+	<ul class="navbar-nav d-block d-md-none px-2">
+		@foreach (var category in Model)
+		{
+			<li class="nav-item dropdown bg-transparent nav-language-dropdown nav-text my-2">
+				<a class="nav-link dropdown-toggle text-light" href="#" role="button" data-bs-toggle="dropdown"
+				aria-expanded="false">
+					@category.Icon @category.Name
+				</a>
+				<ul class="dropdown-menu bg-transparent border-0">
+					@foreach (var subject in category.CardSubjects)
+					{
+						<li class="nav-text">
+							<a class="dropdown-item text-light bg-transparent ms-3 mb-2" asp-controller="Cards"
+						asp-action="Subject" asp-route-categoryName="@category.Name"
+						asp-route-subjectName="@subject.Name" asp-route-page="1">@subject.Name</a>
+						</li>
+					}
+					<li class="nav-text">
+						<a class="dropdown-item text-info bg-transparent ms-3 mb-2" asp-controller="Cards"
+						asp-action="Category" asp-route-categoryName="@category.Name">See all</a>
+					</li>
+				</ul>
+			</li>
+		}
 
+	</ul>
+</div>
 <script>
 	document.addEventListener('DOMContentLoaded', function (event) {
 		let categoryItems = document.querySelectorAll('.category-item');
@@ -42,7 +67,19 @@
 				const currentCategoryId = currentCategory[currentCategory.length - 1];
 				document.querySelector(`#subjects-${currentCategoryId}`).classList.remove('visible-item');
 				document.querySelector(`#subjects-${currentCategoryId}`).classList.add('hidden-item');
-				document.querySelector(`a.category-item.selected`).classList.remove('selected');
+				document.querySelector(`span.category-item.selected`).classList.remove('selected');
+				item.classList.add('selected');
+
+				const categoryId = item.getAttribute('data-categoryId');
+				document.querySelector(`#subjects-${categoryId}`).classList.remove('hidden-item');
+				document.querySelector(`#subjects-${categoryId}`).classList.add('visible-item');
+			})
+			item.addEventListener('touch', event => {
+				const currentCategory = document.querySelector(".visible-item").getAttribute("id");
+				const currentCategoryId = currentCategory[currentCategory.length - 1];
+				document.querySelector(`#subjects-${currentCategoryId}`).classList.remove('visible-item');
+				document.querySelector(`#subjects-${currentCategoryId}`).classList.add('hidden-item');
+				document.querySelector(`span.category-item.selected`).classList.remove('selected');
 				item.classList.add('selected');
 
 				const categoryId = item.getAttribute('data-categoryId');

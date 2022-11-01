@@ -1,88 +1,115 @@
 ﻿@model CardSetViewModel
+@using System.Security.Claims
 
-<div class="row">
-	<div class="row p-0 offset-xs-0 col-xs-12 offset-md-2 col-md-8">
-		<div class="col-12">
-			<p class="display-6 text-white"><strong>@Model.Name</strong></p>
-		</div>
-		<div class="col-12 set-study-card d-block">
-			<div class="set-study-card-inner">
-				<div class="card-front d-flex flex-column justify-content-between py-4 px-2">
-					<div class="row">
-						<div class="col-2 text-center">
-							<p class='card-text text-white'>
-								Question
+<div class="row mx-3">
+	<div class="p-0 offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
+		<div class="row m-0 p-0">
+			<div class="col-12 p-0">
+				<p class="display-6 text-white"><strong>@Model.Name</strong></p>
+			</div>
+			<div class="col-12 p-0 set-study-card d-block">
+				<div class="set-study-card-inner">
+					<div class="card-front d-flex flex-column justify-content-between py-4 px-2">
+						<div class="row">
+							<div class="col-2 text-center">
+								<p class='card-text text-white'>
+									Question
+								</p>
+							</div>
+							<div class="offset-2 col-4 text-center">
+								<p class='card-text text-white'>
+									<span class="current-card-number">1</span>
+									<span>/ @Model.CardCount</span>
+								</p>
+							</div>
+						</div>
+						<div class="text-center py-2 px-2 px-sm-3 px-lg-5 text-white">
+							<p id="currentQuestionParagraph" class="set-study-qa card-text">
 							</p>
 						</div>
-						<div class="offset-3 col-2 text-center">
-							<p class='card-text text-white'>
-								<span class="current-card-number">1</span>
-								<span>/ @Model.CardCount</span>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-around align-items-center">
+								<button type="button"
+									class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive">
+									<i class="bi bi-chevron-left"></i>
+								</button>
+								<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow">
+									<i class="bi bi-chevron-right"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+					<div class="card-back d-flex flex-column justify-content-between py-4 px-2">
+						<div class="row">
+							<div class="col-2 text-center">
+								<p class='card-text text-white'>
+									Answer
+								</p>
+							</div>
+							<div class="offset-2 col-4 text-center">
+								<p class='card-text text-white'>
+									<span class="current-card-number">1</span>
+									<span>/ @Model.CardCount</span>
+								</p>
+							</div>
+						</div>
+						<div class="text-center py-2 px-2 px-sm-3 px-lg-5 text-white">
+							<p id="currentAnswerParagraph" class="set-study-qa card-text">
 							</p>
 						</div>
-					</div>
-					<div class="row text-center py-2 px-5 text-white">
-						<p id="setQuestion" class="set-study-qa card-text">
-						</p>
-					</div>
-					<div class="row">
-						<div class="col-12 d-flex justify-content-around align-items-center">
-							<button type="button" class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive"><i
-									class="bi bi-chevron-left"></i></button>
-							<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow"><i
-									class="bi bi-chevron-right"></i></button>
-						</div>
-					</div>
-				</div>
-				<div class="card-back d-flex flex-column justify-content-between py-4 px-2">
-					<div class="row">
-						<div class="col-2 text-center">
-							<p class='card-text text-white'>
-								Answer
-							</p>
-						</div>
-						<div class="offset-3 col-2 text-center">
-							<p class='card-text text-white'>
-								<span class="current-card-number">1</span>
-								<span>/ @Model.CardCount</span>
-							</p>
-						</div>
-					</div>
-					<div class="row text-center py-2 px-5 text-white">
-						<p id="setAnswer" class="set-study-qa card-text">
-						</p>
-					</div>
-					<div class="row">
-						<div class="col-12 d-flex justify-content-around align-items-center">
-							<button type="button" class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive"><i
-									class="bi bi-chevron-left"></i></button>
-							<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow"><i
-									class="bi bi-chevron-right"></i></button>
+						<div class="row">
+							<div class="col-12 d-flex justify-content-around align-items-center">
+								<button type="button"
+									class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive">
+									<i class="bi bi-chevron-left"></i>
+								</button>
+								<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow">
+									<i class="bi bi-chevron-right"></i>
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="col-12 after-study-screen d-none flex-column justify-content-between">
-			<div class="row pt-3 m-0">
+			<div class="row m-0 d-flex align-items-center">
 				<div class="col-8 p-0">
-					<p class="display-6 text-light">
+					<p class="display-6 text-light mb-0">
 						<strong>You went through every card in the set.</strong>
 					</p>
 				</div>
-				<div class="col-4 p-0 bg-emote text-center text-info"><i class="bi bi-emoji-laughing-fill"></i>
+				<div class="col-4 p-0 bg-emote text-center text-info">
+					<i class="bi bi-emoji-laughing-fill"></i>
 				</div>
-
 			</div>
-			<div class="row flex-grow-1 p-0 m-0">
-				<div class="col-6">
+			<div class="row p-0 m-0">
+				<div class="col-12 col-sm-6 p-0 pb-3 pb-sm-0 d-flex flex-column">
 					<p class="text-light text-sub">Your results</p>
+					<div class="d-flex justify-content-center flex-grow-1 align-items-center">
+						<div class="row mx-0">
+							<div class="col-4 d-flex donut-score">
+								<div class="hole"><span></span></div>
+							</div>
+							<div class="col-8 d-flex text-score">
+								<div class="d-flex flex-column justify-content-between me-3">
+									<p class="text-completed mb-2">Completed</p>
+									<p class="text-remaining mb-0">Remaining</p>
+								</div>
+								<div class="d-flex flex-column justify-content-between">
+									<p class="text-completed score text-center rounded-5 px-3 mb-2"></p>
+									<p class="text-remaining score text-center rounded-5 px-3 mb-0"></p>
+									@* TO BE DONE IN NEXT VERSION *@
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="col-6 d-flex flex-column justify-content-between p-0">
+				<div class="col-12 col-sm-6 d-flex flex-column justify-content-between p-0">
 					<p class="text-light text-sub">Next steps</p>
 					<div class="row continue-btn p-3 mx-0 mb-2">
-						<div class="col-3 bg-img bg-learn"></div>
-						<div class="col-8 d-flex flex-column justify-content-between">
+						<div class="col-2 col-sm-3 bg-img bg-learn"></div>
+						<div class="col-9 col-sm-8 d-flex flex-column justify-content-between">
 							<div>
 								<p class="btn-title">Learn the set</p>
 							</div>
@@ -90,13 +117,14 @@
 								<p class="btn-sub text-light">Quiz yourself in order to learn these terms.</p>
 							</div>
 						</div>
-						<div class="col-1 d-flex align-items-center">
+						@* TO BE DONE IN NEXT VERSION *@
+						<div class="col-1 ps-2 d-flex align-items-center">
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
 					<div id="repeatCards" class="row continue-btn p-3 mx-0">
-						<div class="col-3 bg-img bg-repeat"></div>
-						<div class="col-8">
+						<div class="col-2 col-sm-3 bg-img bg-repeat"></div>
+						<div class="col-9 col-sm-8 pe-0">
 							<div>
 								<p class="btn-title">Restart flashcards</p>
 							</div>
@@ -104,65 +132,111 @@
 								<p class="btn-sub text-light">Start this sequence from the beginning.</p>
 							</div>
 						</div>
-						<div class="col-1 d-flex align-items-center">
+						<div class="col-1 ps-2 col-sm-1 d-flex align-items-center">
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="row py-3 m-0">
-				<div class="after-study-links col-12 d-flex justify-content-between align-items-center p-0">
-					<p id="backToLastQuestion" class="text-light"><i class="bi bi-arrow-left"></i> Back to the last
-						question</p>
-					<p class="text-light">Continue and test your knowledge<i class="bi bi-arrow-right"></i></p>
+				<div class="col-12 after-study-links p-0">
+					<div class="row p-0 m-0 d-flex justify-content-between align-items-center">
+						<div class="col-12 col-sm-6 mt-2 d-flex justify-content-start align-items-center p-0">
+							<div>
+								<p id="backToLastQuestion" class="text-light p-0 m-0 ms-1">
+									<i class="bi bi-arrow-left me-2"></i>Back to the last question
+								</p>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 mt-4 mt-sm-2 d-flex justify-content-end align-items-center p-0">
+							<div>
+								<p id="continueToTest" class="text-light text-end p-0 m-0 me-1">
+									Continue and test your knowledge<i class="bi bi-arrow-right ms-2"></i>
+								</p>
+								@* TO BE DONE IN NEXT VERSION *@
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="row p-0 offset-xs-0 col-xs-12 offset-md-2 col-md-8 mt-3">
+	<div class="flow-control d-block offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 p-0 mt-3">
 		<p class='text-light cards-controls'>
 			<span class='btn-play'><i class="bi bi-play-fill"></i></span>
 			<span class='btn-shuffle'><i class="bi bi-shuffle"></i></span>
 		</p>
 	</div>
 </div>
-<div class="row">
-	<div class="offset-xs-0 col-xs-12 offset-md-2 col-md-8">
+<div class="row mx-3">
+	<div class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 p-0">
 		<div class="col-12">
 			<div class="row p-0 d-flex justify-content-between">
-				<div class="col-3 d-flex justify-content-start">
-					<div class="row p-0">
-						<div class="col-4">
-							<p class="display-6 text-info  m-0 p-0">
-								<a class="text-info user-link" asp-action="Sets"
-									asp-route-author="@Model.User.Nickname">
-									<i class="bi bi-person-circle"></i>
-								</a>
-							</p>
-						</div>
-						<div class="col-8">
-							<p class="text-muted text- m-0 p-0">Created by:</p>
-							<p class=" m-0 p-0">
-								<a class="text-info user-link" asp-action="Sets"
-									asp-route-author="@Model.User.Nickname">
-									@Model.User.Nickname</a>
-							</p>
-						</div>
+				<div class="col d-flex align-items-center">
+					<div class="me-3">
+						<p class="display-6 text-info m-0 p-0">
+							<a class="text-info user-link" asp-action="Sets" asp-route-author="@Model.User.Nickname">
+								<i class="bi bi-person-circle p-0 m-0"></i>
+							</a>
+						</p>
+					</div>
+					<div class="">
+						<p class="text-muted text- m-0 p-0">Created by:</p>
+						<p class="m-0 p-0">
+							<a class="text-info user-link" asp-action="Sets" asp-route-author="@Model.User.Nickname">
+								@Model.User.Nickname
+							</a>
+						</p>
 					</div>
 				</div>
 				<div class="col-1 d-flex justify-content-end align-items-center cards-controls">
-					<span class="text-info m-0 p-0 btn-copy">
-						<a class="text-info user-link" asp-route-author="@Model.User.Nickname">
+					<a class="text-info user-link d-flex align-items-center" asp-action="CopySet"
+						asp-route-id="@Model.Id" data-bs-toggle="tooltip" data-bs-title="Copy set">
+						<span class="text-info m-0 p-0 btn-copy">
 							<i class="bi bi-clipboard-plus-fill"></i>
+						</span>
+					</a>
+					@if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) ==
+							@Model.User.Id)
+					{
+						<a class="text-info user-link d-flex align-items-center ms-2" asp-action="EditSet"
+						asp-route-id="@Model.Id" data-bs-toggle="tooltip" data-bs-title="Edit set">
+							<span class="text-info m-0 p-0 btn-copy">
+								<i class="bi bi-pencil-square"></i>
+							</span>
 						</a>
-					</span>
+						<a class="text-info user-link d-flex align-items-center ms-2" data-bs-toggle="modal"
+						data-bs-target="#deleteModal" data-toggle="tooltip" data-bs-title="Delete set">
+							<span class="text-info m-0 p-0 btn-copy">
+								<i class="bi bi-trash"></i>
+							</span>
+						</a>
+
+					}
+
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
-<div class="row">
-	<div id="setTerms" class="offset-xs-0 col-xs-12 offset-md-2 col-md-8 mt-4">
+@{
+	if (Model?.Description?.Length > 0)
+	{
+		<div class="row mx-3">
+			<div id="termsInSets" class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 mt-4 p-0">
+				<div>
+					<div class="row mx-0 p-3 text-light  term-in-set">
+						<p class="text-light text-justified mb-0 px-0">
+							@Model?.Description
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+<div class="row mx-3">
+	<div id="termsInSet" class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 mt-4 p-0">
 		<div>
 			<p class="text-light">
 				Terms in this set (@Model.CardCount)
@@ -170,29 +244,47 @@
 		</div>
 	</div>
 </div>
+<partial name="_ModalDeleteSet" model="@Model" />
 
 @section Scripts {
 <script>
 	var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardsForCardSet/";
-	var setQuestion = document.querySelector("#setQuestion");
-	var setAnswer = document.querySelector("#setAnswer");
+	var currentQuestionParagraph = document.querySelector("#currentQuestionParagraph");
+	var currentAnswerParagraph = document.querySelector("#currentAnswerParagraph");
 	var currentCardNumberText = document.querySelectorAll('.current-card-number');
-	var cardElement = document.querySelector(".set-study-card");
-	var cardInnerElement = cardElement.querySelector('.set-study-card-inner');
+	var studyCard = document.querySelector(".set-study-card");
+	var studyCardInner = studyCard.querySelector('.set-study-card-inner');
 	var afterStudyScreen = document.querySelector(".after-study-screen");
+
 	var btnsPrevCard = document.querySelectorAll(".btn-prev-card, #backToLastQuestion");
 	var btnsNextCard = document.querySelectorAll(".btn-next-card");
 	var btnRepeatCards = document.querySelector("#repeatCards");
 	var btnAutoPlay = document.querySelector(".btn-play");
 	var btnShuffle = document.querySelector(".btn-shuffle");
-	var setTerms = document.querySelector('#setTerms');
+
+	var termsInSet = document.querySelector('#termsInSet');
+	var flowControlPanel = document.querySelector('.flow-control');
+
+	var donutScore = document.querySelector(".donut-score");
+	var donutScoreText = document.querySelector('.donut-score .hole span');
+	var termsCompletedParagraph = document.querySelector('.text-completed.score');
+	var termsRemainingParagraph = document.querySelector('.text-remaining.score');
+
 	var currentCardNumber = 0;
-	var cardsOriginal;
-	var cards;
+	var cardsListOriginal;
+	var cardsList;
+
 	var cardsScreenHidden = false;
 	var autoPlayToggled = false;
 	var shuffleToggled = false;
 	var autoPlayTimeout;
+
+	var tooltipDeleteSet = document.querySelector("[data-toggle=tooltip]");
+	var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+	if (tooltipDeleteSet !== null) {
+		tooltipTriggerList = [...tooltipTriggerList, tooltipDeleteSet];
+	}
+	const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 	fetch(PostBackURL + @Model.Id, {
 		method: "GET",
@@ -202,119 +294,139 @@
 	})
 		.then((response) => response.json())
 		.then((data) => {
-			cardsOriginal = data;
-			cards = [...cardsOriginal];
+			cardsListOriginal = data;
+			cardsList = [...cardsListOriginal];
 			setCurrentCardData(currentCardNumber);
 			loadTerms();
 		})
+		.catch((err) => console.log(err))
 
-	cardInnerElement.addEventListener('click', (e) => {
+	studyCardInner.addEventListener('click', (e) => {
 		flipCard();
 		if (autoPlayToggled && e.isTrusted)
-			foo(true);
+			autoplay(true);
 	})
 
+	// adding behavior for selecting previous card
 	btnsPrevCard.forEach((item) => {
 		item.addEventListener('click', (e) => {
 			e.stopPropagation();
 			if (currentCardNumber > 0) {
-				currentCardNumber--;
+				currentCardNumber--; // if current card index bigger than 0 - decrese the current card index
 				if (autoPlayToggled && e.isTrusted)
-					foo(true);
-				hideAfterScreenShowCards();
-				slideFromLeft();
-				setCurrentCardData(currentCardNumber);
+					autoplay(true); // if autoplay is ON and event was fired by a user action, reset the timer on autoplay by passing boolean true
+				hideAfterScreenShowCards(); // decide whether to hide after screen and show the cards
+				slideFromLeft(); // add classes to elements, that animate slide from left
+				setCurrentCardData(currentCardNumber); // update current card data
 				if (currentCardNumber === 0)
-					disablePrevCardButton();
+					disablePrevCardButton(); // disable the ability to go to previous card if current card index is 0
 				else
-					eneablePrevCardButton();
+					eneablePrevCardButton(); // if current card index is not 0, eneable prev button
+				// for when going to prev card from after screen
 			}
 		});
 	});
 
+	// add behavior matching previous card button, but for going forward
 	btnsNextCard.forEach((item) => {
 		item.addEventListener('click', (e) => {
 			e.stopPropagation();
 			if (currentCardNumber < @Model.CardCount)
 				currentCardNumber++;
 			if (autoPlayToggled && e.isTrusted)
-				foo(true);
+				autoplay(true);
 			hideCardsShowAfterScreen();
-			if (currentCardNumber < @(Model.CardCount)) {
+			if (currentCardNumber < @(Model.CardCount)) { // if current card index is withon the range od card count
 				slideFromRight();
 				setCurrentCardData(currentCardNumber);
-				eneablePrevCardButton();
+				eneablePrevCardButton(); //
 			}
 		});
 	});
 
-	var setCurrentCardData = (i) => {
-		setQuestion.textContent = cards[i].question;
-		setAnswer.textContent = cards[i].answer;
+	function setCurrentCardData(i) {
+		// on card change, update question, answer and current card number
+		currentQuestionParagraph.textContent = cardsList[i].question;
+		currentAnswerParagraph.textContent = cardsList[i].answer;
 		currentCardNumberText.forEach(item => item.textContent = currentCardNumber + 1)
 	}
 
-	var flipCard = () => {
-		if (cardInnerElement.classList.contains('flip')) {
+	function flipCard() {
+		// .flip is a class informing that card has been flipped and that the answer is to be shown
+		// .out class is adding animation for flipping out card
+		if (studyCardInner.classList.contains('flip')) {
 			unflipCard();
 		}
 		else
-			cardInnerElement.classList.add('flip');
+			studyCardInner.classList.add('flip');
 	}
 
-	var unflipCard = () => {
-		cardInnerElement.classList.remove('flip');
-		if (!cardInnerElement.classList.contains('out'))
-			cardInnerElement.classList.add('out');
+	function unflipCard() {
+		studyCardInner.classList.remove('flip');
+		if (!studyCardInner.classList.contains('out'))
+			studyCardInner.classList.add('out');
 	}
 
-	var slideFromLeft = () => {
-		cardInnerElement.classList.remove('out');
-		cardInnerElement.classList.remove('flip');
+	function slideFromLeft() {
+		removeOutFlipClasses();
 		removeLeftRightClasses();
-		void cardElement.offsetWidth;
-		cardInnerElement.classList.add('from-left');
+		void studyCard.offsetWidth; //triggering reflow to reset animation starting point 
+		studyCardInner.classList.add('from-left');
 	}
 
-	var slideFromRight = () => {
-		cardInnerElement.classList.remove('out');
-		cardInnerElement.classList.remove('flip');
+	function slideFromRight() {
+		removeOutFlipClasses();
 		removeLeftRightClasses();
-		void cardElement.offsetWidth;
-		cardInnerElement.classList.add('from-right');
+		void studyCard.offsetWidth; //triggering reflow to reset animation starting point
+		studyCardInner.classList.add('from-right');
 	}
 
-	var removeLeftRightClasses = () => {
-		if (cardInnerElement.classList.contains('from-left')) {
-			cardInnerElement.classList.remove('from-left');
+	function removeOutFlipClasses() {
+		studyCardInner.classList.remove('out');
+		studyCardInner.classList.remove('flip');
+	}
+
+	function removeLeftRightClasses() {
+		if (studyCardInner.classList.contains('from-left')) {
+			studyCardInner.classList.remove('from-left');
 		}
-		if (cardInnerElement.classList.contains('from-right')) {
-			cardInnerElement.classList.remove('from-right');
+		if (studyCardInner.classList.contains('from-right')) {
+			studyCardInner.classList.remove('from-right');
 		}
 	}
 
-	var disablePrevCardButton = () => {
+	function disablePrevCardButton() {
 		if (currentCardNumber === 0)
 			btnsPrevCard.forEach(b => b.classList.add('inactive'));
 	}
 
-	var eneablePrevCardButton = () => {
+	function eneablePrevCardButton() {
 		if (currentCardNumber === 1 && btnsPrevCard[0].classList.contains('inactive')) {
 			btnsPrevCard.forEach(b => b.classList.remove('inactive'));
 		}
 	}
 
-	var hideCardsShowAfterScreen = () => {
+	function hideCardsShowAfterScreen() {
+		// replace display classes for card element and after study screen with flow control panel
+		// if autplay was on, turn it off, as there are no more cards to go through
 		if (currentCardNumber > @(Model.CardCount - 1) && !cardsScreenHidden) {
-			cardElement.classList.replace('d-block', 'd-none');
+			if (autoPlayToggled) {
+				autoplayOff();
+			}
+			studyCard.classList.replace('d-block', 'd-none');
 			afterStudyScreen.classList.replace('d-none', 'd-flex');
+			flowControlPanel.classList.replace('d-block', "d-none");
 			cardsScreenHidden = true;
+			updateResultScreen();
 		}
 	}
-	var hideAfterScreenShowCards = () => {
+
+	function hideAfterScreenShowCards() {
+		// replace display classes for card element and after study screen with flow control panel
 		if ((currentCardNumber === @Model.CardCount - 1 && cardsScreenHidden) || (cardsScreenHidden && currentCardNumber === 0)) {
 			afterStudyScreen.classList.replace('d-flex', 'd-none');
-			cardElement.classList.replace('d-none', 'd-block');
+			studyCard.classList.replace('d-none', 'd-block');
+			flowControlPanel.classList.replace('d-none', "d-block");
 			cardsScreenHidden = false;
 		}
 	}
@@ -323,29 +435,36 @@
 		goBackToFirstCard();
 	})
 
-	var goBackToFirstCard = () => {
+	function goBackToFirstCard() {
+		// set current card index to 0 and update UI
 		currentCardNumber = 0;
 		setCurrentCardData(currentCardNumber);
 		hideAfterScreenShowCards();
 		disablePrevCardButton();
 	}
 
+	function updateResultScreen() {
+		// Not yet implemented - update result screen with calculated values
+		donutScore.style.background = "conic-gradient(#f1db77 calc((@Model.CardCount/@Model.CardCount) * 360deg), #88bdbc 0 360deg";
+		termsCompletedParagraph.textContent = @Model.CardCount;
+		termsRemainingParagraph.textContent = 0;
+		donutScoreText.textContent = Math.round(@Model.CardCount/@Model.CardCount*100) + "%";
+	}
+
 	btnAutoPlay.addEventListener('click', () => {
 		toggleAutoPlay();
 	})
 
-	var toggleAutoPlay = () => {
+	function toggleAutoPlay() {
 		if (autoPlayToggled) {
-			clearTimeout(autoPlayTimeout);
-			autoPlayToggled = false;
-			btnAutoPlay.classList.remove('toggled');
-			btnAutoPlay.querySelector('i').classList = "bi bi-play";
+			autoplayOff();
 		}
 		else {
+			// start timeout for autoplay function, update UI for autoplay toggled
 			autoPlayToggled = true;
 			btnAutoPlay.classList.add('toggled');
 			btnAutoPlay.querySelector('i').classList = "bi bi-pause";
-			autoPlayTimeout = setTimeout(foo, 5000);
+			autoPlayTimeout = setTimeout(autoplay, 5000);
 		}
 	}
 
@@ -353,79 +472,97 @@
 		toggleShuffle();
 	})
 
-	var toggleShuffle = () => {
-		console.log(cards);
+	function toggleShuffle() {
+		// toggle shuffle - if shuffle OFF - turn it on; else turn it off
 		if (shuffleToggled) {
 			shuffleToggled = false;
 			btnShuffle.classList.remove('toggled');
-			if (cardInnerElement.classList.contains('flip')) {
-				unflipCard();
-			}
-			cards = [...cardsOriginal];
-			currentCardNumber = 0;
-			setCurrentCardData(currentCardNumber);
+			checkIfCardFlippedAndUnflip();
+			cardsList = [...cardsListOriginal]; // reset card array to original
+			currentCardNumber = 0; // reset current card index to 0 - the first card
+			setCurrentCardData(currentCardNumber); // update state for current card index
 		}
 		else {
 			shuffleToggled = true;
 			btnShuffle.classList.add('toggled');
-			cards = shuffleArray(cards);
-			currentCardNumber = 0;
-			setCurrentCardData(currentCardNumber);
+			checkIfCardFlippedAndUnflip();
+			cardsList = shuffleArray(cardsList); // set card array to shuffled array
+			currentCardNumber = 0; // reset current card index to 0
+			setCurrentCardData(currentCardNumber); // update state for current card index
 		}
 	}
 
-	function foo(resetAutoplay = false) {
+	function checkIfCardFlippedAndUnflip() {
+		if (studyCardInner.classList.contains('flip')) {
+			unflipCard(); // if shuffle toggled when card was flipped to answer side - unflip it
+		}
+	}
+
+	function autoplay(resetAutoplay = false) {
 		if (resetAutoplay) {
 			clearTimeout(autoPlayTimeout);
-			autoPlayTimeout = setTimeout(foo, 5000);
+			autoPlayTimeout = setTimeout(autoplay, 5000);
 		}
 		// clearing timeout and starting it again when user flips card/clicks prev/next card when autoplay is ON
-		// cleared when function called foo(true)
+		// cleared when function called autoplay(true)
 		else {
 			if (autoPlayToggled && currentCardNumber < @Model.CardCount) {
-				autoPlayTimeout = setTimeout(foo, 5000);
-				if (!cardInnerElement.classList.contains('flip')) // if card was not yet flipped - flip it
+				autoPlayTimeout = setTimeout(autoplay, 5000);
+				// on autplay toggled, set timeout
+				if (!studyCardInner.classList.contains('flip')) // if card was not yet flipped - flip it
 					flipCard();
 				else // else click NEXT CARD button
 					btnsNextCard[0].click();
 			}
 			// toggle autoplay OFF when finished all cards
 			else if (autoPlayToggled && currentCardNumber === @Model.CardCount) {
-				toggleAutoPlay();
+				autoplayOff();
 			}
 		}
 	}
 
+	// turn autoplay off - remove classes for toggle, clear timeout
+	function autoplayOff() {
+		autoPlayToggled = false;
+		btnAutoPlay.classList.remove('toggled');
+		btnAutoPlay.querySelector('i').classList = "bi bi-play";
+		clearTimeout(autoPlayTimeout);
+	}
+
 	function shuffleArray(array) {
 		let currentIndex = array.length, randomIndex;
-		// While there remain elements to shuffle.
+		// While there remain elements to shuffle
 		while (currentIndex != 0) {
-			// Pick a remaining element.
+			// Pick a remaining element
 			randomIndex = Math.floor(Math.random() * currentIndex);
 			currentIndex--;
-			// And swap it with the current element.
+			// And swap it with the current element
 			[array[currentIndex], array[randomIndex]] = [
 				array[randomIndex], array[currentIndex]];
 		}
 		return array;
 	}
 
-	var loadTerms = () => {
-		cardsOriginal.forEach(card => {
+	// displaying all terms in the CardSet, creating new element for every card and appending it to the page
+	function loadTerms() {
+		cardsListOriginal.forEach(card => {
 			let newTerm = document.createElement('div');
 			newTerm.className = "row mx-0 mb-2 p-3 text-light term-in-set";
 			let termQuestion = document.createElement('div');
-			termQuestion.className = "col-4 col-question p-0";
+			termQuestion.setAttribute('lang', 'en');
+			termQuestion.className = "col-4 col-question p-0 pe-1";
 			let p1 = document.createElement('p');
+			p1.className = "mb-0";
 			p1.textContent = card.question;
 			termQuestion.append(p1);
 			let termAnswer = document.createElement('div');
 			termAnswer.className = "col-8 col-answer";
 			let p2 = document.createElement('p');
+			p2.className = "mb-0";
 			p2.textContent = card.answer;
 			termAnswer.append(p2);
 			newTerm.append(termQuestion, termAnswer);
-			setTerms.append(newTerm);
+			termsInSet.append(newTerm);
 		})
 	}
 </script>

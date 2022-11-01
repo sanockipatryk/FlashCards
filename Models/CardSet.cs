@@ -17,7 +17,7 @@ namespace FlashCards.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
         public bool IsPublic { get; set; }
-        
+
         [ForeignKey(nameof(User))]
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }

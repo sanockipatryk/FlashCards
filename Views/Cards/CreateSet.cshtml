@@ -1,51 +1,78 @@
 ﻿@using FlashCards.Helpers
 @model CreateCardSetViewModel
 
-
-<div class="row">
-	<div class="col"><p class="display-6 text-light"><strong>Create a new card set</strong></p></div>
+<div class="row mx-1">
+	<div class="col">
+		<p class="h3 text-light">
+			@{
+				switch (Model.ActionType)
+				{
+					case FlashCards.Enums.CreateSetActionType.Edit:
+						<strong>Editing "@Model.CardSet.Name"</strong>
+						break;
+					case FlashCards.Enums.CreateSetActionType.Copy:
+						<strong>Making copy of "@Model.CardSet.Name"</strong>
+						break;
+					default:
+						<strong>Create a new card set</strong>
+						break;
+				}
+			}
+		</p>
+	</div>
 </div>
-<form method="post">
+<form id="setForm" class="mx-3" method="post">
+	<input type="hidden" asp-for="CardSet.Id" />
+	<input type="hidden" asp-for="ActionType" />
 	<div class="mb-3">
 		<input type="text" class="form-control" asp-for="@Model.CardSet.Name" placeholder="Enter a title">
 		<span asp-validation-for="@Model.CardSet.Name" class="text-danger"></span>
 	</div>
 	<div class="row mb-3">
-		<div class="col-6 d-flex align-items-stretch">
-			<textarea class="form-control resize-off" asp-for="@Model.CardSet.Description" placeholder="Add a description..."></textarea>
+		<div class="col-12 mb-3 mb-sm-0 col-sm-6 d-flex flex-column">
+			<textarea class="form-control resize-off flex-grow-1" asp-for="@Model.CardSet.Description"
+				placeholder="Add a description..."></textarea>
+		<span asp-validation-for="@Model.CardSet.Description" class="text-danger"></span>
 		</div>
-		<div class="col-6 d-flex flex-column align-items-stretch">
+		<div class="col-12 col-sm-6 d-flex flex-column align-items-stretch">
 			<input type="hidden" asp-for="@Model.CardSet" />
 
 			@if (Model.SelectedCardCategoryId == -1)
 			{
-				<select id="card-category-select" class="form-select " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")" aria-label="Category">
+				<select class="form-select card-category-select" asp-for="@Model.SelectedCardCategoryId"
+				asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")"
+				aria-label="Category">
 				</select>
 				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
 			}
 			else
 			{
-				<select id="card-category-select" class="form-select " asp-for="@Model.SelectedCardCategoryId" asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)" aria-label="Category">
+				<select class="form-select card-category-select" asp-for="@Model.SelectedCardCategoryId"
+				asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)"
+				aria-label="Category">
 				</select>
 				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
 			}
 			@if (Model.CardSet.CardSubjectId == 0)
 			{
-				<select disabled id="card-subject-select" class="form-select mt-3" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				<select disabled id="" class="form-select mt-3 card-subject-select" asp-for="@Model.CardSet.CardSubjectId"
+				asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
 				</select>
 				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
 			}
 			else
 			{
-				<select id="card-subject-select" class="form-select mt-3" asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
+				<select class="form-select mt-3 card-subject-select" asp-for="@Model.CardSet.CardSubjectId"
+				asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
 				</select>
 				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
 			}
 		</div>
 	</div>
 	<div class="row mb-3 d-flex align-items-center">
-		<div class="form-check form-switch offset-4 col-4 d-flex justify-content-center">
-			<input asp-for="CardSet.IsPublic" class="form-check-input checkbox-margin-right" type="checkbox" id="checkPublic">
+		<div class="form-check form-switch col-12 d-flex justify-content-center">
+			<input asp-for="CardSet.IsPublic" class="form-check-input checkbox-margin-right" type="checkbox"
+				id="checkPublic">
 			<label class="form-check-label text-light" for="checkPublic">
 				Allow others access to this set?
 			</label>
@@ -61,17 +88,24 @@
 				<div class="card">
 					<div class="card-header p-3 d-flex justify-content-between align-items-center">
 						<p class="card-subtitle text-light p-0 m-0">@(i+1)</p>
-						<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel" asp-route-cardIndex="@i"><i class="bi bi-trash"></i></button>
+						@if(Model.CardSet.Cards.Count>1) {
+						<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel"
+						asp-route-cardIndex="@i"><i class="bi bi-trash"></i></button>
+						} else {
+							<span></span>
+						}
 					</div>
 					<div class="card-body">
 						<div class="row question-answer">
-							<div class="col-6 form-floating">
-								<input type="text" asp-for="@card.Question" name="CardSet.Cards[@i].Question" class="form-control shadow-none qa-input" placeholder="q" id="questionInput-@i">
+							<div class="col-12 mb-3 col-sm-6 mb-sm-0 form-floating">
+								<input type="text" asp-for="@card.Question" name="CardSet.Cards[@i].Question"
+								class="form-control shadow-none qa-input" placeholder="q" id="questionInput-@i">
 								<label class="card-label-floating text-light" for="questionInput-@i">Question</label>
 								<span asp-validation-for="@Model.CardSet.Cards[@i].Question" class="text-danger"></span>
 							</div>
-							<div class="col-6 form-floating">
-								<input type="text" asp-for="@card.Answer" name="CardSet.Cards[@i].Answer" class="form-control shadow-none qa-input" placeholder="a" id="answerInput-@i">
+							<div class="col-12 col-sm-6 form-floating">
+								<input type="text" asp-for="@card.Answer" name="CardSet.Cards[@i].Answer"
+								class="form-control shadow-none qa-input" placeholder="a" id="answerInput-@i">
 								<label class="card-label-floating text-light" for="answerInput-@i">Answer</label>
 								<span asp-validation-for="@Model.CardSet.Cards[@i].Answer" class="text-danger"></span>
 							</div>
@@ -83,10 +117,15 @@
 		}
 		<div class="col-12 mb-3 qa-card">
 			<div class="card">
-				<div id="addCardsContainer" class="card-body py-4 text-center d-flex justify-content-center align-items-center">
-					<label id="addManyInputLabel" class="card-label text-light" for="addManyInput">How many cards to add?</label>
-					<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number" class="form-control shadow-none qa-input mx-2" min="1" max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
-					<button type="submit" id="btnAddCards" class="btn btn-info" asp-action="AddCardToModel">Add Card</button>
+				<div id="addCardsContainer"
+					class="card-body py-4 text-center d-flex justify-content-center align-items-center">
+					<label id="addManyInputLabel" class="card-label text-light" for="addManyInput">How many cards to
+						add?</label>
+					<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number"
+						class="form-control shadow-nonen qa-input mx-2" min="1"
+						max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
+					<button type="submit" id="btnAddCards" class="btn btn-info" asp-action="AddCardToModel">
+						Add Card</button>
 					<p hidden id="cardLimitInfo" class="text-primary m-0">Limit of cards per set achieved.</p>
 				</div>
 			</div>
@@ -94,47 +133,47 @@
 	</div>
 	<div class="row">
 		<div class="col text-center">
-	<button type="submit" class="btn btn-primary" asp-action="CreateSetPOST">Submit</button>
-	<a type="submit" class="btn btn-danger" asp-controller="Home" asp-action="Index">Cancel</a>
-	</div>
+			<a type="submit" class="btn btn-danger" asp-controller="Home" asp-action="Index">Cancel</a>
+			<button type="submit" class="btn btn-info" asp-action="@(Model.ActionType)SetPOST"
+				asp-route-id="@(Model.CardSet.Id != 0? Model.CardSet.Id : null)">Submit</button>
+		</div>
 	</div>
 </form>
 @section Scripts {
 <script>
-	var cardCategorySelect = document.querySelector("#card-category-select");
-	var cardSubjectSelect = document.querySelector("#card-subject-select");
+	var cardCategorySelect = document.querySelector(".card-category-select");
+	var cardSubjectSelect = document.querySelector(".card-subject-select");
 	var categoryChanged = false;
 	var items = '';
 
-	if(cardCategorySelect.value != -1) {
+	if (cardCategorySelect.value != -1) {
 		categoryChanged = true;
 		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
-		.then(response => response.json()).then(data => {
-			items = '';
-			data.forEach(subject => {
-				items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+			.then(response => response.json()).then(data => {
+				items = '';
+				data.forEach(subject => {
+					items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+				});
+				cardSubjectSelect.removeAttribute("disabled");
+				cardSubjectSelect.innerHTML = items;
+				cardSubjectSelect.value = @Model.CardSet.CardSubjectId;
 			});
-			cardSubjectSelect.removeAttribute("disabled");
-			cardSubjectSelect.innerHTML = items;
-			cardSubjectSelect.value = @Model.CardSet.CardSubjectId;
-		});
 	}
 
-	cardCategorySelect.addEventListener('change', (e) =>{
-		if(!categoryChanged)
-		{
+	cardCategorySelect.addEventListener('change', (e) => {
+		if (!categoryChanged) {
 			cardCategorySelect.removeChild(cardCategorySelect.querySelector('option[value="-1"]'));
 			categoryChanged = true;
 		}
 		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
-		.then(response => response.json()).then(data => {
-			items = '';
-			data.forEach(subject => {
-				items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+			.then(response => response.json()).then(data => {
+				items = '';
+				data.forEach(subject => {
+					items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
+				});
+				cardSubjectSelect.removeAttribute("disabled");
+				cardSubjectSelect.innerHTML = items;
 			});
-			cardSubjectSelect.removeAttribute("disabled");
-			cardSubjectSelect.innerHTML = items;
-		});
 	})
 
 	var addManyInput = document.querySelector("#addManyInput");
@@ -147,26 +186,35 @@
 		if (e.currentTarget.value > parseInt(addManyInputMax)) {
 			addManyInput.value = addManyInputMax;
 		}
-		 if (e.currentTarget.value < parseInt(addManyInputMin)) {
+		if (e.currentTarget.value < parseInt(addManyInputMin)) {
 			addManyInput.value = addManyInputMin;
 		}
-		if(addManyInput.value == 1)
-		{
+		if (addManyInput.value == 1) {
 			btnAddCards.textContent = "Add Card";
 		}
-		if(addManyInput.value > 1)
-		{
+		if (addManyInput.value > 1) {
 			btnAddCards.textContent = "Add Cards";
 		}
 	})
 
 	var addManyInputLabel = document.querySelector("#addManyInputLabel");
-	if(@Model.CardSet.Cards.Count() == 50) {
+	if (@Model.CardSet.Cards.Count() == 50) {
 		document.querySelector("#addCardsContainer").removeChild(addManyInput);
 		document.querySelector("#addCardsContainer").removeChild(addManyInputLabel);
 
 		document.querySelector("#addCardsContainer").removeChild(btnAddCards);
 		cardLimitInfo.removeAttribute('hidden');
 	}
+
+
+	// disabling ENTER key for inputs
+	var inputs = document.querySelectorAll("#setForm input");
+	inputs.forEach(input => input.addEventListener('keydown', (e) => {
+		if (event.keyCode == 13) {
+		  e.preventDefault();
+		  return false;
+		}
+	}))
+
 </script>
 }

@@ -14,8 +14,6 @@ namespace FlashCards.Models
         [MinLength(1, ErrorMessage = "Answer cannot be shorter than 1 character.")]
         [MaxLength(300, ErrorMessage = "Answer cannot be longer than 300 characters.")]
         public string Answer { get; set; }
-        public DateTime DateCreated { get; set; }
-        public DateTime DateUpdated { get; set; }
 
         [ForeignKey(nameof(CardSet))]
         public int CardSetId { get; set; }

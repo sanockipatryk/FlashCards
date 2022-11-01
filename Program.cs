@@ -1,8 +1,11 @@
+using FlashCards.Authorization;
 using FlashCards.Data;
 using FlashCards.Data.Services;
 using FlashCards.Models;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using FlashCards.Helpers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,9 +23,17 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<ICardsService, CardsService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<ApplicationUserClaimsPrincipalFactory>();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddClaimsPrincipalFactory<ApplicationUserClaimsPrincipalFactory>();
+builder.Services.AddAuthorization(options => options.AddPolicy("MustBeCardSetOwner", policy =>
+                policy.Requirements.Add(new MustBeCardSetOwnerRequirement())));
+builder.Services.AddScoped<IAuthorizationHandler, MustBeCardSetOwnerHandler>();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

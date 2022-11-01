@@ -3,27 +3,38 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
-	<form class="d-flex" role="search">
-		<input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-		<button class="btn btn-primary" type="submit">Search</button>
-	</form>
+	<partial name="_SearchBox" />
 	@if (SignInManager.IsSignedIn(User))
 	{
-		<li class="nav-item">
-			<a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
+		<li class="nav-item account-dropdown dropdown nav-text ms-0 ms-md-2 mt-2 mt-md-0 px-2 px-md-0">
+			<a class="nav-link text-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+			aria-expanded="false">
+				Account
+			</a>
+			<ul class="dropdown-menu">
+				<li class="dropdown-item d-flex nav-text p-0 ms-3 ms-md-0">
+					<a class="nav-link flex-grow-1 text-start text-md-center py-1" asp-area="Identity"
+					asp-page="/Account/Manage/Index" title="Manage">
+						Settings
+					</a>
+				</li>
+				<li class="dropdown-item nav-text p-0 ms-3 ms-md-0">
+					<form class="form-inline d-flex" asp-area="Identity" asp-page="/Account/Logout"
+					asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+						<button type="submit"
+						class="nav-link btn btn-link flex-grow-1 text-start text-md-center py-1">Logout</button>
+					</form>
+				</li>
+			</ul>
 		</li>
-		<li class="nav-item">
-			<form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-				<button type="submit" class="nav-link btn btn-link text-light">Logout</button>
-			</form>
-		</li>
+
 	}
 	else
 	{
-		<li class="nav-item">
+		<li class="nav-item nav-text mt-2 mt-md-0">
 			<a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register">Register</a>
 		</li>
-		<li class="nav-item">
+		<li class="nav-item nav-text my-2 my-md-0">
 			<a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Login">Login</a>
 		</li>
 	}

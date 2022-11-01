@@ -1,6 +1,6 @@
 ﻿@model SetsPageViewModel
 
-<div class="row">
+<div class="row mx-3">
 	<div class="col-12">
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
@@ -9,35 +9,37 @@
 		</nav>
 	</div>
 </div>
-<div class="row">
+<div class="row mx-3">
 	<div class="col-12">
-		<div class="container-fluid cat-sub-title rounded text-dark p-3">
-			<div class="container py-3 px-5">
-				<p class="lead">Public</p>
-				<p class="display-6"><strong>Flashcard sets</strong></p>
+		<div class="cat-sub-title rounded text-dark py-4 px-5">
+			<p class="lead">Public</p>
+			<p class="display-6"><strong>Flashcard sets</strong></p>
+		</div>
+	</div>
+</div>
+<div class="row mx-3 d-flex justify-content-center">
+	<div class="col-12">
+		<div>
+			<p class="my-3 text-light"><strong>Specific category?</strong></p>
+			<div class="pb-3 subject-category-buttons">
+				@foreach (var category in Model.CardCategories)
+				{
+					<a class="btn btn-primary different-cat-sub text-light" asp-action="Category"
+					asp-route-categoryName="@category.Name" asp-route-page="1" asp-route-name="@Model.Filters.Name"
+					asp-route-numberOfCards="@Model.Filters.NumberOfCards" asp-route-author="@Model.Filters.Author"
+					asp-route-sort="@Model.Filters.SortBy">
+						@category.Name
+					</a>
+				}
 			</div>
 		</div>
 	</div>
 </div>
-<div class="rowt">
-	<div class="col-12">
-		<p class="my-3 text-light"><strong>Specific category?</strong></p>
-	</div>
-	<div class="col-12 subject-category-buttons">
-		@foreach (var category in Model.CardCategories)
-		{
-			<a class="btn btn-primary different-cat-sub text-light" asp-action="Category"
-			asp-route-categoryName="@category.Name" asp-route-page="1" asp-route-name="@Model.Filters.Name"
-			asp-route-numberOfCards="@Model.Filters.NumberOfCards" asp-route-author="@Model.Filters.Author"
-			asp-route-sort="@Model.Filters.SortBy">
-				@category.Name
-			</a>
-		}
-	</div>
+<div class="row mx-3">
+	<partial name="_SetsFilters" model="@Model.Filters" />
 </div>
-<partial name="_SetsFilters" model="@Model.Filters" />
-<div class="row">
-	<partial name="_CardSetList" model="@Model.CardSets" />
+<div class="row mx-3">
+	<partial name="_CardSetList" model="@Model.CardSetListData" />
 	<partial name="_CardSetListPagination" model="@Model.Pagination" />
 </div>
 <partial name="_ModalPreviewCardSet" />

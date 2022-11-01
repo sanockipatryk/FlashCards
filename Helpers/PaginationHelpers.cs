@@ -1,11 +1,8 @@
-﻿using FlashCards.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace FlashCards.Helpers
+﻿namespace FlashCards.Helpers
 {
     public static class PaginationHelpers
     {
-        public static int GetMinOrMaxPage(int currentPage, int totalPages)
+        public static int GetMinOrMaxPageIfOverBounds(int currentPage, int totalPages)
         {
             if (currentPage > totalPages)
             {

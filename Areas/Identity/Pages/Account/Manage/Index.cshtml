@@ -1,0 +1,45 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Profile";
+	ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+	<div class="col-12 col-sm-8 offset-sm-2 col-md-8 offset-md-0 col-lg-6">
+		<form>
+			@*<div asp-validation-summary="ModelOnly" class="text-danger"></div>*@
+			<div class="form-floating mt-3">
+				<input asp-for="@User.FindFirst("Nickname").Value" class="form-control" disabled />
+				<label class="text-light" asp-for="@User.FindFirst("Nickname").Value"
+					class="form-label">Nickname</label>
+			</div>
+			<div class="form-floating mt-2">
+				<input asp-for="@User.Identity.Name" class="form-control" disabled />
+				<label class="text-light" asp-for="@User.Identity.Name" class="form-label">E-mail</label>
+			</div>
+			<div class="form-floating mt-2">
+				<input asp-for="@Model.UserSetsData.TotalSetCount" class="form-control" disabled />
+				<label class="text-light" asp-for="@Model.UserSetsData.TotalSetCount" class="form-label"></label>
+			</div>
+			<div class="form-floating mt-2">
+				<input asp-for="@Model.UserSetsData.PublicSetCount" class="form-control" disabled />
+				<label class="text-light" asp-for="@Model.UserSetsData.PublicSetCount" class="form-label"></label>
+			</div>
+			<div class="form-floating mt-2">
+				<input asp-for="@Model.UserSetsData.PrivateSetCount" class="form-control" disabled />
+				<label class="text-light" asp-for="@Model.UserSetsData.PrivateSetCount" class="form-label"></label>
+			</div>
+			<div class="form-floating mt-2">
+				<input asp-for="@Model.UserSetsData.TotalCardsCount" class="form-control" disabled />
+				<label class="text-light" asp-for="@Model.UserSetsData.TotalCardsCount" class="form-label"></label>
+			</div>
+			@*<button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>*@
+		</form>
+	</div>
+</div>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+}

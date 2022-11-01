@@ -1,52 +1,73 @@
-﻿<div class="modal modal-lg fade" id="previewModal" tabindex="-1" role="dialog" aria-hidden="true">
-	<div class="modal-dialog modal-dialog-scrollable" role="document">
+﻿<div class="modal modal-lg" id="previewModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
 		<div class="modal-content">
-			<div class="modal-header text-light bg-success">
-				<h5 class="modal-title"></h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-header text-light d-flex align-items-start mx-2">
+				<div>
+					<h5 class="modal-title"></h5>
+				</div>
+				<button type="button" class="btn-close d-none d-sm-block ms-2 p-3" data-bs-dismiss="modal"
+					aria-label="Close"></button>
 			</div>
-			<div id="card-preview-scrollable" class="modal-body">
+			<div id="card-preview-scrollable" class="modal-body text-light">
+				<p class="cardset-description text-justified d-none mx-2"></p>
+				<p class="text-light mx-2">Terms in set:</p>
+				<div class="terms-body"></div>
 			</div>
-			<div class="modal-footer">
+			<div class="modal-footer d-flex justify-content-end mx-3">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-				<a id="studyButton" class="btn btn-primary">Study</a>
+				<a id="studyButton" class="btn btn-info flex-grow-1 flex-sm-grow-0">Study</a>
 			</div>
 		</div>
 	</div>
 </div>
 <script language="javascript">
 	document.addEventListener('DOMContentLoaded', function (event) {
-	var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardSetPreview/";
-	var firstLoadComplete;
-	var id = undefined;
-	var modalBody = document.querySelector("#previewModal .modal-body");
-	var modalTitle = document.querySelector("#previewModal .modal-title");
-	var previewButtons = document.querySelectorAll(".previewButton");
-	var studyButton = document.querySelector("#studyButton");
-	previewButtons.forEach(button => button.addEventListener('click', async () => {
-		modalTitle.textContent = button.getAttribute("data-title");
-		id = button.getAttribute('data-id');
-		studyButton.setAttribute('href', '/Sets/' + id);
-		modalBody.innerHTML = "<p class='text-center'>Loading...</p>";
-		firstLoadComplete = false;
-		await fetch(PostBackURL + id + "/" + 0, {
-			method: "GET",
-			headers: {
-				'Content-Type': 'application/json; charset=utf-8'
+		var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardSetPreview/";
+		var firstLoadComplete;
+		var id = undefined;
+		var modalTermsBody = document.querySelector("#previewModal .terms-body");
+		var modalTitle = document.querySelector("#previewModal .modal-title");
+		var modalDescription = document.querySelector("#previewModal .cardset-description")
+		var previewButton = document.querySelectorAll(".previewButton");
+		var studyButton = document.querySelector("#studyButton");
+
+		previewButton.forEach(button => button.addEventListener('click', async () => {
+			modalTitle.textContent = button.getAttribute("data-title");
+			modalDescription.textContent = "";
+
+			var cardSetDescription = button.getAttribute("data-description");
+			if (cardSetDescription.length > 0) {
+				modalDescription.classList.replace('d-none', 'd-block');
+				modalDescription.textContent = button.getAttribute("data-description");
 			}
-		})
-		.then((response) => response.text())
-		.then((data) => {
-			modalBody.innerHTML = data;
-			firstLoadComplete = true;
+			else if (modalDescription.classList.contains("d-block")) {
+				modalDescription.classList.replace("d-block", "d-none");
+			}
+
+			id = button.getAttribute('data-id');
+			studyButton.setAttribute('href', '/Sets/' + id);
+			modalTermsBody.innerHTML = "<p class='text-center'>Loading terms...</p>";
+			firstLoadComplete = false;
+			await fetch(PostBackURL + id + "/" + 0, {
+				method: "GET",
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8'
+				}
 			})
+				.then((response) => response.text())
+				.then((data) => {
+					modalTermsBody.innerHTML = data;
+					firstLoadComplete = true;
+				})
 		}));
 		var cardPreviewDiv = document.querySelector("#card-preview-scrollable");
 		var qaPreviewElements;
 		cardPreviewDiv.addEventListener('scroll', async (event) => {
 			qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
 			var element = event.target;
-			if ((element.scrollHeight - element.scrollTop === element.clientHeight) && firstLoadComplete) {
+			if ((element.scrollHeight - element.scrollTop - element.clientHeight >= 0 &&
+				element.scrollHeight - element.scrollTop - element.clientHeight <= 1
+			) && firstLoadComplete) {
 				await fetch(PostBackURL + id + '/' + qaPreviewElementsCount, {
 					method: "GET",
 					headers: {
@@ -55,10 +76,11 @@
 				})
 					.then((response) => response.text())
 					.then((data) => {
-						modalBody.innerHTML += data;
+						modalTermsBody.innerHTML += data;
 						firstCardsLoaded = true;
 					})
 			}
 		})
+
 	})
 </script>

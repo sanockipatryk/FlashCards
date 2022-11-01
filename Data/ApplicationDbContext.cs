@@ -9,11 +9,11 @@ namespace FlashCards.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
-		}
+        }
 
-		public DbSet<CardCategory> CardCategories { get; set; }
+        public DbSet<CardCategory> CardCategories { get; set; }
         public DbSet<CardSubject> CardSubjects { get; set; }
         public DbSet<CardSet> CardSets { get; set; }
-		public DbSet<Card> Cards { get; set; }
+        public DbSet<Card> Cards { get; set; }
     }
 }
