@@ -1,0 +1,100 @@
+﻿@model FrontPageCardSetListsViewModel
+@if (!User.Identity.IsAuthenticated)
+{
+	<div class="row row-full home-main-bg mb-4">
+		<div class="col-12 col-md-8 offset-md-2 d-flex align-items-stretch">
+			<div class="row px-3 text-light d-flex align-items-center">
+				<div class="col-12 col-md-7 col-lg-5">
+					<h1 class="pb-3"><strong>Improve the way you learn things with use of flashcards and quizes</strong>
+					</h1>
+					<p class="home-subtitle pb-4">
+						Join the community and share your flashcard sets with others! Add sets,
+						copy
+						the sets of
+						others. Access your resources from anywhere, learn new terms and quiz yourself to achieve the best
+						possible results of
+						your studies.</p>
+					<a class="btn btn-secondary p-3" asp-area="Identity" asp-page="/Account/Register">Register an account
+						now</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row home-why mb-5 mx-0">
+		<div class="col-12 col-md-10 offset-md-1 d-flex align-items-stretch mb-5 px-0">
+			<div class="row text-light d-flex align-items-center justify-content-center mx-0">
+				<div class="col-11 p-0 col-md-6 pe-md-4 mb-4 mb-md-0">
+					<img class="home-why-image" src="../img/stack.png">
+				</div>
+				<div class="col-11 p-0 col-md-6 ps-md-4 text-center text-md-start">
+					<h3 class="pb-3"><strong>Create your own Flashcards</strong>
+					</h3>
+					<p class="home-why-subtitle mb-0">
+						Add up to a 50 cards to a set and improve your way of everyday learning.</p>
+					<p class="home-why-subtitle mb-0">
+						Sit back and let the autoplay flip the cards for you.</p>
+					<p class="home-why-subtitle mb-0">
+						Shuffle the deck to change the order you learn the terms.</p>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 col-md-10 offset-md-1 d-flex align-items-stretch mt-5 px-0">
+			<div class="row text-light d-flex align-items-center justify-content-center mx-0">
+				<div class="col-11 p-0 col-md-6 pe-md-4 text-center text-md-start order-1 order-md-0">
+					<h3 class="pb-3"><strong>Improve the way you learn things with use of flashcards and quizes</strong>
+					</h3>
+					<p class="home-why-subtitle pb-4">
+						Quiz yourself to change the way you learn things and to test your knowledge.</p>
+					<a class="btn btn-secondary p-3" asp-area="Identity" asp-page="/Account/Register">Begin now</a>
+				</div>
+				<div class="col-11 p-0 col-md-6 ps-md-4 mb-4 mb-md-0 order-0 order-md-1">
+					<img class="home-why-image" src="../img/quiz.png">
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row mt-5 mb-4 mx-0">
+		<p class="h3 text-light text-center">Join the community and access sets created by others.</p>
+	</div>
+	@if (Model.MostRecentPublicCardSets.CardSets.Count > 0)
+	{
+		<div class="row mx-3">
+			<partial name="_CardSetList" model="@Model.MostRecentPublicCardSets" />
+		</div>
+	}
+	<div class="row mt-4 mb-2 mx-0">
+		<p class="h4 text-light text-center">Dont wait, <a class="text-info text-register" asp-area="Identity"
+			asp-page="/Account/Register">Register now</a>.</p>
+	</div>
+}
+else
+{
+	<div class="row mx-3">
+		<div class="col-12">
+			<div class="cat-sub-title rounded text-dark py-4 px-5">
+				<p class="lead">Jump right into</p>
+				<p class="display-6"><strong>Recent sets</strong></p>
+			</div>
+		</div>
+	</div>
+	@if (Model.MostRecentAccessedCardSets.CardSets.Count > 0)
+	{
+		<div class="row mx-3">
+			<partial name="_CardSetList" model="@Model.MostRecentAccessedCardSets" />
+		</div>
+	}
+	@if (Model.MostRecentPublicCardSets.CardSets.Count > 0)
+	{
+		<div class="row mx-3">
+			<partial name="_CardSetList" model="@Model.MostRecentPublicCardSets" />
+		</div>
+	}
+	@if (Model.MostRecentUserCardSets.CardSets.Count > 0)
+	{
+		<div class="row mx-3">
+			<partial name="_CardSetList" model="@Model.MostRecentUserCardSets" />
+		</div>
+	}
+
+}
+<partial name="_ModalPreviewCardSet" />

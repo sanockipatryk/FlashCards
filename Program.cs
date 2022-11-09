@@ -20,19 +20,28 @@ builder.Services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<ICardsService, CardsService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ApplicationUserClaimsPrincipalFactory>();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddDefaultTokenProviders()
+    .AddDefaultUI()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddClaimsPrincipalFactory<ApplicationUserClaimsPrincipalFactory>();
 builder.Services.AddAuthorization(options => options.AddPolicy("MustBeCardSetOwner", policy =>
-                policy.Requirements.Add(new MustBeCardSetOwnerRequirement())));
+    policy.Requirements.Add(new MustBeCardSetOwnerRequirement())));
 builder.Services.AddScoped<IAuthorizationHandler, MustBeCardSetOwnerHandler>();
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddRazorPages();
+
+builder.Services.ConfigureApplicationCookie(config =>
+{
+    config.LoginPath = "/Identity/Account/Login";
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -41,7 +50,7 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    SeedData.Initialize(services);
+    SeedData.SeedDbData(services);
 }
 
 // Configure the HTTP request pipeline.

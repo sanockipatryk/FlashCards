@@ -6,8 +6,6 @@ namespace FlashCards.Helpers
 {
     public static class CardSetFiltersHelpers
     {
-        public static IQueryable<CardSet> PublicOrUserIsOwner(this IQueryable<CardSet> set, string? userId) => set.Where(c => c.IsPublic || userId != null && c.UserId == userId);
-
         public static bool FilterCardsCount(int cardsCount, string numberOfCards)
         {
             switch (numberOfCards)

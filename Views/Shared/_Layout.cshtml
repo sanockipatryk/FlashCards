@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,6 +10,7 @@
 	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/FlashCards.styles.css" asp-append-version="true" />
 </head>
+
 <body>
 	<header>
 		<partial name="_NavbarContent" />
@@ -20,13 +22,20 @@
 	</div>
 
 	<footer class="border-top footer text-light">
-		<div class="container">
-			&copy; 2022 - FlashCards - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+		<div class="container d-flex flex-column d-sm-block">
+			<span class="me-2">&copy; 2022 - FlashCards</span>
+			<a class="text-secondary text-decoration-none mx-2" asp-controller="Home" asp-action="Index">Home</a>
+			<a class="text-secondary text-decoration-none mx-2" asp-controller="Sets" asp-route-page="1">Browse sets</a>
+			<a class="text-secondary text-decoration-none mx-2" asp-controller="Sets" asp-action="CreateSet">Create a
+				set</a>
 		</div>
 	</footer>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+		crossorigin="anonymous"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

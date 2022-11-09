@@ -3,14 +3,14 @@
 		<div class="modal-content">
 			<div class="modal-header text-light d-flex align-items-start mx-2">
 				<div>
-					<h5 class="modal-title"></h5>
+					<p class="text-info modal-title h4"></p>
 				</div>
 				<button type="button" class="btn-close d-none d-sm-block ms-2 p-3" data-bs-dismiss="modal"
 					aria-label="Close"></button>
 			</div>
 			<div id="card-preview-scrollable" class="modal-body text-light">
-				<p class="cardset-description text-justified d-none mx-2"></p>
-				<p class="text-light mx-2">Terms in set:</p>
+				<p class="cardset-description text-justified d-none mx-2 pb-2"></p>
+				<p class="text-info mx-2 mb-0 h5">Terms in set:</p>
 				<div class="terms-body"></div>
 			</div>
 			<div class="modal-footer d-flex justify-content-end mx-3">
@@ -30,6 +30,7 @@
 		var modalDescription = document.querySelector("#previewModal .cardset-description")
 		var previewButton = document.querySelectorAll(".previewButton");
 		var studyButton = document.querySelector("#studyButton");
+		var loadingData = false;
 
 		previewButton.forEach(button => button.addEventListener('click', async () => {
 			modalTitle.textContent = button.getAttribute("data-title");
@@ -48,6 +49,7 @@
 			studyButton.setAttribute('href', '/Sets/' + id);
 			modalTermsBody.innerHTML = "<p class='text-center'>Loading terms...</p>";
 			firstLoadComplete = false;
+			loadingData = true;
 			await fetch(PostBackURL + id + "/" + 0, {
 				method: "GET",
 				headers: {
@@ -58,6 +60,7 @@
 				.then((data) => {
 					modalTermsBody.innerHTML = data;
 					firstLoadComplete = true;
+					loadingData = false;
 				})
 		}));
 		var cardPreviewDiv = document.querySelector("#card-preview-scrollable");
@@ -65,9 +68,11 @@
 		cardPreviewDiv.addEventListener('scroll', async (event) => {
 			qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
 			var element = event.target;
-			if ((element.scrollHeight - element.scrollTop - element.clientHeight >= 0 &&
-				element.scrollHeight - element.scrollTop - element.clientHeight <= 1
-			) && firstLoadComplete) {
+			if ((
+				element.scrollHeight - element.scrollTop - element.clientHeight >= 0 &&
+				element.scrollHeight - element.scrollTop - element.clientHeight <= 10
+			) && firstLoadComplete && !loadingData) {
+				loadingData = true;
 				await fetch(PostBackURL + id + '/' + qaPreviewElementsCount, {
 					method: "GET",
 					headers: {
@@ -78,6 +83,7 @@
 					.then((data) => {
 						modalTermsBody.innerHTML += data;
 						firstCardsLoaded = true;
+						loadingData = false;
 					})
 			}
 		})

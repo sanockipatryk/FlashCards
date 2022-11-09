@@ -1,20 +1,20 @@
 ﻿@using FlashCards.Helpers
 @model CreateCardSetViewModel
 
-<div class="row mx-1">
+<div class="row mx-1 mb-2">
 	<div class="col">
-		<p class="h3 text-light">
+		<p class="h3 text-light text-center">
 			@{
 				switch (Model.ActionType)
 				{
 					case FlashCards.Enums.CreateSetActionType.Edit:
-						<strong>Editing "@Model.CardSet.Name"</strong>
+						<strong>Editing <i>"@Model.CardSet.Name"</i></strong>
 						break;
 					case FlashCards.Enums.CreateSetActionType.Copy:
-						<strong>Making copy of "@Model.CardSet.Name"</strong>
+						<strong>Making copy of <i>"@Model.CardSet.Name"</i></strong>
 						break;
 					default:
-						<strong>Create a new card set</strong>
+						<strong>Create a <i>new</i> card set</strong>
 						break;
 				}
 			}
@@ -32,7 +32,7 @@
 		<div class="col-12 mb-3 mb-sm-0 col-sm-6 d-flex flex-column">
 			<textarea class="form-control resize-off flex-grow-1" asp-for="@Model.CardSet.Description"
 				placeholder="Add a description..."></textarea>
-		<span asp-validation-for="@Model.CardSet.Description" class="text-danger"></span>
+			<span asp-validation-for="@Model.CardSet.Description" class="text-danger"></span>
 		</div>
 		<div class="col-12 col-sm-6 d-flex flex-column align-items-stretch">
 			<input type="hidden" asp-for="@Model.CardSet" />
@@ -88,10 +88,13 @@
 				<div class="card">
 					<div class="card-header p-3 d-flex justify-content-between align-items-center">
 						<p class="card-subtitle text-light p-0 m-0">@(i+1)</p>
-						@if(Model.CardSet.Cards.Count>1) {
-						<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel"
+						@if (Model.CardSet.Cards.Count > 1)
+						{
+							<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel"
 						asp-route-cardIndex="@i"><i class="bi bi-trash"></i></button>
-						} else {
+						}
+						else
+						{
 							<span></span>
 						}
 					</div>
@@ -122,7 +125,7 @@
 					<label id="addManyInputLabel" class="card-label text-light" for="addManyInput">How many cards to
 						add?</label>
 					<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number"
-						class="form-control shadow-nonen qa-input mx-2" min="1"
+						class="form-control shadow-nonen qa-input mx-2" min="0"
 						max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
 					<button type="submit" id="btnAddCards" class="btn btn-info" asp-action="AddCardToModel">
 						Add Card</button>
@@ -134,47 +137,56 @@
 	<div class="row">
 		<div class="col text-center">
 			<a type="submit" class="btn btn-danger" asp-controller="Home" asp-action="Index">Cancel</a>
-			<button type="submit" class="btn btn-info" asp-action="@(Model.ActionType)SetPOST"
+			<button type="submit" class="btn btn-info" asp-action="@(Model.ActionType)Set"
 				asp-route-id="@(Model.CardSet.Id != 0? Model.CardSet.Id : null)">Submit</button>
 		</div>
 	</div>
 </form>
 @section Scripts {
 <script>
+	var PostBackURL = '@Url.Content("~/")' + "Sets/GetAllCardSubjects/";
 	var cardCategorySelect = document.querySelector(".card-category-select");
 	var cardSubjectSelect = document.querySelector(".card-subject-select");
-	var categoryChanged = false;
-	var items = '';
 
-	if (cardCategorySelect.value != -1) {
-		categoryChanged = true;
-		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
-			.then(response => response.json()).then(data => {
-				items = '';
-				data.forEach(subject => {
-					items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
-				});
-				cardSubjectSelect.removeAttribute("disabled");
-				cardSubjectSelect.innerHTML = items;
-				cardSubjectSelect.value = @Model.CardSet.CardSubjectId;
-			});
-	}
+	var categoryChanged = false;
+	var subjectListJsonFromModel = "@Model.CardSubjectsListJson"
+	var categorySubjects = JSON.parse(subjectListJsonFromModel.replace(/&quot;/g, '"'));
+
+	setCategorySelectValue();
 
 	cardCategorySelect.addEventListener('change', (e) => {
 		if (!categoryChanged) {
-			cardCategorySelect.removeChild(cardCategorySelect.querySelector('option[value="-1"]'));
 			categoryChanged = true;
+			removeCategorySelectDefaultOption();
 		}
-		fetch('@Url.Content("~/")' + "Sets/GetSubjectsForCardCategory/" + cardCategorySelect.value)
-			.then(response => response.json()).then(data => {
-				items = '';
-				data.forEach(subject => {
-					items += "<option value='" + subject.value + "'>" + subject.text + "</option>";
-				});
-				cardSubjectSelect.removeAttribute("disabled");
-				cardSubjectSelect.innerHTML = items;
-			});
-	})
+		setSubjectsOptionsForCategory();
+	});
+
+	function setCategorySelectValue() {
+		if (cardCategorySelect.value != -1) {
+			categoryChanged = true;
+			setSubjectsOptionsForCategory(true);
+		}
+	}
+
+	function removeCategorySelectDefaultOption() { cardCategorySelect.removeChild(cardCategorySelect.querySelector('option[value="-1"]')); }
+
+	function setSubjectsOptionsForCategory(hasDefaultValue = false) {
+		var items = '';
+		var subjectsForCategory = [];
+		subjectsForCategory = categorySubjects.filter(subject => subject.CardCategoryId === parseInt(cardCategorySelect.value));
+		subjectsForCategory.forEach(subject => {
+			items += "<option value='" + subject.Id + "'>" + subject.Name + "</option>";
+		});
+		cardSubjectSelect.removeAttribute("disabled");
+		cardSubjectSelect.innerHTML = items;
+		if (hasDefaultValue) {
+			cardSubjectSelect.value = @Model.CardSet.CardSubjectId;
+		}
+		else {
+			cardSubjectSelect.value = subjectsForCategory[0]?.Id;
+		}
+	}
 
 	var addManyInput = document.querySelector("#addManyInput");
 	var addManyInputMax = addManyInput.getAttribute('max');
@@ -195,6 +207,12 @@
 		if (addManyInput.value > 1) {
 			btnAddCards.textContent = "Add Cards";
 		}
+		if (e.currentTarget.value === "" || e.target.value === "0") {
+			btnAddCards.setAttribute('disabled', true)
+		}
+		else if (btnAddCards.hasAttribute('disabled')) {
+			btnAddCards.removeAttribute('disabled');
+		}
 	})
 
 	var addManyInputLabel = document.querySelector("#addManyInputLabel");
@@ -206,13 +224,12 @@
 		cardLimitInfo.removeAttribute('hidden');
 	}
 
-
 	// disabling ENTER key for inputs
 	var inputs = document.querySelectorAll("#setForm input");
 	inputs.forEach(input => input.addEventListener('keydown', (e) => {
 		if (event.keyCode == 13) {
-		  e.preventDefault();
-		  return false;
+			e.preventDefault();
+			return false;
 		}
 	}))
 

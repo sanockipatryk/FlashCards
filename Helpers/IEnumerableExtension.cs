@@ -29,5 +29,10 @@ namespace FlashCards.Helpers
         {
             return item.GetType().GetProperty(propertyName).GetValue(item, null).ToString();
         }
+        
+        public static IEnumerable<T> ShuffleArray<T>(this IEnumerable<T> list)
+        {
+            return list.OrderBy(i => Guid.NewGuid()).ToList();
+        }
     }
 }

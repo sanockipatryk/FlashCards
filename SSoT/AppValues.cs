@@ -8,5 +8,8 @@
         public const int SelectedCardCategoryId = -1;
         public const int AddManyCards = 1;
         public const int PreviewCardCount = 10;
+
+        public const string UserRole = "User";
+        public const string AdminRole = "Admin";
     }
 }

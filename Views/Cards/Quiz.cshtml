@@ -1,0 +1,218 @@
+﻿@model CardSetQuiz
+
+<div id="quiz" class="offset-1 col-10 offset-md-1 col-md-10 offset-lg-2 col-lg-8 mt-4 p-0">
+	<div class="p-0 mb-3">
+		<a class="text-info text-decoration-none" asp-action="Set" asp-route-id="@Model.CardSet.Id"><i
+				class="bi bi-arrow-left me-2"></i>Back to learning the set
+		</a>
+	</div>
+	<div class="row m-0 p-0">
+		<div class="col-12 p-0">
+			<p class="h3 text-white text-center"><strong>Randomized Quiz for <i>@Model.CardSet.Name</i></strong></p>
+		</div>
+	</div>
+	<div class="row m-0 p-0">
+		<div class="col-12 after-study-screen d-none flex-column justify-content-between">
+			<div class="row p-0">
+				<div class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-0 p-0 pb-3 pb-md-0 d-flex flex-column">
+					<p class="text-light text-sub">Your results</p>
+					<div class="d-flex justify-content-center flex-grow-1 align-items-center">
+						<div class="row mx-0 d-flex align-items-center">
+							<div class="col-4 d-flex donut-score">
+								<div class="hole"><span></span></div>
+							</div>
+							<div class="col-8 d-flex text-quiz-score">
+								<div class="d-flex flex-column justify-content-between me-3">
+									<p class="text-correct mb-2">Correct</p>
+									<p class="text-wrong mb-2">Wrong</p>
+									<p class="text-remaining mb-0">Unanswered</p>
+								</div>
+								<div class="d-flex flex-column justify-content-between">
+									<p class="text-correct score text-center rounded-5 px-3 mb-2"></p>
+									<p class="text-wrong score text-center rounded-5 px-3 mb-2"></p>
+									<p class="text-remaining score text-center rounded-5 px-3 mb-0"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div
+					class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-0 d-flex flex-column justify-content-between p-0">
+					<p class="text-light text-sub">Next steps</p>
+					<div class="row continue-btn p-3 mx-0 mb-2">
+						<div class="col-2 col-sm-3 bg-img bg-learn"></div>
+						<div id="restartQuiz" class="col-10 col-sm-8 d-flex flex-column justify-content-between">
+							<div>
+								<p class="btn-title">Restart</p>
+							</div>
+							<div>
+								<p class="btn-sub text-light">Restart this quiz with the same order.</p>
+							</div>
+						</div>
+						<div class="d-none d-sm-flex ps-2 col-sm-1 align-items-center">
+							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
+						</div>
+					</div>
+					<div id="shuffleQuiz" class="row continue-btn p-3 mx-0">
+						<div class="col-2 col-sm-3 bg-img bg-repeat"></div>
+						<div class="col-10 col-sm-8 pe-0">
+							<div>
+								<p class="btn-title">Shuffle</p>
+							</div>
+							<div>
+								<p class="btn-sub text-light">Restart this quiz with questions shuffled.</p>
+							</div>
+						</div>
+						<div class="d-none d-sm-flex ps-2 col-sm-1 align-items-center">
+							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row py-3 m-0">
+				<div class="col-12 after-study-links p-0">
+					<div class="row pb-2 m-0 d-flex justify-content-between align-items-center">
+						<div class="col-12 col-sm-6 mt-2 d-flex justify-content-start align-items-center p-0">
+							<div>
+								<p id="backToLastQuestion" class="text-light p-0 m-0 ms-1">
+									<a class="text-light text-decoration-none" asp-action="Set"
+										asp-route-id="@Model.CardSet.Id">
+										<i class="bi bi-arrow-left me-2"></i>Back to learning the set
+									</a>
+								</p>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 mt-4 mt-sm-2 d-flex justify-content-end align-items-center p-0">
+							<div>
+								<p id="continueToTest" class="text-light text-end p-0 m-0 me-1">
+									<a class="text-light text-decoration-none" asp-action="Sets" asp-route-page="1">
+										Go back to all sets
+										<i class="bi bi-arrow-right ms-2"></i>
+									</a>
+								</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div>
+		@{
+			int index = 0;
+		}
+		@foreach (var q in Model.QuizQuestions)
+		{
+			@(index++)
+			<div class="row mx-0 my-2 text-light term-in-set">
+				<p class="text-secondary px-0 d-flex justify-content-between">
+					<span>Definition</span>
+					<span>@(index)/@Model.QuizQuestions.Count()</span>
+				</p>
+				<p class="text-light text-center mb-0 px-0 h5">
+					@q.Question
+				</p>
+				<div class="p-0 answer-buttons">
+					<div class="d-flex flex-wrap justify-content-between my-4">
+						@foreach (var answer in q.PossibleAnswers)
+						{
+							<button data-correct="@(q.CorrectAnswer == answer)" type="button" data-question="@index"
+						class="btn btn-secondary py-3">@answer</button>
+							//margins set in css
+						}
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+	<div class="mt-4 d-flex justify-content-center">
+		<a class="btn btn-secondary button-quiz-control me-1 py-3" asp-action="Set" asp-route-id="@Model.CardSet.Id">Go
+			back</a>
+		<button id="submitQuiz" type="button" class="btn btn-info button-quiz-control ms-1 py-3">Submit</button>
+	</div>
+</div>
+@section Scripts {
+<script>
+	var donutScore = document.querySelector(".donut-score");
+	var donutScoreText = document.querySelector('.donut-score .hole span');
+	var termsCorrectParagraph = document.querySelector('.text-correct.score');
+	var termsWrongParagraph = document.querySelector('.text-wrong.score');
+	var termsRemainingParagraph = document.querySelector('.text-remaining.score');
+
+	var quizResultsScreen = document.querySelector('.after-study-screen');
+
+	var restartQuizButton = document.querySelector("#restartQuiz");
+	var shuffleQuizButton = document.querySelector("#shuffleQuiz");
+
+	var submitButton = document.querySelector("#submitQuiz");
+	var correctButtons = document.querySelectorAll("#quiz .answer-buttons button[data-correct='True']");
+	var answerButtons = document.querySelectorAll("#quiz .answer-buttons button");
+
+	answerButtons.forEach(button => button.addEventListener('click', () => {
+		var buttonQuestionId = button.getAttribute('data-question');
+		var anyButtonAlreadySelected = document.querySelector(`#quiz .answer-buttons button[data-question="${buttonQuestionId}"].selected`);
+		if (anyButtonAlreadySelected != null) {
+			anyButtonAlreadySelected.classList.remove('selected');
+		}
+		button.classList.add("selected");
+	}))
+
+
+	submitButton.addEventListener('click', () => {
+		var selectedButtons = document.querySelectorAll("#quiz .answer-buttons button.selected");
+		correctButtons.forEach(button => {
+			var questionId = button.getAttribute('data-question');
+			if (document.querySelector(`button.selected[data-question="${questionId}"]`) !== null) {
+				button.classList.add('correct');
+				document.querySelectorAll(`button[data-question="${questionId}"]`).forEach(btn => btn.setAttribute('disabled', true))
+			}
+		})
+		selectedButtons.forEach(button => {
+			if (button.getAttribute('data-correct') !== "True") {
+				button.classList.add('wrong');
+			}
+			var questionId = button.getAttribute('data-question');
+		})
+		updateResultScreen();
+		quizResultsScreen.classList.replace('d-none', 'd-flex');
+		window.scrollTo(0, 0);
+	})
+
+	function updateResultScreen() {
+		var correctChoices = document.querySelectorAll('#quiz .answer-buttons button.selected.correct').length;
+		var wrongChoices = document.querySelectorAll('#quiz .answer-buttons button.selected.wrong').length;
+
+		var questionCount = @Model.QuizQuestions.Count();
+		var correctFraction = correctChoices / questionCount;
+		var wrongFraction = wrongChoices / questionCount;
+		var correctPercentage = Math.round(correctFraction * 100);
+
+		donutScore.style.background =
+			`conic-gradient(lightgreen calc((${correctFraction}) * 360deg), 
+			lightcoral calc((${correctFraction} * 360deg)) calc((${correctFraction + wrongFraction}) * 360deg), 
+			#88bdbc 0 360deg`;
+		termsCorrectParagraph.textContent = correctChoices;
+		termsWrongParagraph.textContent = wrongChoices;
+		termsRemainingParagraph.textContent = @Model.QuizQuestions.Count - correctChoices - wrongChoices;
+		donutScoreText.textContent = `${correctPercentage}%`;
+	}
+
+	restartQuizButton.addEventListener('click', () => restartQuiz())
+
+	function restartQuiz() {
+		answerButtons.forEach(button => {
+			button.classList = "btn btn-secondary py-3";
+			button.removeAttribute('disabled');
+		})
+		quizResultsScreen.classList.replace('d-flex', 'd-none');
+	}
+
+	shuffleQuizButton.addEventListener('click', () => {
+		reloadPage();
+	})
+
+	function reloadPage() {
+		location.reload();
+	}
+</script>
+}

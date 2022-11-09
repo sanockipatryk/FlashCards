@@ -1,6 +1,6 @@
-﻿<nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow mb-3">
-	<div class="container-fluid">
-		<a class="navbar-brand text-light" asp-controller="Cards" asp-action="Sets" asp-route-page="1">FlashCards</a>
+﻿<nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow px-2">
+	<div class="container-fluid py-2">
+		<a class="navbar-brand text-light" asp-controller="Home" asp-action="Index">FlashCards</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
 			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
@@ -15,7 +15,7 @@
 				{
 					<li class="nav-item nav-text">
 						<a class="nav-link text-light" asp-controller="Cards" asp-action="Sets" asp-route-page="1"
-						asp-route-author="@(User.FindFirst("Nickname").Value)">
+						asp-route-author="@(User.FindFirst("Nickname")?.Value)">
 							My sets
 						</a>
 					</li>

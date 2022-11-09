@@ -10927,9 +10927,15 @@ body {
   background-color: #022534 !important;
 }
 
-nav.navbar {
-  background-color: #022534;
-  border-bottom: 1px solid grey !important;
+html {
+  font-size: 12pt;
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+  overflow-x: hidden;
 }
 
 .container {
@@ -10938,6 +10944,16 @@ nav.navbar {
 
 .bg-main {
   background-color: #022534;
+}
+
+nav.navbar {
+  background-color: #022534;
+  border-bottom: 1px solid grey !important;
+  margin-bottom: 16px;
+}
+
+.footer {
+  height: 60px;
 }
 
 input.form-control,
@@ -11034,7 +11050,8 @@ input.form-control:-webkit-autofill:active {
   transition: background-color 5000s;
 }
 
-.qa-input.form-control:-webkit-autofill .qa-input.form-control:-webkit-autofill:hover,
+.qa-input.form-control:-webkit-autofill,
+.qa-input.form-control:-webkit-autofill:hover,
 .qa-input.form-control:-webkit-autofill:focus,
 .qa-input.form-control:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px #022534 inset !important;
@@ -11103,26 +11120,6 @@ div.question-answer div input:focus {
 
 .different-cat-sub {
   margin-right: 4px;
-}
-
-html {
-  font-size: 14px;
-  background-color: #f6f7fb;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-html {
-  position: relative;
-  min-height: 100%;
-}
-
-body {
-  margin-bottom: 60px;
-  background-color: #f6f7fb;
 }
 
 div.dropdown-multicol {
@@ -11357,6 +11354,15 @@ label.card-label-floating {
   border: 2px solid #f1db77;
 }
 
+.after-study-screen .continue-btn.innactive {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.after-study-screen .continue-btn.innactive:hover {
+  border: 2px solid transparent;
+}
+
 .after-study-screen .continue-btn .btn-title {
   padding: 0;
   margin: 0;
@@ -11394,18 +11400,22 @@ label.card-label-floating {
   border-radius: 100%;
 }
 
-.cards-controls span:hover {
-  cursor: pointer;
-  background-color: #88bdbc;
+@media (hover: hover) {
+  .cards-controls span:hover {
+    cursor: pointer;
+    background-color: #88bdbc;
+  }
 }
-
 .cards-controls span.toggled {
   border-color: #f1db77;
 }
 
 .cards-controls span.btn-shuffle {
   font-size: 16pt;
-  margin-left: 12px;
+}
+
+.cards-controls span.btn-skip {
+  font-size: 16pt;
 }
 
 .cards-controls span.btn-copy {
@@ -11422,6 +11432,10 @@ label.card-label-floating {
 
 a.user-link {
   text-decoration: none;
+}
+
+a.user-link.list-user-link {
+  font-size: 14pt;
 }
 
 .term-in-set {
@@ -11585,8 +11599,14 @@ a.user-link {
   height: 80px;
 }
 
+.text-quiz-score {
+  height: 120px;
+}
+
 .text-completed,
-.text-remaining {
+.text-remaining,
+.text-correct,
+.text-wrong {
   font-size: 14pt;
   border: 2px solid transparent;
 }
@@ -11599,8 +11619,18 @@ a.user-link {
   color: #88bdbc;
 }
 
+.text-correct {
+  color: lightgreen;
+}
+
+.text-wrong {
+  color: lightcoral;
+}
+
 .text-completed.score,
-.text-remaining.score {
+.text-remaining.score,
+.text-correct.score,
+.text-wrong.score {
   border: 2px solid;
 }
 
@@ -11622,6 +11652,11 @@ a.user-link {
 .account-dropdown ul.dropdown-menu.show li form button {
   transition: 0s;
   color: white;
+}
+
+.account-dropdown ul.dropdown-menu.show li a.account-button,
+.account-dropdown ul.dropdown-menu.show li form button.account-button {
+  font-weight: normal;
 }
 
 .account-dropdown ul.dropdown-menu.show li {
@@ -11714,18 +11749,125 @@ a.user-link {
   font-size: 20pt;
 }
 
+.cardset-description {
+  border-bottom: 1px solid white;
+}
+
+#quiz .answer-buttons {
+  width: 100%;
+}
+
+#quiz .answer-buttons button {
+  flex-basis: 100%;
+  flex-grow: 1;
+  margin-bottom: 1rem;
+  border: 2px solid transparent;
+}
+
+#quiz .answer-buttons button:nth-of-type(4n) {
+  margin-bottom: 0;
+}
+
+#quiz .answer-buttons button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+#quiz .answer-buttons button:disabled {
+  opacity: 0.9;
+}
+
+#quiz .answer-buttons button.selected {
+  border: 4px solid #f1db77;
+  background-color: #0a6684;
+  color: white;
+}
+
+#quiz .answer-buttons button.correct {
+  background-color: lightgreen;
+  color: black;
+}
+
+#quiz .answer-buttons button.selected.wrong {
+  background-color: lightcoral;
+  color: white;
+}
+
+.button-quiz-control {
+  flex-basis: 50%;
+}
+
+.home-main-bg {
+  background-image: url("../img/people-gf893189e0_1920.jpg");
+  background-position: bottom;
+  height: 100vh;
+  background-size: cover;
+  margin-top: -17px;
+}
+
+.row-full {
+  width: 100vw;
+  position: relative;
+  margin-left: -50vw;
+  left: 50%;
+}
+
+.home-main-bg h1, .home-main-bg .h1 {
+  font-size: 16pt;
+}
+
+.home-main-bg p.home-subtitle {
+  font-size: 13pt;
+}
+
+.home-why img.home-why-image {
+  width: 100%;
+}
+
+.home-why p.home-why-subtitle {
+  font-size: 13pt;
+}
+
+a.text-register {
+  text-decoration: none;
+}
+
+a.text-register:hover {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+@media (min-width: 576px) {
+  .home-main-bg {
+    height: 750px;
+  }
+  .home-main-bg h1, .home-main-bg .h1 {
+    font-size: 21pt;
+  }
+  .home-main-bg p.home-subtitle {
+    font-size: 15pt;
+  }
+  .home-why img.home-why-image {
+    width: 100%;
+  }
+  .home-why p.home-why-subtitle {
+    font-size: 13pt;
+  }
+}
 @media (min-width: 768px) {
   .divide-areas {
     border-top: none;
   }
   .nav-text {
-    font-size: unset;
+    font-size: 11pt;
+    font-weight: bold;
   }
   .navbar-brand {
-    font-size: unset;
+    font-size: 16pt;
+    font-weight: bold;
   }
   .search-form {
-    width: 200px;
+    width: 150px;
   }
   .search-form input {
     font-size: unset;
@@ -11737,5 +11879,38 @@ a.user-link {
     position: unset;
     right: unset;
     top: unset;
+  }
+  #quiz .answer-buttons button {
+    flex-basis: 48%;
+    flex-grow: 1;
+    margin-bottom: unset;
+    border: 4px solid transparent;
+  }
+  #quiz .answer-buttons button:nth-of-type(2n - 1) {
+    margin-right: 1rem;
+  }
+  #quiz .answer-buttons button:nth-of-type(1),
+#quiz .answer-buttons button:nth-of-type(2) {
+    margin-bottom: 1rem;
+  }
+  .button-quiz-control {
+    flex-basis: 35%;
+  }
+  .home-main-bg h1, .home-main-bg .h1 {
+    font-size: 24pt;
+  }
+}
+@media (min-width: 992px) {
+  .search-form {
+    width: 250px;
+  }
+  .nav-text {
+    font-size: 12pt;
+  }
+  .button-quiz-control {
+    flex-basis: 20%;
+  }
+  .home-main-bg h1, .home-main-bg .h1 {
+    font-size: 2em;
   }
 }/*# sourceMappingURL=bootstrap.custom.css.map */

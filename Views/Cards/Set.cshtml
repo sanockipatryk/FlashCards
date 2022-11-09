@@ -4,8 +4,8 @@
 <div class="row mx-3">
 	<div class="p-0 offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
 		<div class="row m-0 p-0">
-			<div class="col-12 p-0">
-				<p class="display-6 text-white"><strong>@Model.Name</strong></p>
+			<div class="col-12 p-0 mb-2">
+				<p class="h2 text-center text-white"><i><strong>@Model.Name</strong></i></p>
 			</div>
 			<div class="col-12 p-0 set-study-card d-block">
 				<div class="set-study-card-inner">
@@ -29,11 +29,12 @@
 						</div>
 						<div class="row">
 							<div class="col-12 d-flex justify-content-around align-items-center">
-								<button type="button"
+								<button type="button" name="btn-prev-question"
 									class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive">
 									<i class="bi bi-chevron-left"></i>
 								</button>
-								<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow">
+								<button type="button" name="btn-next-question"
+									class="btn btn-info btn-lg btn-next-card set-study-arrow">
 									<i class="bi bi-chevron-right"></i>
 								</button>
 							</div>
@@ -59,13 +60,14 @@
 						</div>
 						<div class="row">
 							<div class="col-12 d-flex justify-content-around align-items-center">
-								<button type="button"
+								<button type="button" name="btn-prev-answer"
 									class="btn btn-info btn-lg btn-prev-card set-study-arrow inactive">
 									<i class="bi bi-chevron-left"></i>
 								</button>
-								<button type="button" class="btn btn-info btn-lg btn-next-card set-study-arrow">
+								<a type="button" name="btn-next-answer"
+									class="btn btn-info btn-lg btn-next-card set-study-arrow">
 									<i class="bi bi-chevron-right"></i>
-								</button>
+								</a>
 							</div>
 						</div>
 					</div>
@@ -76,11 +78,13 @@
 			<div class="row m-0 d-flex align-items-center">
 				<div class="col-8 p-0">
 					<p class="display-6 text-light mb-0">
-						<strong>You went through every card in the set.</strong>
+						<strong id="finishedSetText">You went through every card in the set.</strong>
+						<strong id="skippedToEndText" hidden>You skipped to the end.</strong>
 					</p>
 				</div>
 				<div class="col-4 p-0 bg-emote text-center text-info">
 					<i class="bi bi-emoji-laughing-fill"></i>
+					<i class="bi bi-emoji-wink-fill" hidden></i>
 				</div>
 			</div>
 			<div class="row p-0 m-0">
@@ -99,7 +103,6 @@
 								<div class="d-flex flex-column justify-content-between">
 									<p class="text-completed score text-center rounded-5 px-3 mb-2"></p>
 									<p class="text-remaining score text-center rounded-5 px-3 mb-0"></p>
-									@* TO BE DONE IN NEXT VERSION *@
 								</div>
 							</div>
 						</div>
@@ -107,24 +110,40 @@
 				</div>
 				<div class="col-12 col-sm-6 d-flex flex-column justify-content-between p-0">
 					<p class="text-light text-sub">Next steps</p>
-					<div class="row continue-btn p-3 mx-0 mb-2">
+					<div id="goToQuiz" class="row continue-btn p-3 mx-0 mb-2">
 						<div class="col-2 col-sm-3 bg-img bg-learn"></div>
-						<div class="col-9 col-sm-8 d-flex flex-column justify-content-between">
+						<div class="col-10 col-sm-8 d-flex flex-column justify-content-between">
 							<div>
-								<p class="btn-title">Learn the set</p>
+								@if (Model.CardCount >= 4)
+								{
+									<p class="btn-title">Take a quiz</p>
+								}
+								else
+								{
+									<p class="btn-title">Not enough terms</p>
+								}
 							</div>
 							<div>
-								<p class="btn-sub text-light">Quiz yourself in order to learn these terms.</p>
+								@if (Model.CardCount >= 4)
+								{
+									<p class="btn-sub text-light">Learn the terms by taking a quiz of the terms.</p>
+
+								}
+								else
+								{
+									<p class="btn-sub text-light">Add more terms to the set to take a quiz.</p>
+
+								}
+
 							</div>
 						</div>
-						@* TO BE DONE IN NEXT VERSION *@
-						<div class="col-1 ps-2 d-flex align-items-center">
+						<div class="d-none ps-2 col-sm-1 d-sm-flex align-items-center">
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
 					<div id="repeatCards" class="row continue-btn p-3 mx-0">
 						<div class="col-2 col-sm-3 bg-img bg-repeat"></div>
-						<div class="col-9 col-sm-8 pe-0">
+						<div class="col-10 col-sm-8 pe-0">
 							<div>
 								<p class="btn-title">Restart flashcards</p>
 							</div>
@@ -132,7 +151,7 @@
 								<p class="btn-sub text-light">Start this sequence from the beginning.</p>
 							</div>
 						</div>
-						<div class="col-1 ps-2 col-sm-1 d-flex align-items-center">
+						<div class="d-none ps-2 col-sm-1 d-sm-flex align-items-center">
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
@@ -140,7 +159,7 @@
 			</div>
 			<div class="row py-3 m-0">
 				<div class="col-12 after-study-links p-0">
-					<div class="row p-0 m-0 d-flex justify-content-between align-items-center">
+					<div class="row pb-2 m-0 d-flex justify-content-between align-items-center">
 						<div class="col-12 col-sm-6 mt-2 d-flex justify-content-start align-items-center p-0">
 							<div>
 								<p id="backToLastQuestion" class="text-light p-0 m-0 ms-1">
@@ -151,10 +170,24 @@
 						<div class="col-12 col-sm-6 mt-4 mt-sm-2 d-flex justify-content-end align-items-center p-0">
 							<div>
 								<p id="continueToTest" class="text-light text-end p-0 m-0 me-1">
-									Continue and test your knowledge<i class="bi bi-arrow-right ms-2"></i>
+									@* Continue and test your knowledge *@
+									<a class="text-light text-decoration-none" asp-action="Sets" asp-route-page="1">
+										Go back to all sets
+										<i class="bi bi-arrow-right ms-2"></i>
+									</a>
 								</p>
-								@* TO BE DONE IN NEXT VERSION *@
 							</div>
+						</div>
+					</div>
+					<div id="ifSkippedGoBack" class="row m-0 pb-2 d-none justify-content-between align-items-center">
+						<div class="col-12 col-sm-6 mt-2 d-flex justify-content-start align-items-center p-0">
+							<div>
+								<p id="backToSkippedCard" class="text-info p-0 m-0 ms-1">
+									<i class="bi bi-arrow-left me-2"></i>Back to where you skipped
+								</p>
+							</div>
+						</div>
+						<div class="col-12 col-sm-6 mt-4 mt-sm-2 ">
 						</div>
 					</div>
 				</div>
@@ -163,9 +196,20 @@
 	</div>
 	<div class="flow-control d-block offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 p-0 mt-3">
 		<p class='text-light cards-controls'>
-			<span class='btn-play'><i class="bi bi-play-fill"></i></span>
-			<span class='btn-shuffle'><i class="bi bi-shuffle"></i></span>
+
+			<span class='btn-play'>
+				<i class="bi bi-play-fill"></i>
+			</span>
+			<span class='btn-shuffle ms-2'>
+				<i class="bi bi-shuffle"></i>
+			</span>
+			<span class='btn-skip ms-2 float-end'>
+				<i class="bi bi-skip-forward-fill"></i>
+			</span>
 		</p>
+		@* data-bs-toggle="tooltip" data-bs-title="Autoplay" *@>
+		@* data-bs-toggle="tooltip" data-bs-title="Shuffle cards"> *@
+		@* data-bs-toggle="tooltip" data-bs-title="Skip to end"> *@
 	</div>
 </div>
 <div class="row mx-3">
@@ -191,7 +235,9 @@
 				</div>
 				<div class="col-1 d-flex justify-content-end align-items-center cards-controls">
 					<a class="text-info user-link d-flex align-items-center" asp-action="CopySet"
-						asp-route-id="@Model.Id" data-bs-toggle="tooltip" data-bs-title="Copy set">
+						asp-route-id="@Model.Id">
+						@* data-bs-toggle="tooltip" data-bs-title="Copy set" *@
+
 						<span class="text-info m-0 p-0 btn-copy">
 							<i class="bi bi-clipboard-plus-fill"></i>
 						</span>
@@ -200,20 +246,20 @@
 							@Model.User.Id)
 					{
 						<a class="text-info user-link d-flex align-items-center ms-2" asp-action="EditSet"
-						asp-route-id="@Model.Id" data-bs-toggle="tooltip" data-bs-title="Edit set">
+						asp-route-id="@Model.Id">
+							@* data-bs-toggle="tooltip" data-bs-title="Edit set" *@
+
 							<span class="text-info m-0 p-0 btn-copy">
 								<i class="bi bi-pencil-square"></i>
 							</span>
 						</a>
 						<a class="text-info user-link d-flex align-items-center ms-2" data-bs-toggle="modal"
-						data-bs-target="#deleteModal" data-toggle="tooltip" data-bs-title="Delete set">
+						data-bs-target="#deleteModal" @* data-toggle="tooltip" data-bs-title="Delete set" *@>
 							<span class="text-info m-0 p-0 btn-copy">
 								<i class="bi bi-trash"></i>
 							</span>
 						</a>
-
 					}
-
 				</div>
 			</div>
 		</div>
@@ -256,11 +302,21 @@
 	var studyCardInner = studyCard.querySelector('.set-study-card-inner');
 	var afterStudyScreen = document.querySelector(".after-study-screen");
 
+	var finishedSetText = document.querySelector("#finishedSetText");
+	var skippedToEndText = document.querySelector("#skippedToEndText");
+	var finishedSetEmoji = document.querySelector(".bi-emoji-laughing-fill");
+	var skippedToEndEmoji = document.querySelector(".bi-emoji-wink-fill");
+
 	var btnsPrevCard = document.querySelectorAll(".btn-prev-card, #backToLastQuestion");
 	var btnsNextCard = document.querySelectorAll(".btn-next-card");
 	var btnRepeatCards = document.querySelector("#repeatCards");
+	var btnGoToQuiz = document.querySelector("#goToQuiz");
 	var btnAutoPlay = document.querySelector(".btn-play");
 	var btnShuffle = document.querySelector(".btn-shuffle");
+	var btnSkip = document.querySelector(".btn-skip");
+
+	var ifSkippedGoBack = document.querySelector("#ifSkippedGoBack");
+	var btnBackToSkippedCard = document.querySelector("#backToSkippedCard");
 
 	var termsInSet = document.querySelector('#termsInSet');
 	var flowControlPanel = document.querySelector('.flow-control');
@@ -271,6 +327,8 @@
 	var termsRemainingParagraph = document.querySelector('.text-remaining.score');
 
 	var currentCardNumber = 0;
+	var skippedToEnd = false;
+	var skippedCardIndex = 0;
 	var cardsListOriginal;
 	var cardsList;
 
@@ -279,12 +337,16 @@
 	var shuffleToggled = false;
 	var autoPlayTimeout;
 
-	var tooltipDeleteSet = document.querySelector("[data-toggle=tooltip]");
-	var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-	if (tooltipDeleteSet !== null) {
-		tooltipTriggerList = [...tooltipTriggerList, tooltipDeleteSet];
+	@* var tooltipDeleteSet = document.querySelector("[data-toggle=tooltip]");
+			var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+			if (tooltipDeleteSet !== null) {
+			tooltipTriggerList = [...tooltipTriggerList, tooltipDeleteSet];
+			}
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) *@
+
+	if (@Model.CardCount <4) {
+		btnGoToQuiz.classList.add("innactive");
 	}
-	const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 
 	fetch(PostBackURL + @Model.Id, {
 		method: "GET",
@@ -299,7 +361,7 @@
 			setCurrentCardData(currentCardNumber);
 			loadTerms();
 		})
-		.catch((err) => console.log(err))
+		.catch((err) => { })
 
 	studyCardInner.addEventListener('click', (e) => {
 		flipCard();
@@ -311,6 +373,7 @@
 	btnsPrevCard.forEach((item) => {
 		item.addEventListener('click', (e) => {
 			e.stopPropagation();
+			if (skippedToEnd && currentCardNumber === @Model.CardCount) skippedToEnd = false;
 			if (currentCardNumber > 0) {
 				currentCardNumber--; // if current card index bigger than 0 - decrese the current card index
 				if (autoPlayToggled && e.isTrusted)
@@ -344,11 +407,13 @@
 		});
 	});
 
-	function setCurrentCardData(i) {
-		// on card change, update question, answer and current card number
-		currentQuestionParagraph.textContent = cardsList[i].question;
-		currentAnswerParagraph.textContent = cardsList[i].answer;
-		currentCardNumberText.forEach(item => item.textContent = currentCardNumber + 1)
+	function setCurrentCardData(cardNumber) {
+		if (cardNumber < @Model.CardCount) {
+			currentQuestionParagraph.textContent = cardsList[cardNumber].question;
+			currentAnswerParagraph.textContent = cardsList[cardNumber].answer;
+			//updates text for each side of the card
+			currentCardNumberText.forEach(item => item.textContent = currentCardNumber + 1);
+		}
 	}
 
 	function flipCard() {
@@ -401,7 +466,7 @@
 	}
 
 	function eneablePrevCardButton() {
-		if (currentCardNumber === 1 && btnsPrevCard[0].classList.contains('inactive')) {
+		if (currentCardNumber > 0 && btnsPrevCard[0].classList.contains('inactive')) {
 			btnsPrevCard.forEach(b => b.classList.remove('inactive'));
 		}
 	}
@@ -414,19 +479,21 @@
 				autoplayOff();
 			}
 			studyCard.classList.replace('d-block', 'd-none');
-			afterStudyScreen.classList.replace('d-none', 'd-flex');
 			flowControlPanel.classList.replace('d-block', "d-none");
+			afterStudyScreen.classList.replace('d-none', 'd-flex');
 			cardsScreenHidden = true;
+			showOrHideBackToSkippedButton();
 			updateResultScreen();
+			updateResultText();
 		}
 	}
 
 	function hideAfterScreenShowCards() {
-		// replace display classes for card element and after study screen with flow control panel
-		if ((currentCardNumber === @Model.CardCount - 1 && cardsScreenHidden) || (cardsScreenHidden && currentCardNumber === 0)) {
-			afterStudyScreen.classList.replace('d-flex', 'd-none');
+		// replace display classes for card element and after study screen with flow cocntrol panel
+		if ((cardsScreenHidden)) {
 			studyCard.classList.replace('d-none', 'd-block');
 			flowControlPanel.classList.replace('d-none', "d-block");
+			afterStudyScreen.classList.replace('d-flex', 'd-none');
 			cardsScreenHidden = false;
 		}
 	}
@@ -437,6 +504,7 @@
 
 	function goBackToFirstCard() {
 		// set current card index to 0 and update UI
+		if (skippedToEnd) skippedToEnd = false;
 		currentCardNumber = 0;
 		setCurrentCardData(currentCardNumber);
 		hideAfterScreenShowCards();
@@ -444,11 +512,28 @@
 	}
 
 	function updateResultScreen() {
-		// Not yet implemented - update result screen with calculated values
-		donutScore.style.background = "conic-gradient(#f1db77 calc((@Model.CardCount/@Model.CardCount) * 360deg), #88bdbc 0 360deg";
-		termsCompletedParagraph.textContent = @Model.CardCount;
-		termsRemainingParagraph.textContent = 0;
-		donutScoreText.textContent = Math.round(@Model.CardCount/@Model.CardCount*100) + "%";
+		var percentage = skippedToEnd ? Math.round((skippedCardIndex) / @Model.CardCount * 100) : 100;
+		donutScore.style.background =
+			`conic-gradient(#f1db77 calc((${percentage}/100) * 360deg), #88bdbc 0 360deg`;
+		termsCompletedParagraph.textContent = skippedToEnd ? skippedCardIndex : @Model.CardCount;
+		termsRemainingParagraph.textContent = skippedToEnd ? @Model.CardCount - skippedCardIndex : 0
+		donutScoreText.textContent = `${percentage}%`
+
+	}
+
+	function updateResultText() {
+		if (skippedToEnd) {
+			skippedToEndText.removeAttribute('hidden');
+			skippedToEndEmoji.removeAttribute('hidden');
+			finishedSetText.setAttribute('hidden', true);
+			finishedSetEmoji.setAttribute('hidden', true);
+		}
+		else {
+			finishedSetText.removeAttribute('hidden');
+			finishedSetEmoji.removeAttribute('hidden');
+			skippedToEndText.setAttribute('hidden', true);
+			skippedToEndEmoji.setAttribute('hidden', true);
+		}
 	}
 
 	btnAutoPlay.addEventListener('click', () => {
@@ -541,6 +626,41 @@
 				array[randomIndex], array[currentIndex]];
 		}
 		return array;
+	}
+
+	btnSkip.addEventListener('click', () => {
+		skippedToEnd = true;
+		skippedCardIndex = currentCardNumber;
+		currentCardNumber = @Model.CardCount;
+		setCurrentCardData(currentCardNumber);
+		hideCardsShowAfterScreen();
+	})
+
+	btnBackToSkippedCard.addEventListener('click', () => {
+		skippedToEnd = false;
+		currentCardNumber = skippedCardIndex;
+		skippedCardIndex = 0;
+		setCurrentCardData(currentCardNumber);
+		hideAfterScreenShowCards();
+	})
+
+	function showOrHideBackToSkippedButton() {
+		if (skippedToEnd) {
+			ifSkippedGoBack.classList.replace('d-none', 'd-flex');
+		}
+		else {
+			ifSkippedGoBack.classList.replace('d-flex', 'd-none');
+		}
+	}
+
+	btnGoToQuiz.addEventListener('click', () => {
+		if (@Model.CardCount >= 4) {
+			goToQuiz();
+		}
+	})
+
+	function goToQuiz() {
+		window.location.href = '@Url.Action("Quiz", "Sets")/' + @Model.Id;
 	}
 
 	// displaying all terms in the CardSet, creating new element for every card and appending it to the page

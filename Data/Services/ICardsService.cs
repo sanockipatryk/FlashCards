@@ -8,6 +8,7 @@ namespace FlashCards.Data.Services
         Task<IEnumerable<CardCategory>> GetAllCardCategoriesAsync();
         Task<IEnumerable<CardCategory>> GetAllCardCategoriesWithSubjectsAsync();
         Task<IEnumerable<CardSubject>> GetAllCardSubjectsAsync();
+        Task<string> GetAllCardSubjectsJsonAsync();
         Task<IEnumerable<CardSubject>> GetCardSubjectsForCategoryAsync(int categoryId);
         
         Task<SetsPageViewModel> GetAllCardSetsAsync(int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort, string? userId);
@@ -20,10 +21,16 @@ namespace FlashCards.Data.Services
 
         Task<int> CreateCardSetAsync(CreateCardSetViewModel model, string userId);
         Task<CreateCardSetViewModel> GetCardSetForEditAsync(int id);
-        Task EditCardSetAsync(CreateCardSetViewModel model);
+        Task<int> EditCardSetAsync(CreateCardSetViewModel model);
 
         Task<CreateCardSetViewModel> GetCardSetForCopyAsync(int id, string userId);
 
         Task<bool> DeleteCardSet(int id, string? userId);
+
+        Task AddCardSetAcccessAsync(int id, string userId);
+        Task<FrontPageCardSetListsViewModel> GetFrontPageCardSetsAsync(string? userId);
+
+        Task<CardSetQuiz> GetCardSetQuizAsync(int id, string? userId);
+        
     }
 }

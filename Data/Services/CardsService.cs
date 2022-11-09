@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Net;
 using System.Net.Mail;
+using System.Text.Json;
 
 namespace FlashCards.Data.Services
 {
@@ -29,7 +30,18 @@ namespace FlashCards.Data.Services
 
         public async Task<IEnumerable<CardSubject>> GetAllCardSubjectsAsync()
         {
-            return await _context.CardSubjects.ToListAsync();
+            return await _context.CardSubjects.Select(c => new CardSubject
+            {
+                Id = c.Id,
+                Name = c.Name,
+                CardCategoryId = c.CardCategoryId
+            }).ToListAsync();
+        }
+
+        public async Task<string> GetAllCardSubjectsJsonAsync()
+        {
+            var cardSubjects = await GetAllCardSubjectsAsync();
+            return JsonSerializer.Serialize(cardSubjects);
         }
 
         public async Task<IEnumerable<CardSubject>> GetCardSubjectsForCategoryAsync(int categoryId)
@@ -59,26 +71,7 @@ namespace FlashCards.Data.Services
                 .ApplyFilters(name, numberOfCards, author)
                 .ApplySort(sort)
                 .ApplyPagination(currentPage, cardsPerPage, cardSetsCount)
-                .Select(c => new CardSet
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    IsPublic = c.IsPublic,
-                    UserId = c.UserId,
-                    User = new ApplicationUser
-                    {
-                        Nickname = c.User.Nickname
-                    },
-                    CardSubject = new CardSubject
-                    {
-                        Name = c.CardSubject.Name,
-                        CardCategory = new CardCategory
-                        {
-                            Name = c.CardSubject.CardCategory.Name
-                        }
-                    },
-                })
+                .SelectDefaultCardSetDataForView()
                 .ToListAsync();
 
             var categories = await _context.CardCategories.ToListAsync();
@@ -304,6 +297,7 @@ namespace FlashCards.Data.Services
 
             if (cardSet != null)
             {
+                await AddCardSetAcccessAsync(id, userId);
                 var cardCount = _context.Cards.Count(c => c.CardSetId == cardSet.Id);
                 return new CardSetViewModel
                 {
@@ -354,22 +348,9 @@ namespace FlashCards.Data.Services
 
         public async Task<CreateCardSetViewModel> GetCardSetForEditAsync(int id)
         {
-            var cardSet = await _context.CardSets.Select(c => new CardSet
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Description = c.Description,
-                CardSubjectId = c.CardSubjectId,
-                CardSubject = new CardSubject
-                {
-                    Id = c.CardSubject.Id,
-                    CardCategoryId = c.CardSubject.CardCategoryId
-                },
-                DateUpdated = c.DateUpdated,
-                IsPublic = c.IsPublic,
-                UserId = c.UserId,
-
-            }).FirstOrDefaultAsync(c => c.Id == id);
+            var cardSet = await _context.CardSets
+            .SelectForEditOrCopy()
+            .FirstOrDefaultAsync(c => c.Id == id);
             if (cardSet != null)
             {
                 var cards = await _context.Cards.Where(c => c.CardSetId == cardSet.Id).ToListAsync();
@@ -378,6 +359,7 @@ namespace FlashCards.Data.Services
                 {
                     CardSet = cardSet,
                     CardCategories = await GetAllCardCategoriesAsync(),
+                    CardSubjectsListJson = await GetAllCardSubjectsJsonAsync(),
                     SelectedCardCategoryId = cardSet.CardSubject.CardCategoryId,
                     AddManyCards = DefaultAppValues.AddManyCards,
                     ActionType = Enums.CreateSetActionType.Edit
@@ -386,7 +368,7 @@ namespace FlashCards.Data.Services
             return new CreateCardSetViewModel();
         }
 
-        public async Task EditCardSetAsync(CreateCardSetViewModel model)
+        public async Task<int> EditCardSetAsync(CreateCardSetViewModel model)
         {
             var cardSetFromDb = await _context.CardSets.FirstOrDefaultAsync(c => c.Id == model.CardSet.Id);
             if (cardSetFromDb != null)
@@ -398,6 +380,7 @@ namespace FlashCards.Data.Services
                 cardSetFromDb.Description = model.CardSet.Description;
                 cardSetFromDb.CardSubjectId = model.CardSet.CardSubjectId;
                 cardSetFromDb.IsPublic = model.CardSet.IsPublic;
+                cardSetFromDb.DateUpdated = DateTime.UtcNow;
 
                 model.CardSet.Cards.ForEach(c =>
                 {
@@ -407,7 +390,9 @@ namespace FlashCards.Data.Services
                 await _context.Cards.AddRangeAsync(model.CardSet.Cards);
 
                 await _context.SaveChangesAsync();
+                return cardSetFromDb.Id;
             }
+            return 0;
         }
 
         public async Task<CreateCardSetViewModel> GetCardSetForCopyAsync(int id, string userId)
@@ -415,21 +400,7 @@ namespace FlashCards.Data.Services
             var cardSet = await _context.CardSets
                 .Where(c => c.Id == id)
                 .PublicOrUserIsOwner(userId)
-                .Select(c => new CardSet
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    CardSubjectId = c.CardSubjectId,
-                    CardSubject = new CardSubject
-                    {
-                        Id = c.CardSubject.Id,
-                        CardCategoryId = c.CardSubject.CardCategoryId
-                    },
-                    DateUpdated = c.DateUpdated,
-                    IsPublic = c.IsPublic,
-                    UserId = c.UserId,
-                })
+                .SelectForEditOrCopy()
                 .FirstOrDefaultAsync();
 
             if (cardSet != null)
@@ -440,6 +411,7 @@ namespace FlashCards.Data.Services
                 {
                     CardSet = cardSet,
                     CardCategories = await GetAllCardCategoriesAsync(),
+                    CardSubjectsListJson = await GetAllCardSubjectsJsonAsync(),
                     SelectedCardCategoryId = cardSet.CardSubject.CardCategoryId,
                     AddManyCards = DefaultAppValues.AddManyCards,
                     ActionType = Enums.CreateSetActionType.Copy
@@ -461,6 +433,137 @@ namespace FlashCards.Data.Services
                 return true;
             }
             return false;
+        }
+
+        public async Task AddCardSetAcccessAsync(int id, string userId)
+        {
+            await _context.CardSetAccesses.AddAsync(new CardSetAccess
+            {
+                DateAccessed = DateTime.UtcNow,
+                CardSetId = id,
+                UserId = userId
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<FrontPageCardSetListsViewModel> GetFrontPageCardSetsAsync(string? userId)
+        {
+            List<CardSet>? recentlyAccessedCardSets = new List<CardSet>();
+            List<CardSet>? recentlyEdittedUserCardSets = new List<CardSet>();
+
+
+
+            if (userId != null)
+            {
+                var recentlyAccessedCardSetsAll = await _context.CardSetAccesses
+                    .Where(c => c.UserId == userId)
+                    .OrderByDescending(c => c.DateAccessed)
+                    .Take(100)
+                    .ToListAsync();
+
+                var recentlyAccessedCardSetIds = recentlyAccessedCardSetsAll
+                    .Select(c => c.CardSetId)
+                    .Distinct()
+                    .Take(6)
+                    .ToList();
+
+                var recentlyAccessedCardSetsUnsorted = await _context.CardSets
+                    .Where(c => recentlyAccessedCardSetIds.Contains(c.Id))
+                    .SelectDefaultCardSetDataForView()
+                    .ToListAsync();
+
+                var recentlyAccessedCardSetsSorted = new List<CardSet>();
+                foreach (var setId in recentlyAccessedCardSetIds)
+                {
+                    recentlyAccessedCardSetsSorted
+                        .Add(recentlyAccessedCardSetsUnsorted.Where(c => c.Id == setId).First());
+                }
+
+                recentlyAccessedCardSets = recentlyAccessedCardSetsSorted;
+
+                recentlyEdittedUserCardSets = await _context.CardSets
+                    .Where(c => c.UserId == userId)
+                    .OrderByDescending(c => c.DateUpdated)
+                    .Take(6)
+                    .SelectDefaultCardSetDataForView()
+                    .ToListAsync();
+            }
+
+            var recentlyEdittedPublicCardSets = await _context.CardSets
+                .Where(c => c.UserId != userId && c.IsPublic)
+                .OrderByDescending(c => c.DateUpdated)
+                .Take(6)
+                .SelectDefaultCardSetDataForView()
+                .ToListAsync();
+
+            return new FrontPageCardSetListsViewModel
+            {
+                MostRecentAccessedCardSets = new CardSetListViewModel
+                {
+                    CardSets = recentlyAccessedCardSets,
+                    ListName = "Sets recently accessed by you"
+                },
+                MostRecentPublicCardSets = new CardSetListViewModel
+                {
+                    CardSets = recentlyEdittedPublicCardSets,
+                    ListName = "Recently editted public sets"
+                },
+                MostRecentUserCardSets = new CardSetListViewModel
+                {
+                    CardSets = recentlyEdittedUserCardSets,
+                    ListName = "Your recently editted sets"
+                },
+            };
+        }
+
+        public async Task<CardSetQuiz> GetCardSetQuizAsync(int id, string? userId)
+        {
+            var cardSet = await _context.CardSets
+                .Include(c => c.Cards)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (cardSet != null)
+            {
+                List<QuizQuestion> quizQuestions = new List<QuizQuestion>();
+                //shuffle order of cards
+                var allCards = cardSet.Cards.ShuffleArray();
+                if (allCards.Count() >= 4)
+                {
+                    //During quiz, an asnwer is the question, and questions are possible answer to it
+                    var allAnswers = new List<string>();
+                    foreach (var card in allCards)
+                    {
+                        allAnswers.Add(card.Question);
+                    }
+                    foreach (var card in allCards)
+                    {
+                        allAnswers.Remove(card.Question);
+
+                        var possibleAnswers = allAnswers.ShuffleArray().Take(3).ToList();
+                        possibleAnswers.Add(card.Question);
+                        possibleAnswers = possibleAnswers.ShuffleArray().ToList();
+
+                        var quizQuestion = new QuizQuestion
+                        {
+                            Question = card.Answer,
+                            CorrectAnswer = card.Question,
+                            PossibleAnswers = possibleAnswers
+                        };
+                        quizQuestions.Add(quizQuestion);
+                        allAnswers.Add(card.Question);
+                    }
+                    return new CardSetQuiz
+                    {
+                        CardSet = cardSet,
+                        QuizQuestions = quizQuestions
+                    };
+                }
+                else
+                {
+                    return new CardSetQuiz();
+                }
+            }
+            return new CardSetQuiz();
         }
     }
 }

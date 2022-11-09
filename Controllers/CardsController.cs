@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace FlashCards.Controllers
 {
@@ -22,13 +23,11 @@ namespace FlashCards.Controllers
         }
 
         //GET: View single set
-
+        [Authorize]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> Set(int id)
         {
-            string? userId = null;
-            if (User!.Identity!.IsAuthenticated)
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = UserManagerExtensions.GetUserId(User);
 
             var cardSet = await _service.GetCardSetAsync(id, userId);
             if (cardSet.Name != null)
@@ -40,6 +39,27 @@ namespace FlashCards.Controllers
             {
                 ErrorStatus = "Bad Request",
                 ErrorMessage = "Requested resource could not be accessed."
+            });
+        }
+
+        //GET: View quiz for set; Quiz generated for Sets with at least 4 or more cards
+
+        [Authorize]
+        [HttpGet("Quiz/{id:int}")]
+        public async Task<IActionResult> Quiz(int id)
+        {
+            string? userId = UserManagerExtensions.GetUserId(User);
+
+            var cardSetQuiz = await _service.GetCardSetQuizAsync(id, userId);
+            if (cardSetQuiz.CardSet != null)
+            {
+                return View(cardSetQuiz);
+
+            }
+            return View("Error", new ErrorViewModel
+            {
+                ErrorStatus = "Bad Request",
+                ErrorMessage = "This quiz could not be accessed."
             });
         }
 
@@ -62,12 +82,9 @@ namespace FlashCards.Controllers
             string? author = null,
             string? sort = null)
         {
-            string? userId = null;
-            if (User!.Identity!.IsAuthenticated)
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = UserManagerExtensions.GetUserId(User);
 
             SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage, name, numberOfCards, author, sort, userId);
-            setsPageViewModel.CardSetListData.ActionName = nameof(Sets);
 
             return View(nameof(Sets), setsPageViewModel);
         }
@@ -92,9 +109,7 @@ namespace FlashCards.Controllers
             string? author = null,
             string? sort = null)
         {
-            string? userId = null;
-            if (User!.Identity!.IsAuthenticated)
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = UserManagerExtensions.GetUserId(User);
 
             CategoryPageViewModel categoryPageViewModel =
                 await _service.GetAllCardSetsOfCategoryAsync(
@@ -123,7 +138,7 @@ namespace FlashCards.Controllers
         }
 
         //GET: Browse all sets from a subject with page parameters and filters
-
+        
         [HttpGet("{categoryName}/{subjectName}/page/{page:int?}")]
         public async Task<IActionResult> Subject(
             string categoryName,
@@ -135,10 +150,7 @@ namespace FlashCards.Controllers
             string? author = null,
             string? sort = null)
         {
-            string? userId = null;
-
-            if (User!.Identity!.IsAuthenticated)
-                userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userId = UserManagerExtensions.GetUserId(User);
 
             SubjectPageViewModel subjectPageViewModel =
                 await _service.GetAllCardSetsOfSubjectAsync(
@@ -177,6 +189,7 @@ namespace FlashCards.Controllers
             var createCardSetViewModel = new CreateCardSetViewModel
             {
                 CardCategories = await _service.GetAllCardCategoriesAsync(),
+                CardSubjectsListJson =  await _service.GetAllCardSubjectsJsonAsync(),
                 CardSet = new CardSet()
                 {
                     IsPublic = true,
@@ -195,16 +208,24 @@ namespace FlashCards.Controllers
             return View(createCardSetViewModel);
         }
 
+        private object JsonSerializ(CreateCardSetViewModel? model)
+        {
+            throw new NotImplementedException();
+        }
+
         //POST: Creating new set
 
         [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("CreateSetPOST")]
+        [ActionName("CreateSet")]
+        [HttpPost("CreateSet")]
         public async Task<IActionResult> CreateSetPOST(CreateCardSetViewModel model)
         {
             if (!ModelState.IsValid)
             {
+                
                 model.CardCategories = await _service.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -242,18 +263,30 @@ namespace FlashCards.Controllers
         }
 
         //POST: Editing a set
-
+        [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("EditSetPOST/{id}")]
+        [ActionName("EditSet")]
+        [HttpPost("EditSet/{id}")]
         public async Task<IActionResult> EditSetPOST(CreateCardSetViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 model.CardCategories = await _service.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
-            await _service.EditCardSetAsync(model);
-            return RedirectToAction("Index", "Home");
+            var cardSetId = await _service.EditCardSetAsync(model);
+            if(cardSetId != 0)
+            {
+            return RedirectToAction(nameof(Set), new { id = cardSetId });
+            }
+
+            return View("Error", new ErrorViewModel
+                {
+                    ErrorStatus = "Something went wrong",
+                    ErrorMessage = "Editing set was not successful."
+                });
+
         }
 
         //GET: Get model for copying a set
@@ -288,20 +321,23 @@ namespace FlashCards.Controllers
 
         [Authorize]
         [ValidateAntiForgeryToken]
-        [HttpPost("CopySetPOST/{id}")]
+        [ActionName("CopySet")]
+        [HttpPost("CopySet/{id}")]
         public async Task<IActionResult> CopySetPOST(CreateCardSetViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 model.CardCategories = await _service.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            await _service.CreateCardSetAsync(model, userId);
-            return RedirectToAction("Index", "Home");
+            var cardSetId = await _service.CreateCardSetAsync(model, userId);
+            return RedirectToAction(nameof(Set), new { id = cardSetId });
         }
 
         [Authorize("MustBeCardSetOwner")]
+        [ValidateAntiForgeryToken]
         [HttpPost("DeleteSet/{id:int}")]
         public async Task<IActionResult> DeleteSet(int id)
         {
@@ -314,7 +350,7 @@ namespace FlashCards.Controllers
                 });
             }
 
-            var userId = UserManagerExtensions.GetUserId(User);
+            string? userId = UserManagerExtensions.GetUserId(User);
 
             var result = await _service.DeleteCardSet(id, userId);
 
@@ -332,10 +368,13 @@ namespace FlashCards.Controllers
 
         //POST: Adding one or more empty cards to model - depends on model.AddManyCards value
 
+        [Authorize]
+        [ValidateAntiForgeryToken]
         [HttpPost("AddCardToModel")]
         public async Task<IActionResult> AddCardToModel(CreateCardSetViewModel model)
         {
             model.CardCategories = await _service.GetAllCardCategoriesAsync();
+            model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
             if (model.CardSet.Cards == null)
             {
                 model.CardSet.Cards = new List<Card>();
@@ -362,10 +401,13 @@ namespace FlashCards.Controllers
 
         //POST: Removing a card from model; cant remove when there is only one card left
 
+        [Authorize]
+        [ValidateAntiForgeryToken]
         [HttpPost("DeleteCardFromModel/{cardIndex}")]
         public async Task<IActionResult> DeleteCardFromModel(CreateCardSetViewModel model, int cardIndex)
         {
             model.CardCategories = await _service.GetAllCardCategoriesAsync();
+            model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
             if (model.CardSet.Cards.Count > 1)
             {
                 model.CardSet.Cards.RemoveAt(cardIndex);
@@ -425,6 +467,13 @@ namespace FlashCards.Controllers
 
             }
             return Json(null);
+        }
+
+        [HttpGet("GetAllCardSubjects")]
+        public async Task<IActionResult> GetAllCardSubjects() 
+        {
+            var cardSubjects = await _service.GetAllCardSubjectsAsync();
+            return Json(cardSubjects);
         }
 
     }

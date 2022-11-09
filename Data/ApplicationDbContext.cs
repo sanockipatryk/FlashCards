@@ -15,5 +15,6 @@ namespace FlashCards.Data
         public DbSet<CardSubject> CardSubjects { get; set; }
         public DbSet<CardSet> CardSets { get; set; }
         public DbSet<Card> Cards { get; set; }
+        public DbSet<CardSetAccess> CardSetAccesses { get; set; }
     }
 }
