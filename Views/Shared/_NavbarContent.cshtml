@@ -1,5 +1,5 @@
-﻿<nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow px-2">
-	<div class="container-fluid py-2">
+﻿<nav class="navbar navbar-expand-md navbar-toggleable-md navbar-dark border-bottom box-shadow px-2 py-md-0">
+	<div class="container-fluid py-2 py-md-0">
 		<a class="navbar-brand text-light" asp-controller="Home" asp-action="Index">FlashCards</a>
 		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
 			aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -7,21 +7,21 @@
 		</button>
 		<div class="navbar-collapse collapse d-md-inline-flex justify-content-between">
 			<ul class="navbar-nav flex-grow-1">
-				<li class="nav-item nav-text">
+				<li class="nav-item nav-text nav-border-hover py-md-3">
 					<a class="nav-link text-light " asp-controller="Cards" asp-action="Sets" asp-route-page="1">All
 						sets</a>
 				</li>
 				@if (User.Identity.IsAuthenticated && User.FindFirst("Nickname") != null)
 				{
-					<li class="nav-item nav-text">
+					<li class="nav-item nav-text nav-border-hover py-md-3">
 						<a class="nav-link text-light" asp-controller="Cards" asp-action="Sets" asp-route-page="1"
-						asp-route-author="@(User.FindFirst("Nickname")?.Value)">
+						asp-route-Author="@(User.FindFirst("Nickname")?.Value)">
 							My sets
 						</a>
 					</li>
 				}
 				@await Component.InvokeAsync("NavCategories")
-				<li class="nav-item nav-text mb-2 mb-md-0">
+				<li class="nav-item nav-text nav-border-hover py-md-3 mb-2 mb-md-0">
 					<a class="nav-link text-info" asp-controller="Cards" asp-action="CreateSet">Create a set</a>
 				</li>
 			</ul>

@@ -1,0 +1,272 @@
+@model UserNotificationsListViewModel
+
+@{
+    string queryNotification = Context.Request.Query["Notification"].Count > 0 ? Context.Request.Query["Notification"] :
+            "empty";
+}
+
+<div class="row mx-3">
+    <form id="__NotificationsAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
+    <div
+        class="col-12 col-sm-10 offset-sm-1 col-md-8 offset-md-2 col-lg-6 offset-lg-3 bg-primary rounded-2 pb-3 notification-list">
+        <div class="row m-0 py-3">
+            <div class="col-8 px-0">
+                <p class="h4 mb-0 text-light"><strong>Notifications</strong></p>
+            </div>
+            <div class="col-12 px-0 mt-2">
+                <a class="btn rounded-5 btn-notification-status btn-all active">All</a>
+                <a class="btn rounded-5 btn-notification-status btn-unread">Unread</a>
+            </div>
+        </div>
+        <div class="row m-0 p-0">
+            <div id="noNotificationsContainer" class="d-none p-0 m-0">
+                <p class="display-1 text-secondary text-center mt-4 mb-3">
+                    <i class="bi bi-bell-fill"></i>
+                </p>
+                <p class="h4 text-secondary text-center mb-4">
+                    You have no notifications
+                </p>
+            </div>
+            <div class="notification-list-wrapper p-0 m-0">
+                <partial name="_NotificationList" model="@Model" />
+            </div>
+            <div class="col-12 text-center mt-3 mb-1">
+                @if (Model.AllNotificationsForUserCount == Model.Notifications.Count)
+                {
+                    <a id="loadMoreNotifications" class="h6 text-light disabled-link text-decoration-none">All notifications
+                        loaded.</a>
+                }
+                else
+                {
+                    <a id="loadMoreNotifications" class="h6 text-decoration-none">Load more</a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+<script>
+    var loadMoreButton = document.querySelector("#loadMoreNotifications");
+    var allNotificationsButton = document.querySelector('.btn-notification-status.btn-all');
+    var unreadNotificationsButton = document.querySelector('.btn-notification-status.btn-unread');;
+    var notificationListContainer = document.querySelector('.notification-list-wrapper');
+    var noNotificationsContainer = document.querySelector('#noNotificationsContainer')
+    var notificationTitlesButtons;
+    var notificationActionButtons;
+    var buttonsReadUnread;
+    var buttonsDeleteNotification;
+    var setNotificationAsReadTimeout;
+
+    var __RequestVerificationToken = document.querySelector("#__NotificationsAntiForgeryForm input").value;
+
+    loadUI();
+    checkIfAllNotificationsDeleted();
+
+
+    var requestedNotification = "@queryNotification";
+    if (requestedNotification !== "empty") {
+        document.querySelector(`.notification-wrapper .notification-title[data-notification-id="${requestedNotification}"`).click();
+    }
+
+    //loading variables in function, to reuse it on "loading more" from the server
+    function reloadVariables() {
+        notificationTitlesButtons = document.querySelectorAll('.notification-wrapper .notification-title');
+        notificationActionButtons = document.querySelectorAll('.notification-action');
+        buttonsReadUnread = document.querySelectorAll('.btn-action-read-unread');
+        buttonsDeleteNotification = document.querySelectorAll('.btn-action-delete');
+    }
+
+    function loadAllNotificaions() {
+        return document.querySelectorAll(".notification-wrapper");
+    }
+
+    // calling for read/unread of a notification
+    function addClickEventsToButtonsReadUnread() {
+        buttonsReadUnread.forEach(button => {
+            button.addEventListener('click', async () => {
+                button.classList.add('disabled');
+                var notificationId = button.getAttribute('data-notification-id');
+                readOrUnreadNotification(notificationId)
+                    .then(result => {
+                        button.classList.remove('disabled');
+                    })
+            })
+        })
+    }
+
+    //on successful response updating the UI
+
+    async function readOrUnreadNotification(notificationId) {
+        var Url = '@Url.Action("ReadOrUnreadNotification", "Notifications")';
+        await fetch(Url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'RequestVerificationToken': __RequestVerificationToken
+            },
+            body: JSON.stringify(parseInt(notificationId)
+            )
+        }).then(c => {
+            var notificationWrapper = document.querySelector(`.notification-wrapper[data-notification-id="${notificationId}"]`);
+            if (notificationWrapper.classList.contains('unread')) {
+                notificationWrapper.classList.replace('unread', 'read')
+                document.querySelector(`.btn-action-read-unread[data-notification-id="${notificationId}"] i`).classList.replace('bi-eye-fill', 'bi-eye-slash-fill');
+            }
+            else {
+                notificationWrapper.classList.replace('read', 'unread')
+                document.querySelector(`.btn-action-read-unread[data-notification-id="${notificationId}"] i`).classList.replace('bi-eye-slash-fill', 'bi-eye-fill');
+            }
+            return true;
+
+        })
+            .catch(err => { return false; })
+    }
+
+    //on opening up the notification details text, if notification is unread, mark is at read if user has window open for at 3 seconds
+    //also closes previously opened but not closed notification collapse, making it tidier on screen
+
+    function addClickEventsToNotificationTitles() {
+        notificationTitlesButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                var notificationId = button.getAttribute('data-notification-id');
+                if (button.classList.contains('collapsed')) {
+                    if (setNotificationAsReadTimeout !== undefined)
+                        clearTimeout(setNotificationAsReadTimeout);
+                }
+                else {
+                    var allUncollapsedNotifications = document.querySelectorAll(".notification-wrapper .notification-title:not(.collapsed)");
+                    allUncollapsedNotifications.forEach(notification => {
+                        if (notification !== button) {
+                            notification.click();
+                        }
+                    });
+                    var clickedNotification = document.querySelector(`.notification-wrapper[data-notification-id="${notificationId}"]`);
+                    if (clickedNotification.classList.contains("unread")) {
+                        setNotificationAsReadTimeout = setTimeout(() => setAsRead(notificationId), 3000);
+                    }
+                }
+            })
+        })
+    }
+
+    function setAsRead(notificationId) {
+        readOrUnreadNotification(notificationId).then((r) => { })
+    }
+
+    //fetch for posting for delete of notification and removing it from UI if succeeded
+
+    function addClickEventsToDeleteButtons() {
+        buttonsDeleteNotification.forEach(button => {
+            button.addEventListener('click', async () => {
+                button.classList.add("disabled");
+                var notificationId = button.getAttribute('data-notification-id');
+                var Url = '@Url.Action("DeleteNotification", "Notifications")';
+                await fetch(Url, {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json; charset=utf-8',
+                        'RequestVerificationToken': __RequestVerificationToken
+                    },
+                    body: JSON.stringify(parseInt(notificationId))
+                }).then(c => {
+                    document.querySelector(`.notification-wrapper[data-notification-id="${notificationId}"]`).remove();
+                    checkIfAllNotificationsDeleted();
+                })
+                    .catch(err => button.classList.remove("disabled"))
+            })
+        })
+    }
+
+    function checkIfAllNotificationsDeleted() {
+        if (loadAllNotificaions().length === 0) {
+            noNotificationsContainer.classList.replace('d-none', 'd-block');
+            notificationListContainer.classList.add('d-none');
+            loadMoreButton.remove();
+        }
+    }
+
+    // showing dropdown for additional notification actions => read/unread, delete
+    function addClickEventsToNotificationActionButtons() {
+        notificationActionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                var notificationId = button.getAttribute('data-notification-id');
+                button.classList.toggle('toggled');
+                if (button.classList.contains('toggled')) {
+                    document.querySelector(`#notification-action-dropdown-${notificationId}`).classList.replace('d-none', 'd-block');
+                    button.querySelector('i').className = "bi bi-three-dots-vertical";
+                }
+                else {
+                    document.querySelector(`#notification-action-dropdown-${notificationId}`).classList.replace('d-block', 'd-none');
+                    button.querySelector('i').className = "bi bi-three-dots";
+                }
+            })
+        })
+    }
+
+    // switching between all notifications/unread notifications
+
+    allNotificationsButton.addEventListener('click', () => {
+        if (allNotificationsButton.classList.contains('active')) { }
+        else {
+            allNotificationsButton.classList.add('active');
+            unreadNotificationsButton.classList.remove('active');
+            document.querySelectorAll('.notification-wrapper.read.d-none').forEach(notification => notification.classList.replace('d-none', 'd-flex'))
+        }
+    })
+
+    unreadNotificationsButton.addEventListener('click', () => {
+        if (unreadNotificationsButton.classList.contains('active')) { }
+        else {
+            unreadNotificationsButton.classList.add('active');
+            allNotificationsButton.classList.remove('active');
+            document.querySelectorAll('.notification-wrapper.read').forEach(notification => notification.classList.replace('d-flex', 'd-none'))
+        }
+    })
+
+    if (loadMoreButton !== null)
+        loadMoreButton.addEventListener('click', loadMoreNotifications, false);
+
+    async function loadMoreNotifications() {
+        loadMoreButton.classList.add('disabled-link');
+        loadMoreButton.textContent = "Loading...";
+        var allLoadedNotifications = loadAllNotificaions();
+        var lastLoadedNotificationId = allLoadedNotifications[allLoadedNotifications.length - 1].getAttribute('data-notification-id');
+
+        var Url = '@Url.Action("LoadMoreNotifications", "Notifications")';
+        await fetch(Url, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json; charset=utf-8',
+                'RequestVerificationToken': __RequestVerificationToken
+            },
+            body: JSON.stringify(parseInt(lastLoadedNotificationId))
+        }).then((response) => response.text())
+            .then((data) => {
+                notificationListContainer.innerHTML += data;
+                loadUI();
+                if (allLoadedNotifications.length - loadAllNotificaions.length !== 5) {
+                    this.removeEventListener('click', loadMoreNotifications, false);
+                    loadMoreButton.textContent = "All notifications loaded.";
+                }
+                else {
+                    loadMoreButton.classList.remove('disabled-link');
+                    loadMoreButton.textContent = "Load more";
+                }
+            })
+            .catch(err => {
+                loadMoreButton.textContent = "Error loading notifications";
+            })
+    }
+
+
+
+    function loadUI() {
+        reloadVariables();
+        addClickEventsToButtonsReadUnread();
+        addClickEventsToDeleteButtons();
+        addClickEventsToNotificationActionButtons();
+        addClickEventsToNotificationTitles();
+    }
+
+</script>
+}

@@ -15,9 +15,9 @@ namespace FlashCards.ViewComponents
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            string? userId = UserManagerExtensions.GetUserId((ClaimsPrincipal) User);
-            var categories = await _service.GetFrontPageCardSetsAsync(userId);
-            return View(categories);
+            string? userId = UserManagerExtensions.GetUserId((ClaimsPrincipal)User);
+            var frontPageCardSets = await _service.GetFrontPageCardSetsAsync(userId);
+            return View(frontPageCardSets);
         }
     }
 }

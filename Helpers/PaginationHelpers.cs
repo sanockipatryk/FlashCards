@@ -22,15 +22,15 @@
             return (int)Math.Ceiling((double)itemsCount / (double)itemsPerPage);
         }
 
-        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> set, int currentPage, int cardsPerPage, int cardSetsCount) where T : class
+        public static IQueryable<T> ApplyPagination<T>(this IQueryable<T> queryItem, int currentPage, int itemsPerPage, int allItemsCount) where T : class
         {
-            if (cardSetsCount > 0)
+            if (allItemsCount > 0)
             {
-                return set
-                    .Skip((currentPage - 1) * cardsPerPage)
-                    .Take(cardsPerPage);
+                return queryItem
+                    .Skip((currentPage - 1) * itemsPerPage)
+                    .Take(itemsPerPage);
             }
-            return set;
+            return queryItem;
         }
     }
 }

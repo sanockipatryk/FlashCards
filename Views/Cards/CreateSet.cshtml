@@ -1,147 +1,162 @@
 ﻿@using FlashCards.Helpers
+@using FlashCards.Models.Types.Enums
 @model CreateCardSetViewModel
 
-<div class="row mx-1 mb-2">
-	<div class="col">
-		<p class="h3 text-light text-center">
-			@{
-				switch (Model.ActionType)
-				{
-					case FlashCards.Enums.CreateSetActionType.Edit:
-						<strong>Editing <i>"@Model.CardSet.Name"</i></strong>
-						break;
-					case FlashCards.Enums.CreateSetActionType.Copy:
-						<strong>Making copy of <i>"@Model.CardSet.Name"</i></strong>
-						break;
-					default:
-						<strong>Create a <i>new</i> card set</strong>
-						break;
-				}
-			}
-		</p>
-	</div>
-</div>
-<form id="setForm" class="mx-3" method="post">
-	<input type="hidden" asp-for="CardSet.Id" />
-	<input type="hidden" asp-for="ActionType" />
-	<div class="mb-3">
-		<input type="text" class="form-control" asp-for="@Model.CardSet.Name" placeholder="Enter a title">
-		<span asp-validation-for="@Model.CardSet.Name" class="text-danger"></span>
-	</div>
-	<div class="row mb-3">
-		<div class="col-12 mb-3 mb-sm-0 col-sm-6 d-flex flex-column">
-			<textarea class="form-control resize-off flex-grow-1" asp-for="@Model.CardSet.Description"
-				placeholder="Add a description..."></textarea>
-			<span asp-validation-for="@Model.CardSet.Description" class="text-danger"></span>
-		</div>
-		<div class="col-12 col-sm-6 d-flex flex-column align-items-stretch">
-			<input type="hidden" asp-for="@Model.CardSet" />
-
-			@if (Model.SelectedCardCategoryId == -1)
-			{
-				<select class="form-select card-category-select" asp-for="@Model.SelectedCardCategoryId"
-				asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")"
-				aria-label="Category">
-				</select>
-				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
-			}
-			else
-			{
-				<select class="form-select card-category-select" asp-for="@Model.SelectedCardCategoryId"
-				asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)"
-				aria-label="Category">
-				</select>
-				<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
-			}
-			@if (Model.CardSet.CardSubjectId == 0)
-			{
-				<select disabled id="" class="form-select mt-3 card-subject-select" asp-for="@Model.CardSet.CardSubjectId"
-				asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
-				</select>
-				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
-			}
-			else
-			{
-				<select class="form-select mt-3 card-subject-select" asp-for="@Model.CardSet.CardSubjectId"
-				asp-items="@(new SelectList(string.Empty, "Id", "Name"))" aria-label="Subject">
-				</select>
-				<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
-			}
-		</div>
-	</div>
-	<div class="row mb-3 d-flex align-items-center">
-		<div class="form-check form-switch col-12 d-flex justify-content-center">
-			<input asp-for="CardSet.IsPublic" class="form-check-input checkbox-margin-right" type="checkbox"
-				id="checkPublic">
-			<label class="form-check-label text-light" for="checkPublic">
-				Allow others access to this set?
-			</label>
-		</div>
-	</div>
-	<div class="row card-row mb-3">
+<div class="row mx-3 mb-2">
+	<p class="h3 text-light text-center">
 		@{
-			int i = 0;
+			switch (Model.ActionType)
+			{
+				case CreateSetActionType.Edit:
+					<strong>Editing <i>"@Model.CardSet.Name"</i></strong>
+					break;
+				case CreateSetActionType.Copy:
+					<strong>Making copy of <i>"@Model.CardSet.Name"</i></strong>
+					break;
+				default:
+					<strong>Create a <i>new</i> card set</strong>
+					break;
+			}
 		}
-		@foreach (var card in Model.CardSet.Cards)
-		{
-			<div class="col-12 mb-3 qa-card">
-				<div class="card">
-					<div class="card-header p-3 d-flex justify-content-between align-items-center">
-						<p class="card-subtitle text-light p-0 m-0">@(i+1)</p>
-						@if (Model.CardSet.Cards.Count > 1)
-						{
-							<button type="submit" class="btn btn-link text-danger" asp-action="DeleteCardFromModel"
-						asp-route-cardIndex="@i"><i class="bi bi-trash"></i></button>
-						}
-						else
-						{
-							<span></span>
-						}
-					</div>
-					<div class="card-body">
-						<div class="row question-answer">
-							<div class="col-12 mb-3 col-sm-6 mb-sm-0 form-floating">
-								<input type="text" asp-for="@card.Question" name="CardSet.Cards[@i].Question"
-								class="form-control shadow-none qa-input" placeholder="q" id="questionInput-@i">
-								<label class="card-label-floating text-light" for="questionInput-@i">Question</label>
-								<span asp-validation-for="@Model.CardSet.Cards[@i].Question" class="text-danger"></span>
-							</div>
-							<div class="col-12 col-sm-6 form-floating">
-								<input type="text" asp-for="@card.Answer" name="CardSet.Cards[@i].Answer"
-								class="form-control shadow-none qa-input" placeholder="a" id="answerInput-@i">
-								<label class="card-label-floating text-light" for="answerInput-@i">Answer</label>
-								<span asp-validation-for="@Model.CardSet.Cards[@i].Answer" class="text-danger"></span>
+	</p>
+</div>
+<div class="row mx-3">
+	<form id="setForm" method="post">
+		<input type="hidden" asp-for="CardSet.Id" />
+		<input type="hidden" asp-for="ActionType" />
+		<div class="form-floating mb-3">
+			<input id="setNameInput" type="text" class="form-control" asp-for="@Model.CardSet.Name">
+			<label class="text-light" for="setNameInput">Set title</label>
+			<span asp-validation-for="@Model.CardSet.Name" class="text-danger"></span>
+		</div>
+		<div class="row mb-3">
+			<div class="col-12 mb-3 mb-sm-0 col-sm-6 d-flex flex-column">
+				<div class="form-floating d-flex flex-column flex-grow-1">
+					<textarea class="form-control resize-off flex-grow-1"
+						asp-for="@Model.CardSet.Description"></textarea>
+					<label class="text-light" for="setNameInput">Set description (optional)</label>
+					<span asp-validation-for="@Model.CardSet.Description" class="text-danger"></span>
+				</div>
+			</div>
+			<div class="col-12 col-sm-6 d-flex flex-column align-items-stretch">
+				<input type="hidden" asp-for="@Model.CardSet" />
+				<div class="form-floating">
+					@if (Model.SelectedCardCategoryId == -1)
+					{
+						<select id="categorySelect" class="form-select card-category-select"
+						asp-for="@Model.SelectedCardCategoryId"
+						asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, "Select category")"
+						aria-label="Category">
+						</select>
+						<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
+					}
+					else
+					{
+						<select id="categorySelect" class="form-select card-category-select"
+						asp-for="@Model.SelectedCardCategoryId"
+						asp-items="@Model.CardCategories.ToSelectListItem(Model.SelectedCardCategoryId, null)"
+						aria-label="Category">
+						</select>
+						<span asp-validation-for="@Model.SelectedCardCategoryId" class="text-danger"></span>
+					}
+					<label class="text-light" for="categorySelect">Category</label>
+				</div>
+				<div class="form-floating mt-3">
+					@if (Model.CardSet.CardSubjectId == 0)
+					{
+						<select disabled id="subjectSelect" class="form-select card-subject-select"
+						asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))"
+						aria-label="Subject">
+						</select>
+						<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
+					}
+					else
+					{
+						<select id="subjectSelect" class="form-select card-subject-select"
+						asp-for="@Model.CardSet.CardSubjectId" asp-items="@(new SelectList(string.Empty, "Id", "Name"))"
+						aria-label="Subject">
+						</select>
+						<span asp-validation-for="@Model.CardSet.CardSubjectId" class="text-danger"></span>
+					}
+					<label class="text-light" for="subjectSelect">Subject</label>
+				</div>
+			</div>
+		</div>
+		<div class="row mb-3 d-flex align-items-center">
+			<div class="form-check form-switch col-12 d-flex justify-content-center">
+				<input asp-for="CardSet.IsPublic" class="form-check-input checkbox-margin-right" type="checkbox"
+					id="checkPublic">
+				<label class="form-check-label text-light" for="checkPublic">
+					Allow others access to this set?
+				</label>
+			</div>
+		</div>
+		<div class="row card-row mb-3">
+			@{
+				int i = 0;
+			}
+			@foreach (var card in Model.CardSet.Cards)
+			{
+				<div class="col-12 mb-3 qa-card">
+					<div class="card">
+						<div class="card-header p-3 d-flex justify-content-between align-items-center">
+							<p class="card-subtitle text-light p-0 m-0">@(i+1)</p>
+							@if (Model.CardSet.Cards.Count > 1)
+							{
+								<button type="submit" class="btn btn-link rounded-5 button-remove-card"
+							asp-action="DeleteCardFromModel" asp-route-cardIndex="@i"><i
+								class="bi bi-trash"></i></button>
+							}
+							else
+							{
+								<span></span>
+							}
+						</div>
+						<div class="card-body">
+							<div class="row question-answer">
+								<div class="col-12 mb-3 col-sm-6 mb-sm-0 form-floating">
+									<input type="text" asp-for="@card.Question" name="CardSet.Cards[@i].Question"
+									class="form-control shadow-none qa-input" placeholder="q" id="questionInput-@i">
+									<label class="card-label-floating text-light" for="questionInput-@i">Question</label>
+									<span asp-validation-for="@Model.CardSet.Cards[@i].Question" class="text-danger"></span>
+								</div>
+								<div class="col-12 col-sm-6 form-floating">
+									<input type="text" asp-for="@card.Answer" name="CardSet.Cards[@i].Answer"
+									class="form-control shadow-none qa-input" placeholder="a" id="answerInput-@i">
+									<label class="card-label-floating text-light" for="answerInput-@i">Answer</label>
+									<span asp-validation-for="@Model.CardSet.Cards[@i].Answer" class="text-danger"></span>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			i++;
-		}
-		<div class="col-12 mb-3 qa-card">
-			<div class="card">
-				<div id="addCardsContainer"
-					class="card-body py-4 text-center d-flex justify-content-center align-items-center">
-					<label id="addManyInputLabel" class="card-label text-light" for="addManyInput">How many cards to
-						add?</label>
-					<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number"
-						class="form-control shadow-nonen qa-input mx-2" min="0"
-						max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
-					<button type="submit" id="btnAddCards" class="btn btn-info" asp-action="AddCardToModel">
-						Add Card</button>
-					<p hidden id="cardLimitInfo" class="text-primary m-0">Limit of cards per set achieved.</p>
+				i++;
+			}
+			<div class="col-12 mb-3 qa-card">
+				<div class="card">
+					<div id="addCardsContainer"
+						class="card-body py-4 text-center d-flex justify-content-center align-items-center">
+						<label id="addManyInputLabel" class="card-label text-light" for="addManyInput">How many cards to
+							add?</label>
+						<input id="addManyInput" asp asp-for="@Model.AddManyCards" type="number"
+							class="form-control shadow-nonen qa-input mx-2" min="0"
+							max="@(50 - Model.CardSet.Cards.Count())" style="width: 70px;">
+						<button type="submit" id="btnAddCards" class="btn btn-info" asp-action="AddCardToModel">
+							Add Card</button>
+						<p hidden id="cardLimitInfo" class="text-primary m-0">Limit of cards per set achieved.</p>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="row">
-		<div class="col text-center">
-			<a type="submit" class="btn btn-danger" asp-controller="Home" asp-action="Index">Cancel</a>
-			<button type="submit" class="btn btn-info" asp-action="@(Model.ActionType)Set"
-				asp-route-id="@(Model.CardSet.Id != 0? Model.CardSet.Id : null)">Submit</button>
+		<div class="row">
+			<div class="col text-center">
+				<a type="submit" class="btn btn-secondary" asp-controller="Home" asp-action="Index">Cancel</a>
+				<button type="submit" class="btn btn-info" asp-action="@(Model.ActionType)Set"
+					asp-route-id="@(Model.CardSet.Id != 0? Model.CardSet.Id : null)">Submit</button>
+			</div>
 		</div>
-	</div>
-</form>
+	</form>
+</div>
 @section Scripts {
 <script>
 	var PostBackURL = '@Url.Content("~/")' + "Sets/GetAllCardSubjects/";

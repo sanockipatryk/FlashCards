@@ -1,0 +1,162 @@
+﻿@model UserNotificationsListViewModel
+@using Humanizer
+<li class="nav-item nav-text d-block d-md-none py-md-3 me-3 px-2 px-md-0 mb-2 mb-md-0">
+	<a class="nav-link nav-text text-light" asp-controller="Notifications" asp-action="Index">
+		<span class="text-light">
+			<i class="bi bi-bell-fill"></i>
+			@if (Model.UnreadNotificationsCount > 0)
+			{
+				<span class="text-info">(@Model.UnreadNotificationsCount)</span>
+			}
+			<span class="d-inline-block d-md-none">Notifications</span>
+		</span>
+
+	</a>
+</li>
+<li class="nav-item dropdown d-none d-md-block py-md-3 me-2">
+	<form id="__NotificationsAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
+	<a class="nav-link nav-icon-link nav-text text-light" role="button" data-bs-toggle="dropdown"
+		data-bs-auto-close="outside" aria-expanded="false">
+		<i class="bi bi-bell-fill link-icon"></i>
+		@if (Model.UnreadNotificationsCount > 0)
+		{
+			<span class="notification-count-wrapper text-info">(<span
+				class="notifications-count">@Model.UnreadNotificationsCount</span>)</span>
+		}
+		else
+		{
+			<span class="notification-count-wrapper d-none text-info">(<span class="notifications-count"></span>)</span>
+		}
+	</a>
+	<ul class="dropdown-menu bg-primary dropdown-menu-end notifications-menu">
+		@if (Model.Notifications.Count > 0)
+		{
+			@foreach (var notification in Model.Notifications)
+			{
+				<li data-notification-id="@notification.Id" class="d-flex align-items-center notification px-3">
+					<div class="dropdown-item notification-wrap text-light d-flex flex-column ps-0 @(notification.IsRead ? "" : "unread")"
+				data-notification-id="@notification.Id">
+						<span class="date-sent">@notification.DateSent.Humanize(
+					culture: new System.Globalization.CultureInfo("en"))</span>
+						<span>@notification.Title</span>
+					</div>
+					<div class="rounded-5 additional-options">
+						<a class="show-additional-options rounded-5" type="button" data-bs-toggle="dropdown">
+							<i class="bi bi-three-dots text-light"></i>
+						</a>
+						<ul class="dropdown dropdown-menu-end dropdown-menu dropdown-notification-submenu bg-primary">
+							<li><a data-notification-id="@notification.Id"
+							class="dropdown-item text-light btn-read-unread">@(notification.IsRead ? "Set as unread" :
+							"Set as read")</a></li>
+							<li><a data-notification-id="@notification.Id"
+							class="dropdown-item text-light btn-delete-notification">Delete</a>
+							</li>
+						</ul>
+					</div>
+				</li>
+			}
+		}
+		else
+		{
+			<li class="text-center px-3 pt-2 mt-2 d-flex">
+				<p class="text-light">No notifications</p>
+			</li>
+		}
+		<li class="text-center px-3 py-2 mt-2 d-flex flex-column align-items-stretch">
+			<a class="text-info text-decoration-none see-all-notifications" asp-controller="Notifications"
+				asp-action="Index"><span>See all</span></a>
+		</li>
+	</ul>
+</li>
+
+<script>
+	var notificationElements = document.querySelectorAll('.notification');
+	notificationElements?.forEach(notification => notification.addEventListener('click', (e) => {
+		if (
+			!notification.querySelector('.additional-options').contains(e.target)) {
+			window.location.href = '@Url.Content("~/")' + "Notifications/?Notification=" + notification.getAttribute('data-notification-id');
+		}
+	}))
+
+	var notificationsCount = document.querySelector('.notifications-count');
+	var notificationsCountWrapper = document.querySelector('.notification-count-wrapper');
+
+	var buttonsReadUnread = document.querySelectorAll('.btn-read-unread');
+	var buttonsDeleteNotification = document.querySelectorAll('.btn-delete-notification');
+
+	var __RequestVerificationToken = document.querySelector("#__NotificationsAntiForgeryForm input").value;
+	buttonsReadUnread.forEach(button => {
+		button.addEventListener('click', async () => {
+			var notificationId = button.getAttribute('data-notification-id');
+			var Url = '@Url.Action("ReadOrUnreadNotification", "Notifications")';
+			await fetch(Url, {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					'RequestVerificationToken': __RequestVerificationToken
+				},
+				body: JSON.stringify(parseInt(notificationId)
+				)
+			}).then(c => updateUiForReadUnread(notificationId, document.querySelector(`.notification-wrap[data-notification-id="${notificationId}"]`).classList.contains('unread')))
+				.catch(err => { })
+		})
+	})
+
+	buttonsDeleteNotification.forEach(button => {
+		button.addEventListener('click', async () => {
+			var notificationId = button.getAttribute('data-notification-id');
+			var Url = '@Url.Action("DeleteNotification", "Notifications")';
+			await fetch(Url, {
+				method: "POST",
+				headers: {
+					'Content-Type': 'application/json; charset=utf-8',
+					'RequestVerificationToken': __RequestVerificationToken
+				},
+				body: JSON.stringify(parseInt(notificationId))
+			}).then(c => updateUiForDelete(notificationId, document.querySelector(`.notification-wrap[data-notification-id="${notificationId}"]`).classList.contains('unread')))
+				.catch(err => { })
+		})
+	})
+
+	function updateUiForReadUnread(notificationId, isReadAfterClick) {
+		var unreadCount = parseInt(notificationsCount.textContent);
+		if (isNaN(unreadCount)) unreadCount = 0;
+		if (isReadAfterClick) unreadCount--;
+		else unreadCount++;
+		showOrHideUnreadCount(unreadCount);
+
+		notificationsCount.textContent = unreadCount;
+
+		var notificationWrapperById = document.querySelector(`.notification-wrap[data-notification-id="${notificationId}"]`);
+		var ButtonReadUnreadById = document.querySelector(`.btn-read-unread[data-notification-id="${notificationId}"]`);
+		notificationWrapperById.classList.toggle('unread');
+
+		if (isReadAfterClick)
+			ButtonReadUnreadById.textContent = "Set as unread";
+		else
+			ButtonReadUnreadById.textContent = "Set as read";
+	};
+
+	function updateUiForDelete(notificationId, isUnreadOnClick) {
+		var unreadCount = parseInt(notificationsCount.textContent);
+		if (isNaN(unreadCount)) unreadCount = 0;
+		if (isUnreadOnClick) unreadCount--;
+		showOrHideUnreadCount(unreadCount);
+
+		notificationsCount.textContent = unreadCount;
+
+		var notificationToRemove = document.querySelector(`.notification[data-notification-id="${notificationId}"]`);
+		notificationToRemove.remove();
+	}
+
+	function showOrHideUnreadCount(unreadCount) {
+		if (unreadCount > 0) {
+			if (notificationsCountWrapper.classList.contains('d-none'))
+				notificationsCountWrapper.classList.remove('d-none')
+		}
+		else if (unreadCount === 0) {
+			if (!notificationsCountWrapper.classList.contains('d-none'))
+				notificationsCountWrapper.classList.add("d-none")
+		}
+	}
+</script>

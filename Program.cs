@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using FlashCards.Helpers;
+using FlashCards.SSoT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,15 +26,25 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddScoped<ICardsService, CardsService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IReportsService, ReportsService>();
+builder.Services.AddScoped<INotificationsService, NotificationService>();
 builder.Services.AddScoped<ApplicationUserClaimsPrincipalFactory>();
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddDefaultTokenProviders()
-    .AddDefaultUI()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddClaimsPrincipalFactory<ApplicationUserClaimsPrincipalFactory>();
-builder.Services.AddAuthorization(options => options.AddPolicy("MustBeCardSetOwner", policy =>
-    policy.Requirements.Add(new MustBeCardSetOwnerRequirement())));
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    options.SignIn.RequireConfirmedAccount = false)
+        .AddDefaultUI()
+        .AddEntityFrameworkStores<ApplicationDbContext>()
+        .AddClaimsPrincipalFactory<ApplicationUserClaimsPrincipalFactory>()
+        .AddDefaultTokenProviders();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("MustBeCardSetOwner", policy =>
+        policy.Requirements.Add(new MustBeCardSetOwnerRequirement()));
+    options.AddPolicy("RequireAdminRole", policy =>
+        policy.RequireRole(DefaultAppValues.AdminRole));
+});
+
 builder.Services.AddScoped<IAuthorizationHandler, MustBeCardSetOwnerHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages();

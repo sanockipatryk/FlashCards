@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FlashCards.Models
@@ -17,6 +18,7 @@ namespace FlashCards.Models
         public DateTime DateCreated { get; set; }
         public DateTime DateUpdated { get; set; }
         public bool IsPublic { get; set; }
+        public bool IsDeleted { get; set; }
 
         [ForeignKey(nameof(User))]
         public string? UserId { get; set; }
@@ -28,5 +30,6 @@ namespace FlashCards.Models
         public CardSubject? CardSubject { get; set; }
 
         public List<Card> Cards { get; set; }
+        public List<CardSetReport>? CardSetReports { get; set; }
     }
 }

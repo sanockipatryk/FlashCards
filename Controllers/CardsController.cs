@@ -1,5 +1,5 @@
 ﻿using FlashCards.Data.Services;
-using FlashCards.Enums;
+using FlashCards.Models.Types.Enums;
 using FlashCards.Helpers;
 using FlashCards.Models;
 using FlashCards.Models.ViewModels;
@@ -8,18 +8,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Security.Claims;
-using System.Text.Json;
 
 namespace FlashCards.Controllers
 {
     [Route("Sets")]
     public class CardsController : Controller
     {
-        private readonly ICardsService _service;
+        private readonly ICardsService _cardsService;
 
-        public CardsController(ICardsService service)
+        public CardsController(ICardsService cardsService)
         {
-            _service = service;
+            _cardsService = cardsService;
         }
 
         //GET: View single set
@@ -29,7 +28,7 @@ namespace FlashCards.Controllers
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            var cardSet = await _service.GetCardSetAsync(id, userId);
+            var cardSet = await _cardsService.GetCardSetAsync(id, userId);
             if (cardSet.Name != null)
             {
                 return View(cardSet);
@@ -50,7 +49,7 @@ namespace FlashCards.Controllers
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            var cardSetQuiz = await _service.GetCardSetQuizAsync(id, userId);
+            var cardSetQuiz = await _cardsService.GetCardSetQuizAsync(id, userId);
             if (cardSetQuiz.CardSet != null)
             {
                 return View(cardSetQuiz);
@@ -75,16 +74,14 @@ namespace FlashCards.Controllers
 
         [HttpGet("page/{page:int?}")]
         public async Task<IActionResult> Sets(
+            CardSetFiltersViewModel cardSetFilters,
             int page = DefaultAppValues.Page,
-            int cardsPerPage = DefaultAppValues.CardsPerPage,
-            string? name = null,
-            string? numberOfCards = null,
-            string? author = null,
-            string? sort = null)
+            int setsPerPage = DefaultAppValues.SetsPerPage
+            )
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            SetsPageViewModel setsPageViewModel = await _service.GetAllCardSetsAsync(page, cardsPerPage, name, numberOfCards, author, sort, userId);
+            SetsPageViewModel setsPageViewModel = await _cardsService.GetAllCardSetsAsync(cardSetFilters, page, setsPerPage, userId);
 
             return View(nameof(Sets), setsPageViewModel);
         }
@@ -102,18 +99,15 @@ namespace FlashCards.Controllers
         [HttpGet("{categoryName}/page/{page:int?}")]
         public async Task<IActionResult> Category(
             string categoryName,
+            CardSetFiltersViewModel cardSetFilters,
             int page = DefaultAppValues.Page,
-            int cardsPerPage = DefaultAppValues.CardsPerPage,
-            string? name = null,
-            string? numberOfCards = null,
-            string? author = null,
-            string? sort = null)
+            int setsPerPage = DefaultAppValues.SetsPerPage)
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
             CategoryPageViewModel categoryPageViewModel =
-                await _service.GetAllCardSetsOfCategoryAsync(
-                    categoryName, page, cardsPerPage, name, numberOfCards, author, sort, userId);
+                await _cardsService.GetAllCardSetsOfCategoryAsync(
+                    categoryName, cardSetFilters, page, setsPerPage, userId);
 
             if (categoryPageViewModel.CardCategory != null)
             {
@@ -138,23 +132,21 @@ namespace FlashCards.Controllers
         }
 
         //GET: Browse all sets from a subject with page parameters and filters
-        
+
         [HttpGet("{categoryName}/{subjectName}/page/{page:int?}")]
         public async Task<IActionResult> Subject(
             string categoryName,
             string subjectName,
+            CardSetFiltersViewModel cardSetFilters,
             int page = DefaultAppValues.Page,
-            int cardsPerPage = DefaultAppValues.CardsPerPage,
-            string? name = null,
-            string? numberOfCards = null,
-            string? author = null,
-            string? sort = null)
+            int setsPerPage = DefaultAppValues.SetsPerPage
+            )
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
             SubjectPageViewModel subjectPageViewModel =
-                await _service.GetAllCardSetsOfSubjectAsync(
-                    categoryName, subjectName, page, cardsPerPage, name, numberOfCards, author, sort, userId);
+                await _cardsService.GetAllCardSetsOfSubjectAsync(
+                    categoryName, subjectName, cardSetFilters, page, setsPerPage, userId);
 
             if (subjectPageViewModel.CardSubject != null)
             {
@@ -188,8 +180,8 @@ namespace FlashCards.Controllers
 
             var createCardSetViewModel = new CreateCardSetViewModel
             {
-                CardCategories = await _service.GetAllCardCategoriesAsync(),
-                CardSubjectsListJson =  await _service.GetAllCardSubjectsJsonAsync(),
+                CardCategories = await _cardsService.GetAllCardCategoriesAsync(),
+                CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync(),
                 CardSet = new CardSet()
                 {
                     IsPublic = true,
@@ -208,11 +200,6 @@ namespace FlashCards.Controllers
             return View(createCardSetViewModel);
         }
 
-        private object JsonSerializ(CreateCardSetViewModel? model)
-        {
-            throw new NotImplementedException();
-        }
-
         //POST: Creating new set
 
         [Authorize]
@@ -223,13 +210,13 @@ namespace FlashCards.Controllers
         {
             if (!ModelState.IsValid)
             {
-                
-                model.CardCategories = await _service.GetAllCardCategoriesAsync();
-                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
+
+                model.CardCategories = await _cardsService.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var cardSetId = await _service.CreateCardSetAsync(model, userId);
+            var cardSetId = await _cardsService.CreateCardSetAsync(model, userId);
             return RedirectToAction(nameof(Set), new { id = cardSetId });
         }
 
@@ -257,7 +244,7 @@ namespace FlashCards.Controllers
 
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var cardSetViewModel = await _service.GetCardSetForEditAsync(id);
+            var cardSetViewModel = await _cardsService.GetCardSetForEditAsync(id);
 
             return View(nameof(CreateSet), cardSetViewModel);
         }
@@ -271,21 +258,21 @@ namespace FlashCards.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.CardCategories = await _service.GetAllCardCategoriesAsync();
-                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
+                model.CardCategories = await _cardsService.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
-            var cardSetId = await _service.EditCardSetAsync(model);
-            if(cardSetId != 0)
+            var cardSetId = await _cardsService.EditCardSetAsync(model);
+            if (cardSetId != 0)
             {
-            return RedirectToAction(nameof(Set), new { id = cardSetId });
+                return RedirectToAction(nameof(Set), new { id = cardSetId });
             }
 
             return View("Error", new ErrorViewModel
-                {
-                    ErrorStatus = "Something went wrong",
-                    ErrorMessage = "Editing set was not successful."
-                });
+            {
+                ErrorStatus = "Something went wrong",
+                ErrorMessage = "Editing set was not successful."
+            });
 
         }
 
@@ -312,7 +299,7 @@ namespace FlashCards.Controllers
             }
 
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var cardSetForCopy = await _service.GetCardSetForCopyAsync(id, userId);
+            var cardSetForCopy = await _cardsService.GetCardSetForCopyAsync(id, userId);
 
             return View(nameof(CreateSet), cardSetForCopy);
         }
@@ -327,12 +314,12 @@ namespace FlashCards.Controllers
         {
             if (!ModelState.IsValid)
             {
-                model.CardCategories = await _service.GetAllCardCategoriesAsync();
-                model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
+                model.CardCategories = await _cardsService.GetAllCardCategoriesAsync();
+                model.CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync();
                 return View(nameof(CreateSet), model);
             }
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var cardSetId = await _service.CreateCardSetAsync(model, userId);
+            var cardSetId = await _cardsService.CreateCardSetAsync(model, userId);
             return RedirectToAction(nameof(Set), new { id = cardSetId });
         }
 
@@ -352,17 +339,18 @@ namespace FlashCards.Controllers
 
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            var result = await _service.DeleteCardSet(id, userId);
+            var result = await _cardsService.DeleteCardSet(id, userId);
 
-            if(result) {
+            if (result)
+            {
                 return RedirectToAction(nameof(Sets), new { page = DefaultAppValues.Page });
             }
 
             return View("Error", new ErrorViewModel
-                {
-                    ErrorStatus = "Bad Request",
-                    ErrorMessage = "Requested resource could not be accessed."
-                });
+            {
+                ErrorStatus = "Bad Request",
+                ErrorMessage = "Requested resource could not be accessed."
+            });
 
         }
 
@@ -373,8 +361,8 @@ namespace FlashCards.Controllers
         [HttpPost("AddCardToModel")]
         public async Task<IActionResult> AddCardToModel(CreateCardSetViewModel model)
         {
-            model.CardCategories = await _service.GetAllCardCategoriesAsync();
-            model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
+            model.CardCategories = await _cardsService.GetAllCardCategoriesAsync();
+            model.CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync();
             if (model.CardSet.Cards == null)
             {
                 model.CardSet.Cards = new List<Card>();
@@ -406,8 +394,8 @@ namespace FlashCards.Controllers
         [HttpPost("DeleteCardFromModel/{cardIndex}")]
         public async Task<IActionResult> DeleteCardFromModel(CreateCardSetViewModel model, int cardIndex)
         {
-            model.CardCategories = await _service.GetAllCardCategoriesAsync();
-            model.CardSubjectsListJson = await _service.GetAllCardSubjectsJsonAsync();
+            model.CardCategories = await _cardsService.GetAllCardCategoriesAsync();
+            model.CardSubjectsListJson = await _cardsService.GetAllCardSubjectsJsonAsync();
             if (model.CardSet.Cards.Count > 1)
             {
                 model.CardSet.Cards.RemoveAt(cardIndex);
@@ -432,7 +420,7 @@ namespace FlashCards.Controllers
         [HttpGet("GetSubjectsForCardCategory/{categoryId}")]
         public async Task<IActionResult> GetSubjectsForCardCategory(int categoryId)
         {
-            var cardSubjects = await _service.GetCardSubjectsForCategoryAsync(categoryId);
+            var cardSubjects = await _cardsService.GetCardSubjectsForCategoryAsync(categoryId);
 
             return Json(new SelectList(cardSubjects, "Id", "Name"));
         }
@@ -444,7 +432,7 @@ namespace FlashCards.Controllers
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            var cardSetPreview = await _service.GetCardSetPreviewAsync(cardSetId, count, userId);
+            var cardSetPreview = await _cardsService.GetCardSetPreviewAsync(cardSetId, count, userId);
             if (cardSetPreview != null)
             {
                 return PartialView("_PreviewCardSetInnerModal", cardSetPreview);
@@ -460,7 +448,7 @@ namespace FlashCards.Controllers
         {
             string? userId = UserManagerExtensions.GetUserId(User);
 
-            var cards = await _service.GetCardsForCardSetAsync(id, userId);
+            var cards = await _cardsService.GetCardsForCardSetAsync(id, userId);
             if (cards.Count() > 0)
             {
                 return Json(cards);
@@ -470,9 +458,9 @@ namespace FlashCards.Controllers
         }
 
         [HttpGet("GetAllCardSubjects")]
-        public async Task<IActionResult> GetAllCardSubjects() 
+        public async Task<IActionResult> GetAllCardSubjects()
         {
-            var cardSubjects = await _service.GetAllCardSubjectsAsync();
+            var cardSubjects = await _cardsService.GetAllCardSubjectsAsync();
             return Json(cardSubjects);
         }
 

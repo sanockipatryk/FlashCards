@@ -1,0 +1,91 @@
+﻿@model SendReportViewModel
+@using FlashCards.Models.Types.Enums
+
+<div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header text-light">
+				<p class="modal-title h4">Report this set</p>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close">
+				</button>
+			</div>
+			<form id="reportForm" asp-controller="Reports" asp-action="SendReport">
+				<input type="hidden" asp-for="CardSetId" />
+				<div class="modal-body text-light">
+					<p class="modal-title h4">Why are you reporting this set?</p>
+					<div class="col-12 form-floating mt-3">
+						<select id="responseSelect" class="form-select"
+							asp-items="@Html.GetEnumSelectList<ReportCause>()" asp-for="ReportCause"></select>
+						<label class="text-light" for="causeSelect">Select report cause</label>
+					</div>
+					<div class="col-12 form-floating mt-3">
+						<textarea id="descriptionArea" asp-for="Description"
+							class="form-control floating-textarea"></textarea>
+						<label class="text-light" for="descriptionArea">Specify the problem (optional):</label>
+					</div>
+				</div>
+				<div class="modal-footer d-flex justify-content-between flex-grow-1">
+					<button type="button" id="cancelReport" class="btn btn-secondary flex-grow-1 py-3"
+						data-bs-dismiss="modal">Cancel</button>
+					<button type="submit" id="submitReport" class="btn btn-info flex-grow-1 ms-2 py-3">
+						Report
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	// fetch posting a report
+	var submitButton = document.querySelector('#submitReport');
+	var cancelButton = document.querySelector('#cancelReport');
+	var reportForm = document.querySelector('#reportForm');
+
+	reportForm.addEventListener('submit', (e) => {
+		e.preventDefault();
+
+
+		var formElements = reportForm.querySelectorAll('[name]:not([name="__RequestVerificationToken"])');
+		var antiForgery = reportForm.querySelector('[name="__RequestVerificationToken"').value;
+
+		var formData = {};
+		formElements.forEach(element => {
+			formData = {
+				...formData,
+				[element.getAttribute("name")]: element.value
+			};
+		});
+		sendReport(formData, antiForgery);
+
+	})
+
+	async function sendReport(formData, antiForgery) {
+		var url = '@Url.Action("SendReport", "Reports")';
+		submitButton.setAttribute('disabled', true);
+		await fetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'RequestVerificationToken': antiForgery
+			},
+			body: JSON.stringify({
+				CardSetId: parseInt(formData.CardSetId),
+				Description: formData.Description,
+				ReportCause: parseInt(formData.ReportCause)
+			})
+		})
+			.then(response => response.status)
+			.then(status => {
+				if (status === 200) {
+					cancelButton.textContent = "Close window";
+					reportForm.querySelector(".modal-body").innerHTML = '<p class="modal-title h4">Thank you for submitting a report.</p>';
+				}
+			})
+			.catch(err => {
+				cancelButton.textContent = "Close window";
+				reportForm.querySelector(".modal-body").innerHTML = '<p class="modal-title h4">Error submitting report. Try again later.</p>';
+			});
+
+	}
+</script>

@@ -1,4 +1,4 @@
-﻿using FlashCards.Enums;
+﻿using FlashCards.Models.Types.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace FlashCards.Models.ViewModels

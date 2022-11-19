@@ -5,17 +5,17 @@
 		<nav aria-label="breadcrumb">
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item" aria-current="page">
-					<a class="text-info" asp-action="Sets" asp-route-page="1" asp-route-name="@Model.Filters.Name"
-						asp-route-numberOfCards="@Model.Filters.NumberOfCards" asp-route-author="@Model.Filters.Author"
-						asp-route-sort="@Model.Filters.SortBy">
+					<a class="text-info" asp-action="Sets" asp-route-page="1" asp-route-Name="@Model.Filters.Name"
+						asp-route-Author="@Model.Filters.Author" asp-route-NumberOfCards="@Model.Filters.NumberOfCards"
+						asp-route-Sort="@Model.Filters.SortBy">
 						Sets
 					</a>
 				</li>
 				<li class="breadcrumb-item" aria-current="page">
 					<a class="text-info" asp-action="Category"
 						asp-route-categoryName="@Model.CardSubject.CardCategory.Name" asp-route-page="1"
-						asp-route-name="@Model.Filters.Name" asp-route-numberOfCards="@Model.Filters.NumberOfCards"
-						asp-route-author="@Model.Filters.Author" asp-route-sort="@Model.Filters.SortBy">
+						asp-route-Name="@Model.Filters.Name" asp-route-Author="@Model.Filters.Author"
+						asp-route-NumberOfCards="@Model.Filters.NumberOfCards" asp-route-Sort="@Model.Filters.SortBy">
 						@Model.CardSubject.CardCategory.Name
 					</a>
 				</li>
@@ -26,7 +26,8 @@
 </div>
 <div class="row mx-3">
 	<div class="col-12">
-		<div class="cat-sub-title rounded py-4 px-5 tag-category-@(Model.CardSubject.CardCategory.Name.Replace(" ", ""))">
+		<div
+			class="cat-sub-title rounded py-4 px-5 tag-category-@(Model.CardSubject.CardCategory.Name.Replace(" ", ""))">
 			<p class="lead">@(Model.CardSubject.CardCategory.Name) sets</p>
 			<p class="display-6"><strong>@Model.CardSubject.Name</strong></p>
 		</div>
@@ -40,9 +41,9 @@
 				@foreach (var subject in Model.OtherSubjects)
 				{
 					<a class="btn btn-primary text-light different-cat-sub" asp-action="Subject"
-					asp-route-subjectName="@subject.Name" asp-route-page="1" asp-route-name="@Model.Filters.Name"
-					asp-route-numberOfCards="@Model.Filters.NumberOfCards" asp-route-author="@Model.Filters.Author"
-					asp-route-sort="@Model.Filters.SortBy">
+					asp-route-subjectName="@subject.Name" asp-route-page="1" asp-route-Name="@Model.Filters.Name"
+					asp-route-Author="@Model.Filters.Author" asp-route-NumberOfCards="@Model.Filters.NumberOfCards"
+					asp-route-Sort="@Model.Filters.SortBy">
 						@subject.Name
 					</a>
 				}
@@ -55,6 +56,6 @@
 </div>
 <div class="row mx-3">
 	<partial name="_CardSetList" model="@Model.CardSetListData" />
-	<partial name="_CardSetListPagination" model="@Model.Pagination" />
+	<partial name="_DefaultListPagination" model="@Model.Pagination" />
 </div>
 <partial name="_ModalPreviewCardSet" />

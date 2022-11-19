@@ -1,5 +1,9 @@
 ﻿@model PaginationViewModel
 
+@{
+	var queryString = Context.Request.QueryString;
+}
+
 <nav aria-label="Pagination">
 	@{
 		if (Model.NumberOfPages >= 1)
@@ -8,12 +12,13 @@
 				@if (Model.CurrentPage != 1)
 				{
 					<li class="page-item">
-						<a class="page-link text-light bg-primary" asp-route-page="1" aria-label="First">
+						<a class="page-link text-light bg-primary" href="@(1)@queryString" aria-label="First">
 							<span aria-hidden="true">&laquo;</span>
 						</a>
 					</li>
 					<li class="page-item">
-						<a class="page-link text-light bg-primary" asp-route-page="@(Model.CurrentPage - 1)" aria-label="Previous">
+						<a class="page-link text-light bg-primary" href="@(Model.CurrentPage - 1)@queryString"
+					aria-label="Previous">
 							<span aria-hidden="true">&lsaquo;</span>
 						</a>
 					</li>
@@ -23,34 +28,28 @@
 				{
 					if (Model.CurrentPage == i)
 					{
-						<li class="page-item active"><a class="page-link disabled-link text-dark bg-info" asp-route-page="@i">@i</a>
+						<li class="page-item active"><a class="page-link disabled-link text-dark bg-info" href="@(i)@queryString">@i</a>
 						</li>
 					}
 					else
 					{
-						<li class="page-item"><a class="page-link text-light bg-primary" asp-route-page="@i">@i</a></li>
+						<li class="page-item"><a class="page-link text-light bg-primary" href="@(i)@queryString">@i</a></li>
 					}
 				}
 				@if (Model.CurrentPage != Model.NumberOfPages)
 				{
 					<li class="page-item">
-						<a class="page-link text-light bg-primary" asp-route-page="@(Model.CurrentPage + 1)" aria-label="Next">
+						<a class="page-link text-light bg-primary" href="@(Model.CurrentPage + 1)@queryString" aria-label="Next">
 							<span aria-hidden="true">&rsaquo;</span>
 						</a>
 					</li>
 					<li class="page-item">
-						<a class="page-link text-light bg-primary" asp-route-page="@Model.NumberOfPages" aria-label="Last">
+						<a class="page-link text-light bg-primary" href="@(Model.NumberOfPages)@queryString" aria-label="Last">
 							<span aria-hidden="true">&raquo;</span>
 						</a>
 					</li>
 				}
 			</ul>
-		}
-		else
-		{
-			<div class="text-center">
-				<p>No sets match the filters.</p>
-			</div>
 		}
 	}
 </nav>

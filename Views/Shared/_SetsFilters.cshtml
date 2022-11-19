@@ -1,47 +1,68 @@
 ﻿@model CardSetFiltersViewModel
+@using FlashCards.Models.Types.Enums
+@using FlashCards.Helpers
+
+@{
+	var filtersApplied = Model.FiltersAplied;
+}
 
 <div class="col-12 accordion" id="accordionFilters">
 	<div class="accordion-item px-0">
 		<h2 class="accordion-header" id="headingOne">
 			<button id="filtersAccordionButton"
-				class="accordion-button text-light px-0 @(Model.FiltersAplied ? "" : "collapsed")" type="button"
-				data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="@Model.FiltersAplied.ToString()"
+				class="accordion-button text-light px-0 @(filtersApplied ? "" : "collapsed")" type="button"
+				data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="@filtersApplied.ToString()"
 				aria-controls="collapseOne">
 				<strong>Filters</strong>
-				<span class="ms-auto me-0 filters-accordion-text">@(Model.FiltersAplied ? "collapse" : "expand" )</span>
+				<span class="ms-auto me-0 filters-accordion-text">@(filtersApplied ? "collapse" : "expand" )</span>
 			</button>
 		</h2>
-		<div id="collapseOne" class="accordion-collapse collapse px-0 @(Model.FiltersAplied ? "show" : "")"
+		<div id="collapseOne" class="accordion-collapse collapse px-0 @(filtersApplied ? "show" : "")"
 			aria-labelledby="headingOne" data-bs-parent="#accordionFilters">
 			<form id="filtersForm" class="col-12 offset-sm-1 col-sm-10 offset-xxl-0 col-xxl-12 p-0">
-				<div class="row m-0 p-0  d-flex justify-content-around">
+				<div class="row m-0 p-0 d-flex justify-content-around">
 					<div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0 ps-xxl-0">
-						<input name="name" asp-for="Name" class="form-control flex-grow-1" type="text"
-							placeholder="Name" />
+						<div class="form-floating">
+							<input id="nameInput" asp-for="Name" class="form-control flex-grow-1" type="text" />
+							<label class="text-light" for="nameInput">Set name</label>
+						</div>
 					</div>
 					<div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0">
-						<select id="numberOfCardsSelect" name="numberOfCards" asp-for="NumberOfCards"
-							class="form-select" aria-label="Filter card count">
-							<option value="" selected>All</option>
-							<option value="lessThanTwenty">@("1 - 20")</option>
-							<option value="twentyToForty">@("20 - 39")</option>
-							<option value="moreThanForty">@("40 - 50")</option>
-						</select>
+						<div class="form-floating">
+							<input id="authorInput" asp-for="Author" class="form-control" type="text" />
+							<label class="text-light" for="authorInput">Author nickname</label>
+						</div>
 					</div>
 					<div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0">
-						<input name="author" asp-for="Author" class="form-control" type="text" placeholder="Nickname" />
+						<div class="form-floating">
+							@* Displaying select this way to use Text names instead of numbers in URL for Enum options
+							*@
+							<select id="numberOfCardsSelect" class="form-select" asp-for="NumberOfCards">
+								<option value="">-</option>
+								@foreach (var option in Enum.GetValues<SetsNumberOfCards>())
+								{
+									<option value="@option">@EnumExtensionMethods.GetDisplayName(option)</option>
+								}
+							</select>
+							<label for="numberOfCardsSelect" class="text-light">Number of cards in set</label>
+						</div>
 					</div>
 					<div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0">
-						<select id="sortSelect" name="sort" asp-for="SortBy" class="form-select" aria-label="Sort sets">
-							<option selected value="newest">Most recent</option>
-							<option value="oldest">Least recent</option>
-							<option value="az">Name A-Z</option>
-							<option value="za">Name Z-A</option>
-						</select>
+						<div class="form-floating">
+							@* Displaying select this way to use Text names instead of numbers in URL for Enum options
+							*@
+							<select id="sortSelect" class="form-select" asp-for="SortBy">
+								@foreach (var option in Enum.GetValues<SetsSortBy>())
+								{
+									<option value="@option">@EnumExtensionMethods.GetDisplayName(option)</option>
+								}
+							</select>
+							<label class="text-light" for="sortSelect">Sort by</label>
+						</div>
 					</div>
 					<div
-						class="col-12 col-xxl-2 text-center mt-3 mt-xxl-0 d-flex justify-content-center justify-content-xxl-end pe-0">
-						<button id="clearFiltersButton" class="btn btn-danger">Clear</button>
+						class="col-12 col-xxl-2 text-center mt-3 mt-xxl-0 d-flex justify-content-center align-items-center justify-content-xxl-end pe-0">
+						<button id="clearFiltersButton" class="btn btn-secondary">Clear</button>
 						<button id="filterButton" type="submit" class="btn btn-info ms-2"
 							asp-action="@((string)ViewContext.RouteData.Values["action"])">Apply</button>
 					</div>
@@ -49,77 +70,5 @@
 			</form>
 		</div>
 	</div>
-
 </div>
-
-<script>
-	var filtersForm = document.querySelector("#filtersForm");
-	var filterButton = document.querySelector("#filterButton");
-	var numberOfCardsSelect = document.querySelector("#numberOfCardsSelect");
-	var sortSelect = document.querySelector("#sortSelect");
-	var filtersAccordionButton = document.querySelector("#filtersAccordionButton");
-	var filtersAccordionText = document.querySelector(".filters-accordion-text");
-
-	filtersAccordionButton.addEventListener('click', () => {
-		if (filtersAccordionButton.classList.contains("collapsed")) {
-			filtersAccordionText.textContent = "expand"
-		}
-		else {
-			filtersAccordionText.textContent = "collapse"
-		}
-	})
-
-	var setSelectTextColor = (element, selectValue, compareValue) => {
-		if (selectValue !== compareValue && selectValue !== "") {
-			element.style.color = "#f1db77";
-		}
-		else {
-			element.style.color = "white"
-		}
-	}
-
-	setSelectTextColor(numberOfCardsSelect, "@Model.NumberOfCards", "");
-	setSelectTextColor(sortSelect, "@Model.SortBy", "newest");
-
-	numberOfCardsSelect.addEventListener('change', (e) => {
-		setSelectTextColor(numberOfCardsSelect, e.target.value, "");
-	})
-
-	sortSelect.addEventListener('change', (e) => {
-		setSelectTextColor(sortSelect, e.target.value, "newest");
-	})
-
-	filtersForm.addEventListener('submit', (e) => {
-		filtersForm.querySelectorAll("input").forEach(i => {
-			if (i.value.length === 0) {
-				i.setAttribute('disabled', true);
-			}
-		});
-		filtersForm.querySelectorAll("select").forEach(i => {
-			if (i.value.length === 0) {
-				i.setAttribute('disabled', true);
-			}
-		});
-	});
-
-	filtersForm.addEventListener('keydown', (e) => {
-		if (event.keyCode === 13) {
-			e.preventDefault();
-			filterButton.click();
-		}
-	})
-
-	var clearFiltersButton = document.querySelector("#clearFiltersButton");
-	clearFiltersButton.addEventListener('click', () => {
-		filtersForm.querySelectorAll("input").forEach(i => {
-			i.value = '';
-			setSelectTextColor(numberOfCardsSelect, "", "");
-
-		});
-		filtersForm.querySelectorAll("select").forEach(i => {
-			i.value = '';
-		});
-		filtersForm.submit();
-	})
-
-</script>
+<script src="~/js/defaultFilters.js"></script>

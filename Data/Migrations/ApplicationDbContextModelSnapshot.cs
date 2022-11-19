@@ -163,6 +163,9 @@ namespace FlashCards.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsPublic")
                         .HasColumnType("bit");
 
@@ -210,6 +213,83 @@ namespace FlashCards.Data.Migrations
                     b.ToTable("CardSetAccesses");
                 });
 
+            modelBuilder.Entity("FlashCards.Models.CardSetFavorite", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("CardSetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardSetId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CardSetFavorites");
+                });
+
+            modelBuilder.Entity("FlashCards.Models.CardSetReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("CardSetId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("DateEvaluated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateReported")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EvaluatingAdminId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EvaluationReasoning")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsEvaluated")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MessageToReportedSetOwner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReportCause")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReportResponse")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CardSetId");
+
+                    b.HasIndex("EvaluatingAdminId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("CardSetReports");
+                });
+
             modelBuilder.Entity("FlashCards.Models.CardSubject", b =>
                 {
                     b.Property<int>("Id")
@@ -231,6 +311,42 @@ namespace FlashCards.Data.Migrations
                     b.HasIndex("CardCategoryId");
 
                     b.ToTable("CardSubjects");
+                });
+
+            modelBuilder.Entity("FlashCards.Models.UserNotification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime?>("DateRead")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateSent")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecipientId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("UserNotifications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -413,6 +529,48 @@ namespace FlashCards.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("FlashCards.Models.CardSetFavorite", b =>
+                {
+                    b.HasOne("FlashCards.Models.CardSet", "CardSet")
+                        .WithMany()
+                        .HasForeignKey("CardSetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FlashCards.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CardSet");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FlashCards.Models.CardSetReport", b =>
+                {
+                    b.HasOne("FlashCards.Models.CardSet", "CardSet")
+                        .WithMany("CardSetReports")
+                        .HasForeignKey("CardSetId");
+
+                    b.HasOne("FlashCards.Models.ApplicationUser", "EvaluatedBy")
+                        .WithMany()
+                        .HasForeignKey("EvaluatingAdminId");
+
+                    b.HasOne("FlashCards.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CardSet");
+
+                    b.Navigation("EvaluatedBy");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FlashCards.Models.CardSubject", b =>
                 {
                     b.HasOne("FlashCards.Models.CardCategory", "CardCategory")
@@ -422,6 +580,17 @@ namespace FlashCards.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("CardCategory");
+                });
+
+            modelBuilder.Entity("FlashCards.Models.UserNotification", b =>
+                {
+                    b.HasOne("FlashCards.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -482,6 +651,8 @@ namespace FlashCards.Data.Migrations
 
             modelBuilder.Entity("FlashCards.Models.CardSet", b =>
                 {
+                    b.Navigation("CardSetReports");
+
                     b.Navigation("Cards");
                 });
 

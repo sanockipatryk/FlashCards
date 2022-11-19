@@ -1,0 +1,76 @@
+@model CardSetReportsFilterViewModel
+@using FlashCards.Models.Types.Enums
+@using FlashCards.Helpers
+
+@{
+    var filtersApplied = Model.FiltersAplied;
+}
+
+@* TODO: PODŁĄCZYĆ WYSZUKIWANIE PO SET ID *@
+
+<div class="col-12 accordion" id="accordionFilters">
+    <div class="accordion-item px-0">
+        <h2 class="accordion-header" id="headingOne">
+            <button id="filtersAccordionButton"
+                class="accordion-button text-light px-0 @(filtersApplied ? "" : "collapsed")" type="button"
+                data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="@filtersApplied.ToString()"
+                aria-controls="collapseOne">
+                <strong>Filters</strong>
+                <span class="ms-auto me-0 filters-accordion-text">@(filtersApplied ? "collapse" : "expand" )</span>
+            </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse px-0 @(filtersApplied ? "show" : "")"
+            aria-labelledby="headingOne" data-bs-parent="#accordionFilters">
+            <form id="filtersForm" class="col-12 offset-sm-1 col-sm-10 offset-xxl-0 col-xxl-12 p-0">
+                <div class="row m-0 p-0 d-flex justify-content-around">
+                    <div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0 ps-xxl-0">
+                        <div class="form-floating">
+                            <input type="number" id="inputSetId" class="form-control" asp-for="CardSetId" min="0"
+                                max="@Int32.MaxValue" />
+                            <label for="inputSetId" class="text-light">Set Id</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0 px-xxl-0">
+                        <div class="form-floating">
+                            <select id="showSelect" class="form-select" asp-for="Show"
+                                asp-items="@Html.GetEnumSelectList<ReportsShow>()"></select>
+                            <label for="showSelect" class="text-light">Show</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0 pe-xxl-0">
+                        <div class="form-floating">
+                            <select id="causeSelect" class="form-select" asp-for="Cause"
+                                asp-items="@Html.GetEnumSelectList<ReportCause>()">
+                                <option value="">All causes</option>
+                            </select>
+                            <label for="causeSelect" class="text-light">Report cause</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-xxl mt-3 mt-xxl-0">
+                        <div class="form-floating">
+                            <select id="sortSelect" class="form-select" asp-for="SortBy"
+                                asp-items="@Html.GetEnumSelectList<ReportsSortBy>()"></select>
+                            <label for="sortSelect" class="text-light">Sort by</label>
+                        </div>
+                    </div>
+                    <div
+                        class="col-12 col-xxl-2 text-center mt-3 mt-xxl-0 d-flex justify-content-center align-items-center justify-content-xxl-end pe-0">
+                        <button id="clearFiltersButton" class="btn btn-secondary">Clear</button>
+                        <button id="filterButton" type="submit" class="btn btn-info ms-2"
+                            asp-action="Index">Apply</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="~/js/defaultFilters.js"></script>
+<script>
+    var cardSetIdInput = document.querySelector('#inputSetId');
+    cardSetIdInput.addEventListener('input', (e) => {
+        if (parseInt(e.currentTarget.value) < 0) {
+            cardSetIdInput.value = 0;
+        }
+    })
+</script>

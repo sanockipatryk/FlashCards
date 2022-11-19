@@ -12,6 +12,7 @@
 				<p class="cardset-description text-justified d-none mx-2 pb-2"></p>
 				<p class="text-info mx-2 mb-0 h5">Terms in set:</p>
 				<div class="terms-body"></div>
+				<p id="loadingMoreText" class="d-none text-info mx-2 mb-0">Loading more...</p>
 			</div>
 			<div class="modal-footer d-flex justify-content-end mx-3">
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -21,7 +22,6 @@
 	</div>
 </div>
 <script language="javascript">
-	document.addEventListener('DOMContentLoaded', function (event) {
 		var PostBackURL = '@Url.Content("~/")' + "Sets/GetCardSetPreview/";
 		var firstLoadComplete;
 		var id = undefined;
@@ -30,6 +30,7 @@
 		var modalDescription = document.querySelector("#previewModal .cardset-description")
 		var previewButton = document.querySelectorAll(".previewButton");
 		var studyButton = document.querySelector("#studyButton");
+		var loadingMoreText = document.querySelector('#loadingMoreText');
 		var loadingData = false;
 
 		previewButton.forEach(button => button.addEventListener('click', async () => {
@@ -65,14 +66,17 @@
 		}));
 		var cardPreviewDiv = document.querySelector("#card-preview-scrollable");
 		var qaPreviewElements;
-		cardPreviewDiv.addEventListener('scroll', async (event) => {
-			qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
+		cardPreviewDiv.addEventListener('scroll', loadMoreCardsForPreview, false);
+
+		async function loadMoreCardsForPreview(event) {
+qaPreviewElementsCount = document.querySelectorAll('.set-qa-preview').length;
 			var element = event.target;
 			if ((
 				element.scrollHeight - element.scrollTop - element.clientHeight >= 0 &&
 				element.scrollHeight - element.scrollTop - element.clientHeight <= 10
 			) && firstLoadComplete && !loadingData) {
 				loadingData = true;
+				loadingMoreText.classList.replace('d-none', 'd-block');
 				await fetch(PostBackURL + id + '/' + qaPreviewElementsCount, {
 					method: "GET",
 					headers: {
@@ -81,12 +85,17 @@
 				})
 					.then((response) => response.text())
 					.then((data) => {
-						modalTermsBody.innerHTML += data;
-						firstCardsLoaded = true;
-						loadingData = false;
+				loadingMoreText.classList.replace('d-block', 'd-none');
+						if(data.length === 0)
+						{
+							loadingData = false;
+							cardPreviewDiv.removeEventListener('scroll', loadMoreCardsForPreview, false);
+						}
+						else {
+							modalTermsBody.innerHTML += data;
+							loadingData = false;
+						}
 					})
 			}
-		})
-
-	})
+		}
 </script>

@@ -1,15 +1,29 @@
 ﻿@model CardSetViewModel
 @using System.Security.Claims
-
+@using FlashCards.SSoT
 <div class="row mx-3">
 	<div class="p-0 offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
+		@if (User.Identity.IsAuthenticated && User.IsInRole(DefaultAppValues.AdminRole) &&
+				Context.Request.Query["report"].Count() > 0)
+		{
+			<a class="btn btn-secondary" asp-controller="Reports" asp-action="Details"
+			asp-route-id="@Context.Request.Query["report"]">
+				Back to report details
+			</a>
+		}
 		<div class="row m-0 p-0">
+			@if (!Model.IsPublic)
+			{
+				<div class="col-12 p-0">
+					<p class="text-center text-secondary mb-0">Private set</p>
+				</div>
+			}
 			<div class="col-12 p-0 mb-2">
 				<p class="h2 text-center text-white"><i><strong>@Model.Name</strong></i></p>
 			</div>
 			<div class="col-12 p-0 set-study-card d-block">
 				<div class="set-study-card-inner">
-					<div class="card-front d-flex flex-column justify-content-between py-4 px-2">
+					<div class="card-front d-flex flex-column justify-content-between rounded-3 py-4 px-2">
 						<div class="row">
 							<div class="col-2 text-center">
 								<p class='card-text text-white'>
@@ -40,7 +54,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="card-back d-flex flex-column justify-content-between py-4 px-2">
+					<div class="card-back d-flex flex-column justify-content-between rounded-3 py-4 px-2">
 						<div class="row">
 							<div class="col-2 text-center">
 								<p class='card-text text-white'>
@@ -110,7 +124,7 @@
 				</div>
 				<div class="col-12 col-sm-6 d-flex flex-column justify-content-between p-0">
 					<p class="text-light text-sub">Next steps</p>
-					<div id="goToQuiz" class="row continue-btn p-3 mx-0 mb-2">
+					<div id="goToQuiz" class="row continue-btn rounded-4 p-3 mx-0 mb-2">
 						<div class="col-2 col-sm-3 bg-img bg-learn"></div>
 						<div class="col-10 col-sm-8 d-flex flex-column justify-content-between">
 							<div>
@@ -141,7 +155,7 @@
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
-					<div id="repeatCards" class="row continue-btn p-3 mx-0">
+					<div id="repeatCards" class="row continue-btn rounded-4 p-3 mx-0">
 						<div class="col-2 col-sm-3 bg-img bg-repeat"></div>
 						<div class="col-10 col-sm-8 pe-0">
 							<div>
@@ -170,7 +184,6 @@
 						<div class="col-12 col-sm-6 mt-4 mt-sm-2 d-flex justify-content-end align-items-center p-0">
 							<div>
 								<p id="continueToTest" class="text-light text-end p-0 m-0 me-1">
-									@* Continue and test your knowledge *@
 									<a class="text-light text-decoration-none" asp-action="Sets" asp-route-page="1">
 										Go back to all sets
 										<i class="bi bi-arrow-right ms-2"></i>
@@ -197,69 +210,96 @@
 	<div class="flow-control d-block offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 p-0 mt-3">
 		<p class='text-light cards-controls'>
 
-			<span class='btn-play'>
+			<span class='btn-play' data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-title="Autoplay">
+
 				<i class="bi bi-play-fill"></i>
 			</span>
-			<span class='btn-shuffle ms-2'>
+			<span class='btn-shuffle ms-2' data-bs-toggle="tooltip" data-bs-placement="bottom"
+				data-bs-title="Shuffle cards">
+
 				<i class="bi bi-shuffle"></i>
 			</span>
-			<span class='btn-skip ms-2 float-end'>
+			<span class='btn-skip ms-2 float-end' data-bs-toggle="tooltip" data-bs-placement="bottom"
+				data-bs-title="Skip to end">
+
 				<i class="bi bi-skip-forward-fill"></i>
 			</span>
 		</p>
-		@* data-bs-toggle="tooltip" data-bs-title="Autoplay" *@>
-		@* data-bs-toggle="tooltip" data-bs-title="Shuffle cards"> *@
-		@* data-bs-toggle="tooltip" data-bs-title="Skip to end"> *@
 	</div>
 </div>
 <div class="row mx-3">
 	<div class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 p-0">
-		<div class="col-12">
+		<div class="col-12 set-panel-actions">
 			<div class="row p-0 d-flex justify-content-between">
 				<div class="col d-flex align-items-center">
 					<div class="me-3">
 						<p class="display-6 text-info m-0 p-0">
-							<a class="text-info user-link" asp-action="Sets" asp-route-author="@Model.User.Nickname">
+							<a class="text-info" asp-action="Sets" asp-route-author="@Model.User.Nickname">
 								<i class="bi bi-person-circle p-0 m-0"></i>
 							</a>
 						</p>
 					</div>
 					<div class="">
-						<p class="text-muted text- m-0 p-0">Created by:</p>
+						<p class="text-muted m-0 p-0">Created by:</p>
 						<p class="m-0 p-0">
-							<a class="text-info user-link" asp-action="Sets" asp-route-author="@Model.User.Nickname">
+							<a class="text-info" asp-action="Sets" asp-route-author="@Model.User.Nickname">
 								@Model.User.Nickname
 							</a>
 						</p>
 					</div>
 				</div>
 				<div class="col-1 d-flex justify-content-end align-items-center cards-controls">
-					<a class="text-info user-link d-flex align-items-center" asp-action="CopySet"
-						asp-route-id="@Model.Id">
-						@* data-bs-toggle="tooltip" data-bs-title="Copy set" *@
+					<a class="d-flex align-items-center text-info" asp-action="CopySet" data-bs-placement="bottom"
+						data-bs-toggle="tooltip" data-bs-title="Copy set" asp-route-id="@Model.Id">
 
-						<span class="text-info m-0 p-0 btn-copy">
+						<span class="m-0 p-0 btn-copy">
 							<i class="bi bi-clipboard-plus-fill"></i>
 						</span>
 					</a>
 					@if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) ==
 							@Model.User.Id)
 					{
-						<a class="text-info user-link d-flex align-items-center ms-2" asp-action="EditSet"
+						<a class="text-info d-flex align-items-center ms-2" data-bs-toggle="tooltip"
+						data-bs-placement="bottom" data-bs-title="Edit set" asp-action="EditSet"
 						asp-route-id="@Model.Id">
-							@* data-bs-toggle="tooltip" data-bs-title="Edit set" *@
 
 							<span class="text-info m-0 p-0 btn-copy">
 								<i class="bi bi-pencil-square"></i>
 							</span>
 						</a>
-						<a class="text-info user-link d-flex align-items-center ms-2" data-bs-toggle="modal"
-						data-bs-target="#deleteModal" @* data-toggle="tooltip" data-bs-title="Delete set" *@>
+					}
+					<div class="dropup-center dropup-set-menu">
+						<a class="text-info d-flex align-items-center ms-2" data-bs-toggle="dropdown"
+							aria-expanded="false">
 							<span class="text-info m-0 p-0 btn-copy">
-								<i class="bi bi-trash"></i>
+								<i class="bi bi-three-dots"></i>
 							</span>
 						</a>
-					}
+						<ul id="dropdownSetMoreActions" class="dropdown-menu dropdown-set-actions bg-primary">
+							@if (User.Identity.IsAuthenticated && User.FindFirstValue(ClaimTypes.NameIdentifier) ==
+									@Model.User.Id)
+							{
+								<li>
+									<a class="dropdown-item d-flex align-items-center py-1" data-bs-toggle="modal"
+									data-bs-target="#deleteModal">
+										<i class="bi bi-trash me-2"></i>
+										Delete set
+									</a>
+								</li>
+							}
+							else
+							{
+								<li>
+									<a class="dropdown-item d-flex align-items-center py-1" data-bs-toggle="modal"
+									data-bs-target="#reportModal">
+										<i class="bi bi-exclamation-diamond me-2"></i>
+										Report
+									</a>
+								</li>
+							}
+
+						</ul>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -271,7 +311,7 @@
 		<div class="row mx-3">
 			<div id="termsInSets" class="offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8 mt-4 p-0">
 				<div>
-					<div class="row mx-0 p-3 text-light  term-in-set">
+					<div class="row mx-0 p-3 text-light text-with-bg">
 						<p class="text-light text-justified mb-0 px-0">
 							@Model?.Description
 						</p>
@@ -290,7 +330,8 @@
 		</div>
 	</div>
 </div>
-<partial name="_ModalDeleteSet" model="@Model" />
+<partial name="_ModalDeleteSet" model="@Model.Id" />
+<partial name="_ModalReportSet" model="@new SendReportViewModel {CardSetId = @Model.Id}" />
 
 @section Scripts {
 <script>
@@ -337,12 +378,14 @@
 	var shuffleToggled = false;
 	var autoPlayTimeout;
 
-	@* var tooltipDeleteSet = document.querySelector("[data-toggle=tooltip]");
-			var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-			if (tooltipDeleteSet !== null) {
+	if (isTouchDevice() === false) {
+		var tooltipDeleteSet = document.querySelector("[data-toggle=tooltip]");
+		var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+		if (tooltipDeleteSet !== null) {
 			tooltipTriggerList = [...tooltipTriggerList, tooltipDeleteSet];
-			}
-			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl)) *@
+		}
+		var tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	}
 
 	if (@Model.CardCount <4) {
 		btnGoToQuiz.classList.add("innactive");
@@ -667,7 +710,7 @@
 	function loadTerms() {
 		cardsListOriginal.forEach(card => {
 			let newTerm = document.createElement('div');
-			newTerm.className = "row mx-0 mb-2 p-3 text-light term-in-set";
+			newTerm.className = "row mx-0 mb-2 p-3 text-light text-with-bg";
 			let termQuestion = document.createElement('div');
 			termQuestion.setAttribute('lang', 'en');
 			termQuestion.className = "col-4 col-question p-0 pe-1";
@@ -684,6 +727,10 @@
 			newTerm.append(termQuestion, termAnswer);
 			termsInSet.append(newTerm);
 		})
+	}
+
+	function isTouchDevice() {
+		return true == ("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch);
 	}
 </script>
 }

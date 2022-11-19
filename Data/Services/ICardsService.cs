@@ -10,10 +10,10 @@ namespace FlashCards.Data.Services
         Task<IEnumerable<CardSubject>> GetAllCardSubjectsAsync();
         Task<string> GetAllCardSubjectsJsonAsync();
         Task<IEnumerable<CardSubject>> GetCardSubjectsForCategoryAsync(int categoryId);
-        
-        Task<SetsPageViewModel> GetAllCardSetsAsync(int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort, string? userId);
-        Task<CategoryPageViewModel> GetAllCardSetsOfCategoryAsync(string categoryName, int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort, string? userId);
-        Task<SubjectPageViewModel> GetAllCardSetsOfSubjectAsync(string categoryName, string subjectName, int currentPage, int cardsPerPage, string? name, string? numberOfCards, string? author, string? sort, string? userId);
+
+        Task<SetsPageViewModel> GetAllCardSetsAsync(CardSetFiltersViewModel cardSetFilters, int currentPage, int setsPerPage, string? userId);
+        Task<CategoryPageViewModel> GetAllCardSetsOfCategoryAsync(string categoryName, CardSetFiltersViewModel cardSetFilters, int currentPage, int setsPerPage, string? userId);
+        Task<SubjectPageViewModel> GetAllCardSetsOfSubjectAsync(string categoryName, string subjectName, CardSetFiltersViewModel cardSetFilters, int currentPage, int setsPerPage, string? userId);
 
         Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreviewAsync(int cardSetId, int count, string? userId);
         Task<CardSetViewModel> GetCardSetAsync(int id, string? userId);
@@ -25,12 +25,13 @@ namespace FlashCards.Data.Services
 
         Task<CreateCardSetViewModel> GetCardSetForCopyAsync(int id, string userId);
 
-        Task<bool> DeleteCardSet(int id, string? userId);
+        Task<bool> DeleteCardSet(int? id, string? userId);
+        Task<bool> MakeCardSetPrivate(int? id, string? userId);
 
         Task AddCardSetAcccessAsync(int id, string userId);
         Task<FrontPageCardSetListsViewModel> GetFrontPageCardSetsAsync(string? userId);
 
         Task<CardSetQuiz> GetCardSetQuizAsync(int id, string? userId);
-        
+
     }
 }

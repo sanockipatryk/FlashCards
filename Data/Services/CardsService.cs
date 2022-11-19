@@ -1,21 +1,24 @@
 ﻿using FlashCards.Helpers;
 using FlashCards.Models;
 using FlashCards.Models.ViewModels;
+using FlashCards.Models.Types.Enums;
 using FlashCards.SSoT;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
-using System.Net;
-using System.Net.Mail;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace FlashCards.Data.Services
 {
     public class CardsService : ICardsService
     {
         private readonly ApplicationDbContext _context;
-        public CardsService(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+        public CardsService(
+            ApplicationDbContext context,
+            UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         public async Task<IEnumerable<CardCategory>> GetAllCardCategoriesAsync()
@@ -50,27 +53,31 @@ namespace FlashCards.Data.Services
         }
 
         public async Task<SetsPageViewModel> GetAllCardSetsAsync(
+            CardSetFiltersViewModel cardSetFilters,
             int currentPage,
-            int cardsPerPage,
-            string? name,
-            string? numberOfCards,
-            string? author,
-            string? sort,
+            int setsPerPage,
             string? userId)
         {
-            var cardSetsCount = _context.CardSets
-                .PublicOrUserIsOwner(userId)
-                .ApplyFilters(name, numberOfCards, author)
-                .Count();
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
 
-            var numberOfPages = PaginationHelpers.GetTotalPages(cardSetsCount, cardsPerPage);
+            var cardSetsCount = await _context.CardSets
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
+                .ApplyFilters(cardSetFilters)
+                .CountAsync();
+
+            var numberOfPages = PaginationHelpers.GetTotalPages(cardSetsCount, setsPerPage);
             currentPage = PaginationHelpers.GetMinOrMaxPageIfOverBounds(currentPage, numberOfPages);
 
             var cardSets = await _context.CardSets
-                .PublicOrUserIsOwner(userId)
-                .ApplyFilters(name, numberOfCards, author)
-                .ApplySort(sort)
-                .ApplyPagination(currentPage, cardsPerPage, cardSetsCount)
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
+                .ApplyFilters(cardSetFilters)
+                .ApplySort(cardSetFilters.SortBy)
+                .ApplyPagination(currentPage, setsPerPage, cardSetsCount)
                 .SelectDefaultCardSetDataForView()
                 .ToListAsync();
 
@@ -87,45 +94,43 @@ namespace FlashCards.Data.Services
                     CurrentPage = currentPage,
                     NumberOfPages = numberOfPages
                 },
-                Filters = new CardSetFiltersViewModel
-                {
-                    Name = name,
-                    NumberOfCards = numberOfCards,
-                    Author = author,
-                    SortBy = sort
-                }
+                Filters = cardSetFilters
             };
         }
 
         public async Task<CategoryPageViewModel> GetAllCardSetsOfCategoryAsync(
             string categoryName,
+            CardSetFiltersViewModel cardSetFilters,
             int currentPage,
-            int cardsPerPage,
-            string? name,
-            string? numberOfCards,
-            string? author,
-            string? sort,
+            int setsPerPage,
             string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             var cardCategory = await _context.CardCategories.Include(c => c.CardSubjects)
             .FirstOrDefaultAsync(c => c.Name.ToLower() == categoryName.ToLower());
             if (cardCategory != null)
             {
                 var cardSubjectIds = cardCategory.CardSubjects.Select(cs => cs.Id).ToList();
-                var cardSetsCount = _context.CardSets
+                var cardSetsCount = await _context.CardSets
                     .Where(c => cardSubjectIds.Contains(c.CardSubjectId))
-                    .PublicOrUserIsOwner(userId)
-                    .ApplyFilters(name, numberOfCards, author)
-                    .Count();
+                    .PublicOrUserIsOwner(userId, isUserAdmin)
+                    .NotDeleted()
+                    .ApplyFilters(cardSetFilters)
+                    .CountAsync();
 
-                var numberOfPages = PaginationHelpers.GetTotalPages(cardSetsCount, cardsPerPage);
+                var numberOfPages = PaginationHelpers.GetTotalPages(cardSetsCount, setsPerPage);
                 currentPage = PaginationHelpers.GetMinOrMaxPageIfOverBounds(currentPage, numberOfPages);
                 var cardSets = await _context.CardSets
                     .Where(c => cardSubjectIds.Contains(c.CardSubjectId))
-                    .PublicOrUserIsOwner(userId)
-                    .ApplyFilters(name, numberOfCards, author)
-                    .ApplySort(sort)
-                    .ApplyPagination(currentPage, cardsPerPage, cardSetsCount)
+                    .PublicOrUserIsOwner(userId, isUserAdmin)
+                    .NotDeleted()
+                    .ApplyFilters(cardSetFilters)
+                    .ApplySort(cardSetFilters.SortBy)
+                    .ApplyPagination(currentPage, setsPerPage, cardSetsCount)
                     .Select(c => new CardSet
                     {
                         Id = c.Id,
@@ -160,13 +165,7 @@ namespace FlashCards.Data.Services
                         CurrentPage = currentPage,
                         NumberOfPages = numberOfPages
                     },
-                    Filters = new CardSetFiltersViewModel
-                    {
-                        Name = name,
-                        NumberOfCards = numberOfCards,
-                        Author = author,
-                        SortBy = sort
-                    }
+                    Filters = cardSetFilters
                 };
             }
             return new CategoryPageViewModel();
@@ -175,34 +174,41 @@ namespace FlashCards.Data.Services
         public async Task<SubjectPageViewModel> GetAllCardSetsOfSubjectAsync(
             string categoryName,
             string subjectName,
+            CardSetFiltersViewModel cardSetFilters,
             int currentPage,
-            int cardsPerPage,
-            string? name,
-            string? numberOfCards,
-            string? author,
-            string? sort,
+            int setsPerPage,
             string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             var cardSubject = await _context.CardSubjects
                 .Include(c => c.CardCategory)
-                .FirstOrDefaultAsync(c => c.Name.ToLower() == subjectName.ToLower() && c.CardCategory.Name.ToLower() == categoryName.ToLower());
+                .FirstOrDefaultAsync(
+                    c => c.Name.ToLower() == subjectName.ToLower() &&
+                    c.CardCategory.Name.ToLower() == categoryName.ToLower()
+                    );
 
             if (cardSubject != null)
             {
-                var cardSetCount = _context.CardSets
-                    .ApplyFilters(name, numberOfCards, author)
-                    .PublicOrUserIsOwner(userId)
-                    .Count(c => c.CardSubjectId == cardSubject.Id);
+                var cardSetCount = await _context.CardSets
+                    .ApplyFilters(cardSetFilters)
+                    .PublicOrUserIsOwner(userId, isUserAdmin)
+                    .NotDeleted()
+                    .CountAsync(c => c.CardSubjectId == cardSubject.Id);
 
-                var numberOfPages = PaginationHelpers.GetTotalPages(cardSetCount, cardsPerPage);
+                var numberOfPages = PaginationHelpers.GetTotalPages(cardSetCount, setsPerPage);
                 currentPage = PaginationHelpers.GetMinOrMaxPageIfOverBounds(currentPage, numberOfPages);
 
                 var cardSets = await _context.CardSets
                     .Where(c => c.CardSubjectId == cardSubject.Id)
-                    .PublicOrUserIsOwner(userId)
-                    .ApplyFilters(name, numberOfCards, author)
-                    .ApplySort(sort)
-                    .ApplyPagination(currentPage, cardsPerPage, cardSetCount)
+                    .PublicOrUserIsOwner(userId, isUserAdmin)
+                    .NotDeleted()
+                    .ApplyFilters(cardSetFilters)
+                    .ApplySort(cardSetFilters.SortBy)
+                    .ApplyPagination(currentPage, setsPerPage, cardSetCount)
                     .Select(c => new CardSet
                     {
                         Id = c.Id,
@@ -235,13 +241,7 @@ namespace FlashCards.Data.Services
                         CurrentPage = currentPage,
                         NumberOfPages = numberOfPages
                     },
-                    Filters = new CardSetFiltersViewModel
-                    {
-                        Name = name,
-                        NumberOfCards = numberOfCards,
-                        Author = author,
-                        SortBy = sort
-                    }
+                    Filters = cardSetFilters
                 };
             }
             return new SubjectPageViewModel();
@@ -250,15 +250,29 @@ namespace FlashCards.Data.Services
 
         public async Task<IEnumerable<QuestionWithAnswerViewModel>> GetCardSetPreviewAsync(int cardSetId, int count, string? userId)
         {
-            var cardSet = await _context.CardSets.Include(c => c.Cards)
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
+            var cardSet = await _context.CardSets
                 .Where(c => c.Id == cardSetId)
-                .PublicOrUserIsOwner(userId)
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
                 .FirstOrDefaultAsync();
+
             if (cardSet != null)
             {
-                var questionsWithAnswers = new List<QuestionWithAnswerViewModel>();
-                cardSet.Cards.Skip(count).Take(DefaultAppValues.PreviewCardCount).ToList()
-                    .ForEach(c => questionsWithAnswers.Add(new QuestionWithAnswerViewModel { Question = c.Question, Answer = c.Answer }));
+                var questionsWithAnswers = await _context.Cards
+                .Where(c => c.CardSetId == cardSet.Id)
+                .Skip(count)
+                .Take(DefaultAppValues.PreviewCardCount)
+                .Select(c => new QuestionWithAnswerViewModel
+                {
+                    Question = c.Question,
+                    Answer = c.Answer
+                })
+                .ToListAsync();
 
                 return questionsWithAnswers;
             }
@@ -267,15 +281,22 @@ namespace FlashCards.Data.Services
 
         public async Task<CardSetViewModel> GetCardSetAsync(int id, string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             var cardSet = await _context.CardSets
                 .Where(c => c.Id == id)
-                .PublicOrUserIsOwner(userId)
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
                 .Select(c => new CardSet
                 {
                     Id = c.Id,
                     Name = c.Name,
                     Description = c.Description,
                     DateUpdated = c.DateUpdated,
+                    IsPublic = c.IsPublic,
                     UserId = c.UserId,
                     User = new ApplicationUser
                     {
@@ -298,13 +319,14 @@ namespace FlashCards.Data.Services
             if (cardSet != null)
             {
                 await AddCardSetAcccessAsync(id, userId);
-                var cardCount = _context.Cards.Count(c => c.CardSetId == cardSet.Id);
+                var cardCount = await _context.Cards.CountAsync(c => c.CardSetId == cardSet.Id);
                 return new CardSetViewModel
                 {
                     Id = cardSet.Id,
                     Name = cardSet.Name,
                     Description = cardSet.Description,
                     DateUpdated = cardSet.DateUpdated,
+                    IsPublic = cardSet.IsPublic,
                     User = cardSet.User,
                     CardSubject = cardSet.CardSubject,
                     CardCount = cardCount
@@ -315,9 +337,15 @@ namespace FlashCards.Data.Services
 
         public async Task<IEnumerable<Card>> GetCardsForCardSetAsync(int id, string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             var cardSet = await _context.CardSets
                 .Where(c => c.Id == id)
-                .PublicOrUserIsOwner(userId)
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
                 .FirstOrDefaultAsync();
             if (cardSet != null)
             {
@@ -341,6 +369,7 @@ namespace FlashCards.Data.Services
             model.CardSet.DateUpdated = DateTime.UtcNow;
             model.CardSet.Id = 0; // setting id to 0, to remove Id from model when copying a cardset
             model.CardSet.UserId = userId;
+            model.CardSet.IsDeleted = false;
             var cardSet = await _context.CardSets.AddAsync(model.CardSet);
             await _context.SaveChangesAsync();
             return cardSet.Entity.Id;
@@ -362,7 +391,7 @@ namespace FlashCards.Data.Services
                     CardSubjectsListJson = await GetAllCardSubjectsJsonAsync(),
                     SelectedCardCategoryId = cardSet.CardSubject.CardCategoryId,
                     AddManyCards = DefaultAppValues.AddManyCards,
-                    ActionType = Enums.CreateSetActionType.Edit
+                    ActionType = CreateSetActionType.Edit
                 };
             }
             return new CreateCardSetViewModel();
@@ -397,9 +426,15 @@ namespace FlashCards.Data.Services
 
         public async Task<CreateCardSetViewModel> GetCardSetForCopyAsync(int id, string userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             var cardSet = await _context.CardSets
                 .Where(c => c.Id == id)
-                .PublicOrUserIsOwner(userId)
+                .PublicOrUserIsOwner(userId, isUserAdmin)
+                .NotDeleted()
                 .SelectForEditOrCopy()
                 .FirstOrDefaultAsync();
 
@@ -414,22 +449,50 @@ namespace FlashCards.Data.Services
                     CardSubjectsListJson = await GetAllCardSubjectsJsonAsync(),
                     SelectedCardCategoryId = cardSet.CardSubject.CardCategoryId,
                     AddManyCards = DefaultAppValues.AddManyCards,
-                    ActionType = Enums.CreateSetActionType.Copy
+                    ActionType = CreateSetActionType.Copy
                 };
             }
             return new CreateCardSetViewModel();
         }
 
-        public async Task<bool> DeleteCardSet(int id, string? userId)
+        public async Task<bool> DeleteCardSet(int? id, string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
             var cardSet = await _context.CardSets
-            .Where(c => c.Id == id && userId != null && c.UserId == userId)
+            .Where(c => c.Id == id)
             .FirstOrDefaultAsync();
 
-            if (cardSet != null)
+            var isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
+            if (cardSet != null && (user.Id == cardSet.UserId || isUserAdmin))
             {
-                _context.CardSets.Remove(cardSet);
-                await _context.SaveChangesAsync();
+                cardSet.IsDeleted = true;
+                if (!isUserAdmin)
+                {
+                    await _context.SaveChangesAsync();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public async Task<bool> MakeCardSetPrivate(int? id, string? userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var cardSet = await _context.CardSets
+            .Where(c => c.Id == id)
+            .FirstOrDefaultAsync();
+
+            var isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
+            if (cardSet != null && (user.Id == cardSet.UserId || isUserAdmin))
+            {
+                cardSet.IsPublic = false;
+                _context.CardSets.Update(cardSet);
+                if (!isUserAdmin)
+                {
+                    await _context.SaveChangesAsync();
+                }
                 return true;
             }
             return false;
@@ -448,15 +511,19 @@ namespace FlashCards.Data.Services
 
         public async Task<FrontPageCardSetListsViewModel> GetFrontPageCardSetsAsync(string? userId)
         {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var isUserAdmin = false;
+            if (user != null)
+                isUserAdmin = await _userManager.IsInRoleAsync(user, DefaultAppValues.AdminRole);
+
             List<CardSet>? recentlyAccessedCardSets = new List<CardSet>();
             List<CardSet>? recentlyEdittedUserCardSets = new List<CardSet>();
-
-
 
             if (userId != null)
             {
                 var recentlyAccessedCardSetsAll = await _context.CardSetAccesses
-                    .Where(c => c.UserId == userId)
+                    .Include(c => c.CardSet)
+                    .Where(c => c.UserId == userId && !c.CardSet.IsDeleted && (c.CardSet.IsPublic || c.CardSet.UserId == userId))
                     .OrderByDescending(c => c.DateAccessed)
                     .Take(100)
                     .ToListAsync();
@@ -469,6 +536,8 @@ namespace FlashCards.Data.Services
 
                 var recentlyAccessedCardSetsUnsorted = await _context.CardSets
                     .Where(c => recentlyAccessedCardSetIds.Contains(c.Id))
+                    .PublicOrUserIsOwner(userId, isUserAdmin)
+                    .NotDeleted()
                     .SelectDefaultCardSetDataForView()
                     .ToListAsync();
 
@@ -483,6 +552,7 @@ namespace FlashCards.Data.Services
 
                 recentlyEdittedUserCardSets = await _context.CardSets
                     .Where(c => c.UserId == userId)
+                    .NotDeleted()
                     .OrderByDescending(c => c.DateUpdated)
                     .Take(6)
                     .SelectDefaultCardSetDataForView()
@@ -491,6 +561,7 @@ namespace FlashCards.Data.Services
 
             var recentlyEdittedPublicCardSets = await _context.CardSets
                 .Where(c => c.UserId != userId && c.IsPublic)
+                .NotDeleted()
                 .OrderByDescending(c => c.DateUpdated)
                 .Take(6)
                 .SelectDefaultCardSetDataForView()
@@ -520,6 +591,7 @@ namespace FlashCards.Data.Services
         {
             var cardSet = await _context.CardSets
                 .Include(c => c.Cards)
+                .NotDeleted()
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (cardSet != null)

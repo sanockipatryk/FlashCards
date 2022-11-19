@@ -1,0 +1,16 @@
+@model int
+
+<li class="nav-item nav-text py-md-3 me-3 px-2 px-md-0 mb-2 mb-md-0">
+    <a class="nav-link nav-icon-link nav-text text-light" asp-controller="Reports" asp-action="Index"
+        asp-route-page="1">
+        <span class="text-light">
+            <i class="bi bi-megaphone-fill link-icon"></i>
+            @if (Model > 0)
+            {
+                <span class="text-info">(@Model)</span>
+            }
+            <span class="d-inline-block d-md-none">Reports</span>
+        </span>
+
+    </a>
+</li>

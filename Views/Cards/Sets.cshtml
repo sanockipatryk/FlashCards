@@ -25,9 +25,9 @@
 				@foreach (var category in Model.CardCategories)
 				{
 					<a class="btn btn-primary different-cat-sub text-light" asp-action="Category"
-					asp-route-categoryName="@category.Name" asp-route-page="1" asp-route-name="@Model.Filters.Name"
-					asp-route-numberOfCards="@Model.Filters.NumberOfCards" asp-route-author="@Model.Filters.Author"
-					asp-route-sort="@Model.Filters.SortBy">
+					asp-route-categoryName="@category.Name" asp-route-page="1" asp-route-Name="@Model.Filters.Name"
+					asp-route-NumberOfCards="@Model.Filters.NumberOfCards" asp-route-Author="@Model.Filters.Author"
+					asp-route-Sort="@Model.Filters.SortBy">
 						@category.Name
 					</a>
 				}
@@ -40,6 +40,6 @@
 </div>
 <div class="row mx-3">
 	<partial name="_CardSetList" model="@Model.CardSetListData" />
-	<partial name="_CardSetListPagination" model="@Model.Pagination" />
+	<partial name="_DefaultListPagination" model="@Model.Pagination" />
 </div>
 <partial name="_ModalPreviewCardSet" />

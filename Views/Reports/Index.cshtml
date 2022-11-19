@@ -1,0 +1,103 @@
+@model CardSetReportsListViewModel
+@using FlashCards.Helpers
+@using FlashCards.Models.Types.Enums
+@using Humanizer
+
+<div class="row mx-3">
+    <partial name="_ReportsFilters" model="@Model.Filters" />
+</div>
+<div class="row mx-3 mt-3 mb-3">
+    <div class="col-12">
+        <div class="mt-3 p-0">
+            @if (Model.Reports.Count() > 0)
+            {
+                <div class="row m-0 p-0 report-row ">
+                    <div class="row-inner py-1 col-12 bg-secondary-darker">
+                        <div class="row py-3 px-2">
+                            <div class="col-12 col-sm-3 col-md-2 mb-2 mb-sm-0 text-center text-sm-start text-md-center">
+                                <p class="text-dark mb-0 text-uppercase report-table-text">
+                                    <strong>@Html.DisplayNameFor(c => c.Reports[0].CardSetId)</strong>
+                                </p>
+                            </div>
+                            <div
+                            class="col-12 col-sm-2 col-md-3 order-sm-5 order-md-0 mb-2 mb-sm-0 col-sm-5 text-center text-sm-start text-md-center">
+                                <p class="text-dark mb-0 text-uppercase report-table-text">
+                                    <strong>@Html.DisplayNameFor(c => c.Reports[0].DateReported)</strong>
+                                </p>
+                            </div>
+                            <div class="col-12 col-sm-4 col-md-3 mb-2 mb-sm-0 text-center">
+                                <p class="text-dark mb-0 text-uppercase report-table-text">
+                                    <strong>@Html.DisplayNameFor(c => c.Reports[0].UserId)</strong>
+
+                                </p>
+                            </div>
+                            <div class="col-12 col-sm-5 col-md-4 text-center">
+                                <p class="text-dark mb-0 text-uppercase report-table-text">
+                                    <strong>@Html.DisplayNameFor(c => c.Reports[0].ReportCause)</strong>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @foreach (var report in Model.Reports)
+                {
+                    <div class="row m-0 p-0 report-row" data-report-id="@report.Id">
+                        <div class="col-12 py-1 row-inner @(report.IsEvaluated ? "report-evaluated" : "report-unevaluated")">
+                            <div class="row py-3 px-2 d-flex align-items-center">
+                                <div class="col-12 col-sm-3 col-md-2 mb-2 mb-sm-0 text-center text-sm-start text-md-center">
+                                    <p class="text-secondary mb-0 report-table-text">
+                                        <strong>@report.CardSetId</strong>
+                                    </p>
+                                </div>
+                                <div
+                            class="col-12 col-sm-3 col-md-3 order-sm-5 order-md-0 mb-2 mb-sm-0 text-center text-sm-start text-md-center">
+                                    <p class="text-light mb-0 report-table-text">
+                                        @report.DateReported.Humanize(culture: new
+                                System.Globalization.CultureInfo("en"))
+                                    </p>
+                                </div>
+                                <div class="col-12 col-sm-4 col-md-3 mb-2 mb-sm-0 text-center">
+                                    <p class="text-light mb-0  report-table-text">
+                                        @report.User.Nickname
+                                    </p>
+                                </div>
+                                <div class=" col-12 col-sm-5 col-md-4 text-center">
+                                    <p class="text-light mb-0 report-table-text">
+                                        <strong>@EnumExtensionMethods.GetDisplayName(report.ReportCause)</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="text-center text-light">
+
+                    @switch (Model.Filters.Show)
+                    {
+                        case ReportsShow.Unevaluated:
+                            <p>There aren't any unevaluated reports matching the filters.</p>
+                            break;
+                        case ReportsShow.Evaluated:
+                            <p>There aren't any evaluated reports matching the filters.</p>
+                            break;
+                        default:
+                            <p>There aren't any reports matching the filters.</p>
+                            break;
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<partial name="_DefaultListPagination" model="@Model.Pagination" />
+@section Scripts {
+<script>
+    var reportRows = document.querySelectorAll('.report-row:not(.row.report-row:first-of-type)');
+    reportRows.forEach(report => report.addEventListener('click', (e) => {
+        window.location.href = '@Url.Action("Details", "Reports")/' + report.getAttribute('data-report-id');
+    }))
+</script>
+}

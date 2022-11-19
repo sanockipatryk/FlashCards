@@ -1,25 +1,40 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using FlashCards.SSoT
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
+	@if (SignInManager.IsSignedIn(User))
+	{
+		@await Component.InvokeAsync("UserNotifications")
+
+		@if (User.IsInRole(DefaultAppValues.AdminRole))
+		{
+			@await Component.InvokeAsync("UnevaluatedReportCounter")
+		}
+	}
 	<partial name="_SearchBox" />
 	@if (SignInManager.IsSignedIn(User))
 	{
-		<li class="nav-item account-dropdown dropdown nav-text ms-0 ms-md-2 mt-2 mt-md-0 px-2 px-md-0">
-			<a class="nav-link text-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-			aria-expanded="false">
+		<li
+		class="nav-item account-dropdown nav-border-hover dropdown nav-text ms-0 ms-md-2 mt-2 mt-md-0 py-md-3 px-2 px-md-0">
+			<a class="nav-link text-light" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 				Account
 			</a>
 			<ul class="dropdown-menu">
-				<li class="dropdown-item d-flex nav-text p-0 ms-3 ms-md-0">
-					<a class="nav-link flex-grow-1 text-start account-button text-md-center py-1"
-					asp-area="Identity" 
+				<li class="dropdown-item d-flex nav-text  py-1 ms-3 ms-md-0">
+					<a class="nav-link flex-grow-1 text-start account-button text-md-center py-1" asp-area="Identity"
 					asp-page="/Account/Manage/Index" title="Manage">
 						Settings
 					</a>
 				</li>
-				<li class="dropdown-item nav-text p-0 ms-3 ms-md-0">
+				<li class="dropdown-item d-flex nav-text  py-1 ms-3 ms-md-0">
+					<a class="nav-link flex-grow-1 text-start account-button text-md-center py-1" asp-area=""
+					asp-controller="Notifications" asp-action="Index" title="Manage">
+						Notifications
+					</a>
+				</li>
+				<li class="dropdown-item nav-text  py-1 ms-3 ms-md-0">
 					<form class="form-inline d-flex" asp-area="Identity" asp-page="/Account/Logout"
 					asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
 						<button type="submit"
@@ -32,10 +47,10 @@
 	}
 	else
 	{
-		<li class="nav-item nav-text mt-2 mt-md-0">
+		<li class="nav-item nav-text nav-border-hover ms-md-2 mt-2 mt-md-0 py-md-3">
 			<a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Register">Register</a>
 		</li>
-		<li class="nav-item nav-text my-2 my-md-0">
+		<li class="nav-item nav-text nav-border-hover my-2 my-md-0 py-md-3">
 			<a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Login">Login</a>
 		</li>
 	}

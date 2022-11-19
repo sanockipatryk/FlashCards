@@ -4,6 +4,7 @@
 
 using FlashCards.Helpers;
 using FlashCards.Models;
+using FlashCards.SSoT;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -121,6 +122,9 @@ namespace FlashCards.Areas.Identity.Pages.Account
                     await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                     await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                     result = await _userManager.CreateAsync(user, Input.Password);
+                    if(result.Succeeded){
+                        await _userManager.AddToRoleAsync(user, DefaultAppValues.UserRole);
+                    }
                 }
                 else
                 {
