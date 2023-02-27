@@ -4,11 +4,13 @@ $secondary-lighter: rgba(136, 189, 188, 0.85);
 $secondary-darker: #6aa1a0;
 $light: #f8f9fa;
 $light-dimmer: rgba(255, 255, 255, 0.85);
+$dark: #141414;
 $danger: #dc3545;
 $danger-lighter: #e62438;
 $highlight: #88bdbc;
 $info: #f1db77;
 $info-lighter: rgba(241, 219, 119, 0.85);
+$success: #2ed458;
 $primary-lighter: #0a6684;
 $primary-darker: #1e5566;
 $bg-color: #022534;
@@ -204,7 +206,7 @@ input.form-control:-webkit-autofill:active {
 
 div.dropdown-multicol > div.dropdown-col .dropdown-item.selected {
 	background-color: $highlight;
-	color: black;
+	color: $dark;
 }
 
 div.dropdown-multicol > div.dropdown-col .dropdown-item {
@@ -213,7 +215,7 @@ div.dropdown-multicol > div.dropdown-col .dropdown-item {
 
 div.dropdown-multicol > div.dropdown-col .dropdown-item:hover {
 	background-color: $highlight;
-	color: black;
+	color: $dark;
 }
 
 div.form-floating textarea.floating-textarea {
@@ -418,12 +420,12 @@ label.card-label-floating {
 }
 
 .card-front {
-	color: black;
+	color: $dark;
 }
 
 .card-back {
 	transform: rotateX(180deg);
-	color: black;
+	color: $dark;
 }
 
 .set-study-qa {
@@ -580,7 +582,7 @@ a.list-user-link {
 
 #dropdownSetMoreActions a.dropdown-item:hover {
 	background-color: $highlight;
-	color: black;
+	color: $dark;
 	cursor: pointer;
 }
 
@@ -904,7 +906,7 @@ a.see-all-notifications:hover span {
 
 .account-dropdown ul.dropdown-menu.show li:hover a,
 .account-dropdown ul.dropdown-menu.show li:hover form button {
-	color: black;
+	color: $dark;
 }
 
 #accordionFilters {
@@ -1015,7 +1017,7 @@ a.see-all-notifications:hover span {
 	flex-basis: 100%;
 	flex-grow: 1;
 	margin-bottom: 1rem;
-	border: 2px solid transparent;
+	border: 3px solid transparent;
 }
 
 #quiz .answer-buttons button:nth-of-type(4n) {
@@ -1027,22 +1029,42 @@ a.see-all-notifications:hover span {
 	box-shadow: none;
 }
 
-#quiz .answer-buttons button:disabled {
+#quiz .answer-buttons button:disabled,
+#quiz .answer-buttons input.basic-question:disabled {
 	opacity: 0.9;
 }
 
 #quiz .answer-buttons button.selected {
-	border: 4px solid $info;
+	border: 3px solid $info;
 	background-color: $primary-lighter;
 	color: $light;
 }
-#quiz .answer-buttons button.correct {
+
+#quiz .answer-buttons button.correct,
+#quiz .answer-buttons input.basic-question.correct {
 	background-color: lightgreen;
-	color: black;
+	color: $dark;
 }
-#quiz .answer-buttons button.selected.wrong {
+#quiz .answer-buttons button.selected.wrong,
+#quiz .answer-buttons input.basic-question.wrong {
 	background-color: lightcoral;
-	color: $light;
+	color: $dark;
+}
+
+#quiz .answer-buttons input.basic-question {
+	border: 3px solid $bg-color;
+}
+
+#quiz .answer-buttons input.basic-question:focus {
+	border: 3px solid $info;
+}
+
+#quiz .answer-buttons input.basic-question.correct {
+	border: 3px solid lightgreen;
+}
+
+#quiz .answer-buttons input.basic-question.wrong {
+	border: 3px solid lightcoral;
 }
 
 .button-quiz-control {

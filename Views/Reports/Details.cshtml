@@ -1,7 +1,9 @@
 @model CardSetReport
 @using FlashCards.Helpers
 @using FlashCards.Models.Types.Enums
-
+@{
+    ViewData["Title"] = "Report details";
+}
 <div class="row mx-3">
     <div class="col-12 col-md-8 offset-md-2 px-0">
         <nav aria-label="breadcrumb">
@@ -100,6 +102,7 @@
                     <input type="hidden" asp-for="UserId" />
                     <input type="hidden" asp-for="CardSetId" />
                     <input type="hidden" asp-for="CardSet.IsDeleted" />
+                    <input type="hidden" asp-for="User.Nickname" />
                     <div class="col-12 form-floating">
                         <select id="responseSelect" class="form-select"
                             asp-items="@Html.GetEnumSelectList<ReportResponse>()" asp-for="ReportResponse"></select>
@@ -158,12 +161,10 @@
 
     responseSelect.addEventListener('change', (e) => {
         if (e.target.value !== "@((int)ReportResponse.NoAction)") {
-            console.log(e.target.value)
             if (messageToUserTextArea.hasAttribute('disabled'))
                 messageToUserTextArea.removeAttribute('disabled');
         }
         else {
-            console.log(e.target.value)
             if (!messageToUserTextArea.hasAttribute('disabled'))
                 messageToUserTextArea.setAttribute('disabled', true);
         }

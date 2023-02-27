@@ -1,4 +1,9 @@
-﻿@model CardSetQuiz
+﻿@model CardSetQuizViewModel
+@using FlashCards.Models.Types.Enums
+@{
+	ViewData["Title"] = Model.CardSet.Name + " - Quiz";
+	int maximumRandomValue = (int)Enum.GetValues(typeof(QuizQuestionType)).Cast<QuizQuestionType>().Max() + 1;
+}
 
 <div id="quiz" class="offset-1 col-10 offset-md-1 col-md-10 offset-lg-2 col-lg-8 mt-4 p-0">
 	<div class="p-0 mb-3">
@@ -39,7 +44,7 @@
 				<div
 					class="col-12 col-sm-8 offset-sm-2 col-md-6 offset-md-0 d-flex flex-column justify-content-between p-0">
 					<p class="text-light text-sub">Next steps</p>
-					<div class="row continue-btn p-3 mx-0 mb-2">
+					<div class="row continue-btn rounded-3 p-3 mx-0 mb-2">
 						<div class="col-2 col-sm-3 bg-img bg-learn"></div>
 						<div id="restartQuiz" class="col-10 col-sm-8 d-flex flex-column justify-content-between">
 							<div>
@@ -53,7 +58,7 @@
 							<p class="m-0 p-0 text-light"><i class="bi bi-chevron-right"></i></p>
 						</div>
 					</div>
-					<div id="shuffleQuiz" class="row continue-btn p-3 mx-0">
+					<div id="shuffleQuiz" class="row continue-btn rounded-3 p-3 mx-0">
 						<div class="col-2 col-sm-3 bg-img bg-repeat"></div>
 						<div class="col-10 col-sm-8 pe-0">
 							<div>
@@ -99,30 +104,108 @@
 	</div>
 	<div>
 		@{
-			int index = 0;
+			int index = 1;
+			Random rnd = new Random();
+			var fourOptionsQuestionsEnumerator = Model.FourOptionsQuestions.GetEnumerator();
+			var trueFalseQuestionsEnumerator = Model.TrueFalseQuestions.GetEnumerator();
+			var basicQuestionsEnumerator = Model.BasicQuizQuestions.GetEnumerator();
 		}
-		@foreach (var q in Model.QuizQuestions)
+		@while (index <= Model.QuestionsCount)
 		{
-			@(index++)
-			<div class="row mx-0 my-2 text-light text-with-bg">
-				<p class="text-secondary px-0 d-flex justify-content-between">
-					<span>Definition</span>
-					<span>@(index)/@Model.QuizQuestions.Count()</span>
-				</p>
-				<p class="text-light text-center mb-0 px-0 h5">
-					@q.Question
-				</p>
-				<div class="p-0 answer-buttons">
-					<div class="d-flex flex-wrap justify-content-between my-4">
-						@foreach (var answer in q.PossibleAnswers)
-						{
-							<button data-correct="@(q.CorrectAnswer == answer)" type="button" data-question="@index"
-						class="btn btn-secondary py-3">@answer</button>
-							//margins set in css
-						}
-					</div>
-				</div>
-			</div>
+			var questionType = rnd.Next(maximumRandomValue);
+			switch ((QuizQuestionType)questionType)
+			{
+				case QuizQuestionType.FourOptionsQuestion:
+					if (fourOptionsQuestionsEnumerator.MoveNext())
+					{
+						var fourOptionsQuestion = fourOptionsQuestionsEnumerator.Current;
+						<div class="row mx-0 my-4 text-light text-with-bg">
+							<p class="text-secondary px-0 d-flex justify-content-between">
+								<span>Definition</span>
+								<span>@(index)/@Model.QuestionsCount</span>
+							</p>
+							<p class="text-light text-center mb-0 px-0 h5">
+								@fourOptionsQuestion.Question
+							</p>
+							<div class="p-0 answer-buttons">
+								<div class="d-flex flex-wrap justify-content-between mt-4">
+									@foreach (var answer in fourOptionsQuestion.PossibleAnswers)
+									{
+										<button data-correct="@(fourOptionsQuestion.CorrectAnswer == answer)" type="button"
+						data-question="@index" class="btn btn-secondary py-3">@answer</button>
+										//margins set in css
+									}
+								</div>
+							</div>
+						</div>
+						index++;
+					}
+					break;
+				case QuizQuestionType.TrueFalseQuestion:
+					if (trueFalseQuestionsEnumerator.MoveNext())
+					{
+						var trueFalseQuestion = trueFalseQuestionsEnumerator.Current;
+						<div class="row mx-0 my-4 text-light text-with-bg">
+							<p class="text-secondary px-0 d-flex justify-content-between">
+								<span>Definition</span>
+								<span>@(index)/@Model.QuestionsCount</span>
+							</p>
+							<p class="text-light text-center mb-0 px-0 h5">
+								@trueFalseQuestion.Question
+							</p>
+							<p class="text-secondary mt-4 mb-1 px-0">
+								<span>Answer</span>
+							</p>
+							<p class="text-light text-center mb-0 px-0 h5">
+								@trueFalseQuestion.PossibleAnswer
+							</p>
+							<div class="p-0 answer-buttons">
+								<div class="d-flex flex-wrap justify-content-between mt-4">
+									<button data-correct="@(trueFalseQuestion.CorrectAnswer.Equals(false))" type="button"
+						data-question="@index"
+						class="btn btn-secondary order-1 order-md-0 mb-3 mb-md-0 py-3">False</button>
+									<button data-correct="@(trueFalseQuestion.CorrectAnswer.Equals(true))" type="button"
+						data-question="@index" class="btn btn-secondary order-0 order-md-1 mb-0 py-3">True</button>
+								</div>
+							</div>
+						</div>
+						index++;
+					}
+					break;
+				case QuizQuestionType.BasicTextQuestion:
+					if (basicQuestionsEnumerator.MoveNext())
+					{
+						var basicQuestion = basicQuestionsEnumerator.Current;
+						<div class="row mx-0 my-4 text-light text-with-bg">
+							<p class="text-secondary px-0 d-flex justify-content-between">
+								<span>Definition</span>
+								<span>@(index)/@Model.QuestionsCount</span>
+							</p>
+							<p class="text-light text-center mb-0 px-0 h5">
+								@basicQuestion.Question
+							</p>
+							<p class="text-secondary mt-4 mb-1 px-0">
+								<span>Your answer</span>
+							</p>
+							<div class="p-0 answer-buttons">
+								<div class="d-flex flex-wrap justify-content-between rounded-3 bg-main">
+									<input data-index="@index" data-correct="@basicQuestion.CorrectAnswer" type="text"
+						class="form-control basic-question" placeholder="Type your answer" />
+								</div>
+							</div>
+							<div data-index="@index" class="d-none correct-answer-info p-0 m-0">
+								<p class="text-secondary mt-2 mb-1 px-0">
+									<span>Correct answer</span>
+								</p>
+								<p class="text-success my-0 px-0 h5">
+									<span>@basicQuestion.CorrectAnswer</span>
+								</p>
+							</div>
+						</div>
+						index++;
+					}
+					break;
+			}
 		}
 	</div>
 	<div class="mt-4 d-flex justify-content-center">
@@ -147,6 +230,8 @@
 	var submitButton = document.querySelector("#submitQuiz");
 	var correctButtons = document.querySelectorAll("#quiz .answer-buttons button[data-correct='True']");
 	var answerButtons = document.querySelectorAll("#quiz .answer-buttons button");
+
+	var basicQuestions = document.querySelectorAll('.basic-question');
 
 	answerButtons.forEach(button => button.addEventListener('click', () => {
 		var buttonQuestionId = button.getAttribute('data-question');
@@ -173,16 +258,34 @@
 			}
 			var questionId = button.getAttribute('data-question');
 		})
+		basicQuestions.forEach(question => {
+			if (question.value.length > 0) {
+				question.setAttribute('disabled', 'true');
+				if (question.value.toLowerCase() === question.getAttribute("data-correct").toLowerCase()) {
+					question.classList.add("correct");
+				}
+				else {
+					question.classList.add("wrong");
+					var questionIndex = question.getAttribute("data-index");
+					document.querySelector(`.correct-answer-info[data-index="${questionIndex}"]`).classList.replace('d-none', 'd-block')
+				}
+			}
+		})
 		updateResultScreen();
 		quizResultsScreen.classList.replace('d-none', 'd-flex');
 		window.scrollTo(0, 0);
 	})
 
 	function updateResultScreen() {
-		var correctChoices = document.querySelectorAll('#quiz .answer-buttons button.selected.correct').length;
-		var wrongChoices = document.querySelectorAll('#quiz .answer-buttons button.selected.wrong').length;
+		var correctButtons = document.querySelectorAll('#quiz .answer-buttons button.selected.correct').length;
+		var wrongButtons = document.querySelectorAll('#quiz .answer-buttons button.selected.wrong').length;
+		var correctInputs = document.querySelectorAll('#quiz .answer-buttons input.basic-question.correct').length;
+		var wrongInputs = document.querySelectorAll('#quiz .answer-buttons input.basic-question.wrong').length;
 
-		var questionCount = @Model.QuizQuestions.Count();
+		var correctChoices = correctButtons + correctInputs;
+		var wrongChoices = wrongButtons + wrongInputs;
+
+		var questionCount = @Model.QuestionsCount;
 		var correctFraction = correctChoices / questionCount;
 		var wrongFraction = wrongChoices / questionCount;
 		var correctPercentage = Math.round(correctFraction * 100);
@@ -193,7 +296,7 @@
 			#88bdbc 0 360deg`;
 		termsCorrectParagraph.textContent = correctChoices;
 		termsWrongParagraph.textContent = wrongChoices;
-		termsRemainingParagraph.textContent = @Model.QuizQuestions.Count - correctChoices - wrongChoices;
+		termsRemainingParagraph.textContent = @Model.QuestionsCount - correctChoices - wrongChoices;
 		donutScoreText.textContent = `${correctPercentage}%`;
 	}
 
@@ -204,6 +307,13 @@
 			button.classList = "btn btn-secondary py-3";
 			button.removeAttribute('disabled');
 		})
+		basicQuestions.forEach(input => {
+			input.classList = "form-control basic-question";
+			input.value = "";
+			input.removeAttribute('disabled');
+		})
+		document.querySelectorAll('.correct-answer-info.d-block')
+			.forEach(element => element.classList.replace('d-block', 'd-none'))
 		quizResultsScreen.classList.replace('d-flex', 'd-none');
 	}
 

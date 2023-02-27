@@ -1,6 +1,9 @@
 ﻿@model CardSetViewModel
 @using System.Security.Claims
 @using FlashCards.SSoT
+@{
+	ViewData["Title"] = Model.Name + " - Learn";
+}
 <div class="row mx-3">
 	<div class="p-0 offset-0 col-12 offset-md-1 col-md-10 offset-lg-2 col-lg-8">
 		@if (User.Identity.IsAuthenticated && User.IsInRole(DefaultAppValues.AdminRole) &&

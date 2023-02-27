@@ -1,5 +1,6 @@
 ﻿using FlashCards.Models;
 using FlashCards.Models.ViewModels;
+using FlashCards.Models.Quiz;
 
 namespace FlashCards.Data.Services
 {
@@ -31,7 +32,6 @@ namespace FlashCards.Data.Services
         Task AddCardSetAcccessAsync(int id, string userId);
         Task<FrontPageCardSetListsViewModel> GetFrontPageCardSetsAsync(string? userId);
 
-        Task<CardSetQuiz> GetCardSetQuizAsync(int id, string? userId);
-
+        Task<CardSetQuizViewModel> GetCardSetQuizAsync(int id, string? userId);
     }
 }

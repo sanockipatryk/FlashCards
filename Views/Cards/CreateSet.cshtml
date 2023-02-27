@@ -1,7 +1,20 @@
 ﻿@using FlashCards.Helpers
 @using FlashCards.Models.Types.Enums
 @model CreateCardSetViewModel
-
+@{
+	switch (Model.ActionType)
+	{
+		case CreateSetActionType.Create:
+			ViewData["Title"] = "Create set";
+			break;
+		case CreateSetActionType.Edit:
+			ViewData["Title"] = "Edit " + Model.CardSet.Name;
+			break;
+		case CreateSetActionType.Copy:
+			ViewData["Title"] = "Copy " + Model.CardSet.Name;
+			break;
+	}
+}
 <div class="row mx-3 mb-2">
 	<p class="h3 text-light text-center">
 		@{

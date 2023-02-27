@@ -1,8 +1,11 @@
 @model UserNotificationsListViewModel
 
 @{
-    string queryNotification = Context.Request.Query["Notification"].Count > 0 ? Context.Request.Query["Notification"] :
-            "empty";
+    ViewData["Title"] = "Notifications";
+
+    string queryNotification = Context.Request.Query["Notification"].Count > 0
+    ? Context.Request.Query["Notification"]
+    : "empty";
 }
 
 <div class="row mx-3">

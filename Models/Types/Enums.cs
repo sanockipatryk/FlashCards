@@ -68,4 +68,11 @@ namespace FlashCards.Models.Types.Enums
         [Display(Name = "Send a notification")]
         SendMessage = 3
     }
+
+    public enum QuizQuestionType
+    {
+        FourOptionsQuestion = 0,
+        TrueFalseQuestion = 1,
+        BasicTextQuestion = 2
+    }
 }

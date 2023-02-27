@@ -2,7 +2,9 @@
 @using FlashCards.Helpers
 @using FlashCards.Models.Types.Enums
 @using Humanizer
-
+@{
+    ViewData["Title"] = "Reports list";
+}
 <div class="row mx-3">
     <partial name="_ReportsFilters" model="@Model.Filters" />
 </div>

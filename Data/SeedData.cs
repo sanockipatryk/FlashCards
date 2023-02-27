@@ -35,7 +35,7 @@ namespace FlashCards.Data
                 var user = new ApplicationUser
                 {
                     Email = "user@user.com",
-                    Nickname = "basic-user",
+                    Nickname = "UserOne",
                     UserName = "user@user.com",
                 };
                 if (userManager.FindByEmailAsync(user.Email).Result != null)
@@ -49,10 +49,27 @@ namespace FlashCards.Data
                     }
                 }
 
+                var user2 = new ApplicationUser
+                {
+                    Email = "user2@user.com",
+                    Nickname = "FlashCards",
+                    UserName = "user2@user.com",
+                };
+                if (userManager.FindByEmailAsync(user2.Email).Result != null)
+                { }
+                else
+                {
+                    var result = userManager.CreateAsync(user2, "!Q1w2e3r4").Result;
+                    if (result.Succeeded)
+                    {
+                        userManager.AddToRoleAsync(user2, DefaultAppValues.UserRole).Wait();
+                    }
+                }
+
                 var admin = new ApplicationUser
                 {
                     Email = "admin@admin.com",
-                    Nickname = "admin-user",
+                    Nickname = "Admin1",
                     UserName = "admin@admin.com",
                 };
                 if (userManager.FindByEmailAsync(admin.Email).Result != null)
@@ -122,7 +139,7 @@ namespace FlashCards.Data
                 {
                     int i = 0;
                     var cardCategories = context.CardCategories.Include(c => c.CardSubjects).ToListAsync().Result;
-                    var user = context.Users.FirstOrDefaultAsync(u => u.Email == "user@user.com").Result;
+                    var user = context.Users.FirstOrDefaultAsync(u => u.Email == "user2@user.com").Result;
                     foreach (var category in cardCategories)
                     {
                         foreach (var subject in category.CardSubjects)
@@ -131,8 +148,8 @@ namespace FlashCards.Data
                             {
                                 var cardSet = new CardSet()
                                 {
-                                    Name = $"Card set {j + i * 2 + 1}",
-                                    Description = $"Description for Card set {j + i * 2 + 1}",
+                                    Name = $"Set {j + i * 2 + 1}",
+                                    Description = $"Description for Set {j + i * 2 + 1}",
                                     DateCreated = DateTime.UtcNow,
                                     DateUpdated = DateTime.UtcNow,
                                     CardSubjectId = subject.Id,

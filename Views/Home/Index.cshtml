@@ -1,5 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Home";
+    if (User.Identity.IsAuthenticated)
+        ViewData["Title"] = "Recent sets";
+    else
+        ViewData["Title"] = "Home";
 }
 
 @await Component.InvokeAsync("HomePage");

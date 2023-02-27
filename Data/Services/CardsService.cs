@@ -1,6 +1,7 @@
 ﻿using FlashCards.Helpers;
 using FlashCards.Models;
 using FlashCards.Models.ViewModels;
+using FlashCards.Models.Quiz;
 using FlashCards.Models.Types.Enums;
 using FlashCards.SSoT;
 using Microsoft.EntityFrameworkCore;
@@ -587,55 +588,97 @@ namespace FlashCards.Data.Services
             };
         }
 
-        public async Task<CardSetQuiz> GetCardSetQuizAsync(int id, string? userId)
+        public async Task<CardSetQuizViewModel> GetCardSetQuizAsync(int id, string? userId)
         {
             var cardSet = await _context.CardSets
-                .Include(c => c.Cards)
-                .NotDeleted()
-                .FirstOrDefaultAsync(c => c.Id == id);
+               .Include(c => c.Cards)
+               .NotDeleted()
+               .FirstOrDefaultAsync(c => c.Id == id);
 
             if (cardSet != null)
             {
-                List<QuizQuestion> quizQuestions = new List<QuizQuestion>();
+                List<FourOptionsQuizQuestion> fourOptionsQuestions = new List<FourOptionsQuizQuestion>();
+                List<TrueFalseQuizQuestion> trueFalseQuestions = new List<TrueFalseQuizQuestion>();
+                List<BasicQuizQuestion> basicQuestions = new List<BasicQuizQuestion>();
                 //shuffle order of cards
                 var allCards = cardSet.Cards.ShuffleArray();
                 if (allCards.Count() >= 4)
                 {
+                    Random rnd = new Random();
                     //During quiz, an asnwer is the question, and questions are possible answer to it
                     var allAnswers = new List<string>();
                     foreach (var card in allCards)
                     {
                         allAnswers.Add(card.Question);
                     }
+                    int maximumRandomValue = (int)Enum.GetValues(typeof(QuizQuestionType)).Cast<QuizQuestionType>().Max() + 1;
                     foreach (var card in allCards)
                     {
-                        allAnswers.Remove(card.Question);
-
-                        var possibleAnswers = allAnswers.ShuffleArray().Take(3).ToList();
-                        possibleAnswers.Add(card.Question);
-                        possibleAnswers = possibleAnswers.ShuffleArray().ToList();
-
-                        var quizQuestion = new QuizQuestion
+                        var questionType = rnd.Next(maximumRandomValue);
+                        switch ((QuizQuestionType)questionType)
                         {
-                            Question = card.Answer,
-                            CorrectAnswer = card.Question,
-                            PossibleAnswers = possibleAnswers
-                        };
-                        quizQuestions.Add(quizQuestion);
-                        allAnswers.Add(card.Question);
+                            case QuizQuestionType.FourOptionsQuestion:
+                                allAnswers.Remove(card.Question);
+
+                                var possibleAnswers = allAnswers.ShuffleArray().Take(3).ToList();
+                                possibleAnswers.Add(card.Question);
+                                possibleAnswers = possibleAnswers.ShuffleArray().ToList();
+
+                                var quizQuestion = new FourOptionsQuizQuestion
+                                {
+                                    Question = card.Answer,
+                                    CorrectAnswer = card.Question,
+                                    PossibleAnswers = possibleAnswers
+                                };
+                                fourOptionsQuestions.Add(quizQuestion);
+                                allAnswers.Add(card.Question);
+                                break;
+                            case QuizQuestionType.TrueFalseQuestion:
+                                var trueFalseQuestion = new TrueFalseQuizQuestion
+                                {
+                                    Question = card.Answer
+                                };
+                                var trueOrFalse = rnd.Next(2);
+                                if (trueOrFalse == 1)
+                                {
+                                    trueFalseQuestion.PossibleAnswer = card.Question;
+                                    trueFalseQuestion.CorrectAnswer = true;
+
+                                    trueFalseQuestions.Add(trueFalseQuestion);
+                                }
+                                else
+                                {
+                                    allAnswers.Remove(card.Question);
+
+                                    trueFalseQuestion.PossibleAnswer = allAnswers.ShuffleArray().Take(1).FirstOrDefault();
+                                    trueFalseQuestion.CorrectAnswer = false;
+
+                                    allAnswers.Add(card.Question);
+                                    trueFalseQuestions.Add(trueFalseQuestion);
+                                }
+                                break;
+                            case QuizQuestionType.BasicTextQuestion:
+                                var basicQuestion = new BasicQuizQuestion
+                                {
+                                    Question = card.Answer,
+                                    CorrectAnswer = card.Question
+                                };
+                                basicQuestions.Add(basicQuestion);
+
+                                break;
+                        }
                     }
-                    return new CardSetQuiz
+                    return new CardSetQuizViewModel
                     {
                         CardSet = cardSet,
-                        QuizQuestions = quizQuestions
+                        FourOptionsQuestions = fourOptionsQuestions,
+                        TrueFalseQuestions = trueFalseQuestions,
+                        BasicQuizQuestions = basicQuestions
                     };
                 }
-                else
-                {
-                    return new CardSetQuiz();
-                }
+                return new CardSetQuizViewModel();
             }
-            return new CardSetQuiz();
+            return new CardSetQuizViewModel();
         }
     }
 }

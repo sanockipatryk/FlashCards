@@ -323,6 +323,8 @@ namespace FlashCards.Controllers
             return RedirectToAction(nameof(Set), new { id = cardSetId });
         }
 
+        //POST: Delete set by id
+
         [Authorize("MustBeCardSetOwner")]
         [ValidateAntiForgeryToken]
         [HttpPost("DeleteSet/{id:int}")]
